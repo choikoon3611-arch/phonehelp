@@ -1173,32 +1173,11 @@
             <option value="기기변경">기기변경</option>
           </select>
         </div>
-        <div><label class="sl">단말기 모델</label><input id="sr-model"  class="scan-field" type="text"></div>
-        <div><label class="sl">요금제</label><input id="sr-plan"   class="scan-field" type="text"></div>
-        <!-- 할부원금 섹션 -->
-        <div style="grid-column:1/-1;border-top:2px dashed var(--line);padding-top:8px;margin-top:4px;">
-          <div style="font-size:11px;font-weight:900;color:#0ea5e9;margin-bottom:6px;">📱 할부원금 계산</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-            <div><label class="sl">출고가(원)</label><input id="sr-retail" class="scan-field" type="text" inputmode="numeric" oninput="calcPrice()"></div>
-            <div><label class="sl">공시지원금(원)</label><input id="sr-official" class="scan-field" type="text" inputmode="numeric" placeholder="서류에서 추출" oninput="calcPrice()"></div>
-            <div><label class="sl">추가지원금(원)</label><input id="sr-extra-sub" class="scan-field" type="text" inputmode="numeric" placeholder="고객에게 할인해준 금액" oninput="calcPrice()"></div>
-            <div><label class="sl" style="color:#0ea5e9;">할부원금 (자동)</label><input id="sr-price" class="scan-field" type="text" inputmode="numeric" style="background:#eff6ff;font-weight:700;color:#0ea5e9;" placeholder="자동계산" readonly></div>
-            <div><label class="sl">할부개월</label><input id="sr-months" class="scan-field" type="text" inputmode="numeric"></div>
-            <div><label class="sl">약정기간</label><input id="sr-contract" class="scan-field" type="text" inputmode="numeric" placeholder="24 또는 36"></div>
-          </div>
-        </div>
-        <div style="grid-column:1/-1;"><label class="sl">부가서비스</label><input id="sr-addons" class="scan-field" type="text" placeholder="보험명, 기타 (쉼표 구분)"></div>
-        <!-- 정산정보 섹션 -->
-        <div style="grid-column:1/-1;border-top:2px dashed var(--line);padding-top:8px;margin-top:4px;">
-          <div style="font-size:11px;font-weight:900;color:#8b5cf6;margin-bottom:6px;">💰 정산 계산</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-            <div><label class="sl">기본정책(원) ①</label><input id="sr-base" class="scan-field" type="text" inputmode="numeric" placeholder="기본 리베이트" oninput="calcSettle()"></div>
-            <div><label class="sl">추가정책(원) ②</label><input id="sr-extra-policy" class="scan-field" type="text" inputmode="numeric" placeholder="부가서비스정책 등" oninput="calcSettle()"></div>
-            <div><label class="sl">할인금액(원) ③</label><input id="sr-discount" class="scan-field" type="text" inputmode="numeric" placeholder="고객할인 합계" oninput="calcSettle()"></div>
-            <div><label class="sl" style="color:#8b5cf6;">정산금액 ①+②-③ (자동)</label><input id="sr-settle" class="scan-field" type="text" inputmode="numeric" style="background:#f3f0ff;font-weight:700;color:#8b5cf6;" placeholder="자동계산" readonly></div>
-            <div><label class="sl">수수료(원)</label><input id="sr-fee" class="scan-field" type="text" inputmode="numeric" placeholder="직접 입력"></div>
-          </div>
-        </div>
+        <div><label class="sl">단말기 모델</label><input id="sr-model"    class="scan-field" type="text"></div>
+        <div><label class="sl">요금제</label><input id="sr-plan"     class="scan-field" type="text"></div>
+        <div><label class="sl">할부개월</label><input id="sr-months"   class="scan-field" type="text" inputmode="numeric"></div>
+        <div><label class="sl">약정기간</label><input id="sr-contract" class="scan-field" type="text" inputmode="numeric" placeholder="24 또는 12"></div>
+        <div style="grid-column:1/-1;"><label class="sl">부가서비스</label><input id="sr-addons" class="scan-field" type="text" placeholder="마이스마트콜, 기기보험 등 (쉼표 구분)"></div>
         <div style="grid-column:1/-1;"><label class="sl">메모</label><input id="sr-memo" class="scan-field" type="text"></div>
       </div>
       <div style="margin-top:16px;display:flex;gap:10px;">
@@ -1777,20 +1756,37 @@ function custRender() {
       else if (diff <= 30){ dday = `D-${diff}`; ddayColor='#f59e0b'; }
       else                { dday = `D-${diff}`; ddayColor='#16a34a'; }
     }
+    const phone = (c.전화번호||'').replace(/[^0-9]/g,'');
+    const addons = (c.부가서비스||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const addonBtns = addons.map((a,i) =>
+      `<button onclick="custCopySms('cust-addon-${phone}-${i}',this)" data-sms-id="cust-addon-${phone}-${i}" style="padding:2px 7px;border-radius:5px;background:#fef3c7;border:1px solid #f59e0b;color:#92400e;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">🗑 ${a}</button>
+      <textarea id="cust-addon-${phone}-${i}" style="display:none;">${c.고객명||''}고객님 이쁜핸드폰집입니다^^114상담원연결또는매장내방하셔서부가서비스(${a})삭제부탁드립니다</textarea>`
+    ).join('');
     return `<tr style="border-bottom:1px solid var(--line);">
       <td style="padding:7px 10px;font-weight:700;">${c.고객명||''}</td>
       <td style="padding:7px 10px;">${c.전화번호||''}</td>
       <td style="padding:7px 10px;">${c.통신사||''}</td>
       <td style="padding:7px 10px;font-size:12px;">${c.단말기||''}</td>
-      <td style="padding:7px 10px;font-size:12px;">${c.요금제||''}</td>
+      <td style="padding:7px 10px;font-size:12px;">${c.요금제||''}&nbsp;<button onclick="custCopySms('cust-plan-${phone}',this)" style="padding:2px 6px;border-radius:5px;background:#dbeafe;border:1px solid #3b82f6;color:#1e40af;font-size:11px;font-weight:700;cursor:pointer;">📋요금제</button>
+        <textarea id="cust-plan-${phone}" style="display:none;">${c.고객명||''}고객님 이쁜핸드폰집입니다^^114상담원연결또는매장내방하셔서요금제(${c.요금제||''})변경부탁드립니다</textarea></td>
       <td style="padding:7px 10px;white-space:nowrap;">${c.개통일||''}</td>
       <td style="padding:7px 10px;text-align:center;">${c.약정기간?c.약정기간+'개월':''}</td>
       <td style="padding:7px 10px;text-align:center;">${c.할부개월?c.할부개월+'개월':''}</td>
       <td style="padding:7px 10px;white-space:nowrap;">${c.약정만료일||''}</td>
       <td style="padding:7px 10px;font-weight:700;color:${ddayColor};">${dday}</td>
-      <td style="padding:7px 10px;"><button onclick="custDelete('${c.전화번호?.replace(/[^0-9]/g,'')}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;">🗑</button></td>
+      <td style="padding:7px 6px;font-size:11px;"><div style="display:flex;flex-wrap:wrap;gap:3px;align-items:center;">${addonBtns}<button onclick="custDelete('${phone}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;">🗑</button></div></td>
     </tr>`;
   }).join('');
+}
+
+function custCopySms(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ 복사됨!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
 }
 
 function custDelete(key) {
@@ -2007,18 +2003,9 @@ function scanSaveActivation() {
     개통유형: g('sr-type'),
     단말기:   g('sr-model'),
     요금제:   g('sr-plan'),
-    출고가:    g('sr-retail'),
-    공시지원금: g('sr-official'),
-    추가지원금: g('sr-extra-sub'),
-    할부원금:  g('sr-price'),
     할부개월:  g('sr-months'),
     약정기간:  g('sr-contract'),
     부가서비스: g('sr-addons'),
-    기본정책:  g('sr-base'),
-    추가정책:  g('sr-extra-policy'),
-    할인금액:  g('sr-discount'),
-    정산금액:  g('sr-settle'),
-    수수료:    g('sr-fee'),
     메모:     g('sr-memo'),
   };
   if (!entry.고객명) { alert('고객명을 입력하세요.'); return; }
@@ -2039,6 +2026,7 @@ function scanSaveActivation() {
       고객명: entry.고객명, 전화번호: entry.전화번호, 주민번호: entry.주민번호,
       통신사: entry.통신사, 단말기: entry.단말기, 요금제: entry.요금제,
       개통일: entry.date, 약정기간: 약정기간수, 할부개월: 할부개월수, 약정만료일,
+      부가서비스: entry.부가서비스,
       업데이트: new Date().toISOString().slice(0,10)
     });
   }
@@ -2099,11 +2087,6 @@ async function runScanExtract(file) {
   "개통유형": "신규 또는 번호이동 또는 기기변경",
   "단말기": "모델명",
   "요금제": "요금제명",
-  "출고가": "숫자만(쉼표 없이)",
-  "공시지원금": "통신사 공시지원금(공통지원금), 숫자만(쉼표 없이)",
-  "추가지원금": "대리점이 고객에게 추가로 할인해준 금액, 숫자만(없으면 0)",
-  "선납금": "고객이 선납한 금액, 숫자만(없으면 0)",
-  "할부원금": "숫자만(쉼표 없이)",
   "할부개월": "단말기 할부 개월수, 숫자만",
   "약정기간": "요금제 약정 개월수(약정기간/약정개월), 숫자만",
   "부가서비스": "가입된 부가서비스 전체를 쉼표로 구분 (없으면 빈 문자열)"
@@ -2133,21 +2116,9 @@ async function runScanExtract(file) {
     set('sr-ssn',     d.주민번호);
     set('sr-model',   d.단말기);
     set('sr-plan',    d.요금제);
-    set('sr-retail',    d.출고가);
-    set('sr-official',  d.공시지원금);
-    set('sr-months',    d.할부개월);
-    set('sr-contract',  d.약정기간);
-    set('sr-addons',    d.부가서비스);
-    // 추가지원금·선납금 → 할인금액 자동 합산
-    const extraSub = Number(d.추가지원금 || 0);
-    const prepay   = Number(d.선납금 || 0);
-    if (extraSub) set('sr-extra-sub', extraSub);
-    const discount = extraSub + prepay;
-    if (discount) set('sr-discount', discount);
-    // 할부원금: 서류값 우선, 없으면 자동계산
-    if (d.할부원금) set('sr-price', d.할부원금);
-    calcPrice();
-    calcSettle();
+    set('sr-months',  d.할부개월);
+    set('sr-contract',d.약정기간);
+    set('sr-addons',  d.부가서비스);
     document.getElementById('sr-date').value = new Date().toISOString().slice(0,10);
     if (d.통신사) {
       const map = [
@@ -2239,11 +2210,6 @@ async function scanAndFill(input) {
   "개통유형": "신규 또는 번호이동 또는 기기변경",
   "단말기": "모델명",
   "요금제": "요금제명",
-  "출고가": "숫자만(쉼표 없이)",
-  "공시지원금": "통신사 공시지원금(공통지원금), 숫자만(쉼표 없이)",
-  "추가지원금": "대리점이 고객에게 추가로 할인해준 금액, 숫자만(없으면 0)",
-  "선납금": "고객이 선납한 금액, 숫자만(없으면 0)",
-  "할부원금": "숫자만(쉼표 없이)",
   "할부개월": "단말기 할부 개월수, 숫자만",
   "약정기간": "요금제 약정 개월수(약정기간/약정개월), 숫자만",
   "부가서비스": "가입된 부가서비스 전체를 쉼표로 구분 (없으면 빈 문자열)"
