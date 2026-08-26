@@ -2095,7 +2095,7 @@ async function runScanExtract(file) {
   "고객명": "",
   "전화번호": "개통 번호, 010-xxxx-xxxx 형식",
   "주민번호": "앞 6자리만",
-  "통신사": "SKT 또는 KT 또는 LG 중 하나",
+  "통신사": "SKT / KT / LG / 알뜰 중 하나. 단, 서류에 'KT M모바일','헬로모바일','스카이라이프','U+알뜰','LG알뜰','티플러스','에스원','프리텔레콤','아이즈모바일','마이월드','A모바일','밀리','모빙','여유','이야기','SK7모바일','아이즈비전' 등 알뜰통신 브랜드명이 있으면 반드시 알뜰로 반환. SKT·KT·LG U+ 3사 직영/직판 서류에만 SKT/KT/LG 반환.",
   "개통유형": "신규 또는 번호이동 또는 기기변경",
   "단말기": "모델명",
   "요금제": "요금제명",
@@ -2150,7 +2150,14 @@ async function runScanExtract(file) {
     calcSettle();
     document.getElementById('sr-date').value = new Date().toISOString().slice(0,10);
     if (d.통신사) {
-      const map = [['SKT','SKT'],['KT','KT'],['LGU','LG'],['LG U','LG'],['LG','LG'],['알뜰','KTM']];
+      const map = [
+        ['SKT','SKT'],['SK7','KTM'],
+        ['KTM','KTM'],['KT M','KTM'],['헬로','KTM'],['스카이라이프','KTM'],['마이월드','KTM'],['아이즈','KTM'],['모빙','KTM'],['밀리','KTM'],['여유','KTM'],['이야기','KTM'],['A모바일','KTM'],
+        ['LG U','LG'],['LGU','LG'],['U+알뜰','KTM'],['LG알뜰','KTM'],['미디어로그','KTM'],
+        ['티플러스','KTM'],['에스원','KTM'],['프리텔','KTM'],
+        ['알뜰','KTM'],
+        ['KT','KT'],['LG','LG'],
+      ];
       const found = map.find(([k]) => d.통신사.toUpperCase().includes(k.toUpperCase()));
       if (found) document.getElementById('sr-carrier').value = found[1];
     }
@@ -2228,7 +2235,7 @@ async function scanAndFill(input) {
   "고객명": "",
   "전화번호": "개통 번호, 010-xxxx-xxxx 형식",
   "주민번호": "앞 6자리만",
-  "통신사": "SKT 또는 KT 또는 LG 중 하나",
+  "통신사": "SKT / KT / LG / 알뜰 중 하나. 단, 서류에 'KT M모바일','헬로모바일','스카이라이프','U+알뜰','LG알뜰','티플러스','에스원','프리텔레콤','아이즈모바일','마이월드','A모바일','밀리','모빙','여유','이야기','SK7모바일','아이즈비전' 등 알뜰통신 브랜드명이 있으면 반드시 알뜰로 반환. SKT·KT·LG U+ 3사 직영/직판 서류에만 SKT/KT/LG 반환.",
   "개통유형": "신규 또는 번호이동 또는 기기변경",
   "단말기": "모델명",
   "요금제": "요금제명",
