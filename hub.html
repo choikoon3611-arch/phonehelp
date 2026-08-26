@@ -780,6 +780,7 @@
         <button class="ftab cftab fktm"   data-csf="알뜰">알뜰통신</button>
       </div>
       <div class="consult-actions">
+        <button id="btn-consult-done-toggle" onclick="toggleConsultDone()" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink-soft);font-size:12px;font-weight:700;cursor:pointer;">✅ 완료건 보기</button>
         <button class="btn-share add"   onclick="consultOpenModal()">+ 새 상담 등록</button>
         <button class="btn-share excel" onclick="exportConsultExcel()">📊 엑셀</button>
       </div>
@@ -3343,10 +3344,23 @@ function dataURLtoBlob(dataURL) {
 
 /* ===== 공유업무 ===== */
 const CONSULT_KEY = 'hub_consultations';
-var consultList   = [];
-var consultFilter = '전체';
-var consultSearch = '';
-var consultEditId = null;
+var consultList     = [];
+var consultFilter   = '전체';
+var consultSearch   = '';
+var consultEditId   = null;
+var consultShowDone = false;
+
+function toggleConsultDone() {
+  consultShowDone = !consultShowDone;
+  const btn = document.getElementById('btn-consult-done-toggle');
+  if (btn) {
+    btn.textContent = consultShowDone ? '🙈 완료건 숨기기' : '✅ 완료건 보기';
+    btn.style.background = consultShowDone ? '#dcfce7' : 'var(--panel)';
+    btn.style.borderColor = consultShowDone ? '#16a34a' : 'var(--line)';
+    btn.style.color = consultShowDone ? '#15803d' : 'var(--ink-soft)';
+  }
+  consultRender();
+}
 
 function consultSave() { /* Firebase 실시간 동기화로 대체 */ }
 
@@ -3362,10 +3376,20 @@ function consultRender() {
   `;
 
   let f = consultList;
+  if (!consultShowDone) f = f.filter(e => !e.done);
   if (consultFilter !== '전체') f = f.filter(e => e.carrier === consultFilter);
   if (consultSearch) {
     const t = consultSearch.toLowerCase().replace(/-/g,'');
     f = f.filter(e => (e.name||'').toLowerCase().includes(t) || (e.phone||'').replace(/-/g,'').includes(t));
+  }
+
+  // 완료 숨김 상태에서 숨겨진 건수 표시
+  const hiddenDone = consultList.filter(e => e.done).length;
+  const btn = document.getElementById('btn-consult-done-toggle');
+  if (btn && !consultShowDone && hiddenDone > 0) {
+    btn.textContent = `✅ 완료건 보기 (${hiddenDone}건)`;
+  } else if (btn && !consultShowDone) {
+    btn.textContent = '✅ 완료건 보기';
   }
 
   const tbody = document.getElementById('consult-tbody');
