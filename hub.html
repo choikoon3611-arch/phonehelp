@@ -673,7 +673,8 @@
   <button class="tab-btn" data-tab="scan">📷 스캔입력</button>
   <button class="tab-btn" data-tab="cust">👤 고객DB</button>
   <button class="tab-btn" data-tab="renewal">📅 약정관리</button>
-  <button id="logout-btn" style="margin-left:auto;padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
+  <button id="store-badge" onclick="changeStoreName()" title="클릭해서 매장코드 변경" style="margin-left:auto;padding:5px 12px;background:rgba(126,184,247,0.15);color:#7eb8f7;border:1px solid rgba(126,184,247,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
+  <button id="logout-btn" style="padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
 </nav>
 
 <main>
@@ -1242,6 +1243,20 @@
 .renewal-filter-btn.active { background:#6366f1;color:#fff;border-color:#6366f1; }
 </style>
 
+<!-- 매장코드 설정 모달 -->
+<div id="store-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:18px;padding:36px 32px;width:340px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.35);text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">🏪</div>
+    <div style="font-size:18px;font-weight:900;color:#16283f;margin-bottom:8px;">매장 코드 설정</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:24px;line-height:1.6;">매장마다 데이터가 분리됩니다.<br>같은 코드를 입력하면 같은 데이터를 공유해요.</div>
+    <input id="store-name-input" type="text" placeholder="예: 이쁜핸드폰집" maxlength="20"
+      style="width:100%;padding:12px 14px;border:2px solid #e2e7ec;border-radius:10px;font-size:15px;font-weight:700;text-align:center;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px;"
+      oninput="this.style.borderColor=this.value.trim()?'#7c3aed':'#e2e7ec'"
+      onkeydown="if(event.key==='Enter')confirmStoreName()">
+    <button onclick="confirmStoreName()" style="width:100%;padding:12px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">시작하기</button>
+  </div>
+</div>
+
 <!-- 공유업무 모달 -->
 <div class="modal-bg" id="consult-modal-bg">
   <div class="modal">
@@ -1363,7 +1378,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.database();
-const HUB  = 'hub';
+let HUB    = 'hub';
 
 // 로그인 안 됐으면 login.html로
 document.body.style.visibility = 'hidden';
@@ -1381,8 +1396,59 @@ auth.onAuthStateChanged(user => {
     const el = document.getElementById(id);
     if (el) el.style.display = isAdmin ? '' : 'none';
   });
-  setupFirebaseSync();
+  initStore();
 });
+
+function initStore() {
+  const saved = localStorage.getItem('hub_store_name');
+  if (saved) {
+    HUB = isAdmin && saved === '__admin__' ? 'hub' : 'hub_' + saved;
+    updateStoreBadge(saved === '__admin__' ? '내 매장' : saved);
+    setupFirebaseSync();
+  } else if (isAdmin) {
+    // 관리자는 기존 데이터 유지
+    localStorage.setItem('hub_store_name', '__admin__');
+    HUB = 'hub';
+    updateStoreBadge('내 매장');
+    setupFirebaseSync();
+  } else {
+    // 비관리자 첫 접속 → 매장코드 입력 모달
+    document.getElementById('store-modal-bg').style.display = 'flex';
+    setTimeout(() => document.getElementById('store-name-input')?.focus(), 100);
+  }
+}
+
+function confirmStoreName() {
+  const val = document.getElementById('store-name-input').value.trim();
+  if (!val) { document.getElementById('store-name-input').style.borderColor='#dc2626'; return; }
+  localStorage.setItem('hub_store_name', val);
+  HUB = 'hub_' + val;
+  document.getElementById('store-modal-bg').style.display = 'none';
+  updateStoreBadge(val);
+  setupFirebaseSync();
+}
+
+function updateStoreBadge(name) {
+  const btn = document.getElementById('store-badge');
+  if (btn) btn.textContent = '🏪 ' + name;
+}
+
+function changeStoreName() {
+  const cur = localStorage.getItem('hub_store_name');
+  const displayName = cur === '__admin__' ? '내 매장' : (cur || '');
+  const newName = prompt('매장 코드를 변경하세요.\n현재: ' + displayName + '\n\n(관리자 기본 데이터로 돌아가려면 비워두세요)', cur === '__admin__' ? '' : displayName);
+  if (newName === null) return; // 취소
+  if (!newName.trim() && isAdmin) {
+    localStorage.setItem('hub_store_name', '__admin__');
+    HUB = 'hub';
+    updateStoreBadge('내 매장');
+  } else if (newName.trim()) {
+    localStorage.setItem('hub_store_name', newName.trim());
+    HUB = 'hub_' + newName.trim();
+    updateStoreBadge(newName.trim());
+  }
+  location.reload();
+}
 
 function doLogout() {
   if (!confirm('로그아웃 하겠습니까?')) return;
