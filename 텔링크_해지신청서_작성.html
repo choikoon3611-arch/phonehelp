@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SK텔링크 해지신청서 작성</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Malgun Gothic","맑은 고딕",sans-serif; background:#ececec; margin:0; padding:0 0 60px; }
+  header {
+    background:#e6002d; color:#fff; padding:10px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; flex-wrap:wrap; position:sticky; top:0; z-index:50;
+  }
+  header a.back { color:#ffcdd8; text-decoration:none; font-size:13px; font-weight:600; }
+  header h1 { margin:0; font-size:14px; font-weight:800; flex:1; text-align:center; }
+  .hdr-btn { padding:7px 13px; font-size:12px; font-weight:700; border:none; border-radius:7px; background:#fff; color:#e6002d; cursor:pointer; white-space:nowrap; }
+  .hdr-btn.active-text { background:#ffd600; color:#333; }
+  .hdr-btn.active-check { background:#22c55e; color:#fff; }
+  .hdr-btn-print { background:#16283f; color:#fff; padding:7px 13px; font-size:12px; font-weight:700; border:none; border-radius:7px; cursor:pointer; }
+  .doc-wrap { position:relative; max-width:900px; margin:20px auto; background:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+  .doc-wrap img { display:block; width:100%; height:auto; user-select:none; }
+  .field { position:absolute; border:1px solid rgba(230,0,45,0.45); background:rgba(255,236,179,0.55); border-radius:3px; font-family:"Malgun Gothic","맑은 고딕",sans-serif; color:#16283f; font-weight:700; padding:0 4px; outline:none; font-size:13px; transform:translateY(-50%); }
+  .field:focus { background:rgba(255,236,179,0.95); border-color:#e6002d; z-index:20; }
+  .field.sm { font-size:11px; }
+  .textbox { position:absolute; border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55); outline:none; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:13px; font-weight:700; color:#111; padding:0 3px; overflow:visible; white-space:nowrap; line-height:1.3; cursor:text; }
+  .textbox:focus { background:rgba(255,255,200,0.9); border-color:#0078ff; }
+  .check-mark { position:absolute; font-size:18px; font-weight:900; color:#e6002d; line-height:1; cursor:pointer; user-select:none; transform:translate(-50%,-50%); display:none; }
+  .check-mark.visible { display:block; }
+  .sel-rect { position:absolute; border:2px dashed #0078ff; background:rgba(0,120,255,0.08); pointer-events:none; }
+  @media print { header{display:none;} body{background:#fff;padding:0;} .doc-wrap{box-shadow:none;margin:0 auto;max-width:100%;} .field{border:none;background:transparent;} .textbox{border:none;background:transparent;} .check-mark.visible{display:block;} }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="hub.html">← 허브로 돌아가기</a>
+  <h1>SK텔링크 해지신청서 작성</h1>
+  <button class="hdr-btn" id="text-btn">T 텍스트</button>
+  <button class="hdr-btn" id="check-btn">✓ 체크</button>
+  <button class="hdr-btn" id="undo-btn">↩ 되돌리기</button>
+  <button class="hdr-btn" onclick="exportCoords()">📋 좌표 내보내기</button>
+  <label class="hdr-btn" style="cursor:pointer;">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this,'img1')"></label>
+  <button class="hdr-btn-print" onclick="window.print()">인쇄 / PDF저장</button>
+</header>
+<div class="doc-wrap" id="wrap1">
+  <img id="img1" src="텔링크_해지신청서_p1.jpg" alt="SK텔링크 해지신청서">
+  <input class="field" style="left:36.84%; top:11.415%; width:22.44%; height:1.89%;" placeholder="">
+  <input class="field" style="left:74.84%; top:11.455%; width:16.67%; height:1.81%;" placeholder="">
+  <input class="field" style="left:36.84%; top:13.535%; width:36.67%; height:1.73%;" placeholder="">
+  <input class="field" style="left:69.96%; top:83.875%; width:18.22%; height:1.81%;" placeholder="">
+</div>
+<script>
+const FORM_IMG_KEY='fimg_텔링크해지';
+(function(){ try{var s=localStorage.getItem(FORM_IMG_KEY+'_p1');if(s)document.getElementById('img1').src=s;}catch(e){} })();
+function replaceFormImage(input,imgId){var file=input.files[0];if(!file)return;if(file.size>8*1024*1024){alert('8MB 초과');return;}var r=new FileReader();r.onload=function(ev){document.getElementById(imgId).src=ev.target.result;try{localStorage.setItem(FORM_IMG_KEY+'_p1',ev.target.result);}catch(ex){alert('저장 공간 부족');}};r.readAsDataURL(file);input.value='';}
+function exportCoords(){var wrap=document.getElementById('wrap1');var boxes=wrap.querySelectorAll('.textbox');if(!boxes.length){alert('배치된 텍스트박스가 없습니다.\nT 텍스트 모드로 칸을 먼저 만들어주세요.');return;}var lines=[];boxes.forEach(function(b,i){var l=parseFloat(b.style.left).toFixed(2);var t=parseFloat(b.style.top).toFixed(2);var w=parseFloat(b.style.width).toFixed(2);var h=parseFloat(b.style.minHeight).toFixed(2);var txt=b.textContent.trim()||'';lines.push('필드 '+(i+1)+': left:'+l+'%, top:'+t+'%, width:'+w+'%, height:'+h+'%'+(txt?' | 내용: '+txt:''));});var result='📋 텍스트박스 좌표\n'+lines.join('\n');var ta=document.createElement('textarea');ta.value=result;ta.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);width:600px;max-width:95vw;height:200px;z-index:9999;font-family:monospace;font-size:13px;padding:10px;border:2px solid #e6002d;border-radius:8px;resize:vertical;';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.addEventListener('blur',function(){ta.remove();});ta.addEventListener('keydown',function(e){if(e.key==='Escape')ta.remove();});alert('좌표가 클립보드에 복사됐습니다!\n아래 창을 Claude에게 붙여넣기 하세요.\n(ESC 또는 클릭 밖으로 나가면 닫힙니다)');}
+(function(){var textBtn=document.getElementById('text-btn');var checkBtn=document.getElementById('check-btn');var undoBtn=document.getElementById('undo-btn');var textOn=false,checkOn=false,undoStack=[];function offAll(){textOn=false;checkOn=false;textBtn.classList.remove('active-text');checkBtn.classList.remove('active-check');textBtn.textContent='T 텍스트';checkBtn.textContent='✓ 체크';document.querySelectorAll('.doc-wrap').forEach(function(w){w.style.cursor='';w.style.userSelect='';});}
+textBtn.addEventListener('click',function(){if(textOn){offAll();return;}offAll();textOn=true;textBtn.classList.add('active-text');textBtn.textContent='T 끄기';document.querySelectorAll('.doc-wrap').forEach(function(w){w.style.cursor='crosshair';w.style.userSelect='none';});});
+checkBtn.addEventListener('click',function(){if(checkOn){offAll();return;}offAll();checkOn=true;checkBtn.classList.add('active-check');checkBtn.textContent='✓ 끄기';document.querySelectorAll('.doc-wrap').forEach(function(w){w.style.cursor='crosshair';w.style.userSelect='none';});});
+var dragStart=null,selRect=null;
+document.querySelectorAll('.doc-wrap').forEach(function(wrap){wrap.addEventListener('mousedown',function(e){if(!textOn||e.target.closest('.textbox')||e.target.closest('.field'))return;e.preventDefault();var r=wrap.getBoundingClientRect();dragStart={x:e.clientX-r.left,y:e.clientY-r.top,wrap:wrap};selRect=document.createElement('div');selRect.className='sel-rect';selRect.style.left=dragStart.x+'px';selRect.style.top=dragStart.y+'px';wrap.appendChild(selRect);});wrap.addEventListener('click',function(e){if(!checkOn)return;if(e.target.closest('.textbox')||e.target.closest('.field')||e.target.closest('.check-mark'))return;var r=wrap.getBoundingClientRect();var img=wrap.querySelector('img');var x=e.clientX-r.left,y=e.clientY-r.top;var iw=wrap.offsetWidth,ih=img.offsetHeight;var mk=document.createElement('div');mk.className='check-mark visible';mk.textContent='✔';mk.style.left=(x/iw*100)+'%';mk.style.top=(y/ih*100)+'%';mk.addEventListener('click',function(ev){ev.stopPropagation();mk.remove();});wrap.appendChild(mk);undoStack.push({type:'check',el:mk});});});
+window.addEventListener('mousemove',function(e){if(!textOn||!dragStart)return;var r=dragStart.wrap.getBoundingClientRect();var cx=e.clientX-r.left,cy=e.clientY-r.top;var x=Math.min(dragStart.x,cx),y=Math.min(dragStart.y,cy);selRect.style.left=x+'px';selRect.style.top=y+'px';selRect.style.width=Math.abs(cx-dragStart.x)+'px';selRect.style.height=Math.abs(cy-dragStart.y)+'px';});
+window.addEventListener('mouseup',function(e){if(!textOn||!dragStart)return;var wrap=dragStart.wrap,img=wrap.querySelector('img');var r=wrap.getBoundingClientRect();var cx=e.clientX-r.left,cy=e.clientY-r.top;var x=Math.min(dragStart.x,cx),y=Math.min(dragStart.y,cy);var ww=Math.abs(cx-dragStart.x),h=Math.abs(cy-dragStart.y);selRect.remove();selRect=null;dragStart=null;if(ww<10||h<6)return;var iw=wrap.offsetWidth,ih=img.offsetHeight;var box=document.createElement('div');box.className='textbox';box.contentEditable='true';box.style.left=(x/iw*100)+'%';box.style.top=(y/ih*100)+'%';box.style.width=(ww/iw*100)+'%';box.style.minHeight=(h/ih*100)+'%';box.addEventListener('keydown',function(ev){if((ev.key==='Delete'||ev.key==='Backspace')&&box.textContent===''){ev.preventDefault();box.remove();}});wrap.appendChild(box);box.focus();undoStack.push({type:'textbox',el:box});});
+function undo(){var last=undoStack.pop();if(!last)return;last.el.remove();}
+undoBtn.addEventListener('click',undo);
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='z'){var a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.contentEditable==='true'))return;e.preventDefault();undo();}});
+})();
+</script>
+<style>
+#print-footer { max-width:900px; margin:0 auto; padding:7px 16px; background:#f1f5f9; border-top:1px solid #e2e7ec; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:12px; color:#334155; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+#print-footer span { white-space:nowrap; }
+#print-footer .pf-label { font-weight:700; color:#16283f; }
+@media print { #print-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #bbb; padding:4px 16px; font-size:11px; margin:0; max-width:none; } }
+</style>
+<div id="print-footer">
+  <span><span class="pf-label">접수처:</span> 현성네트워크</span>
+  <span><span class="pf-label">연락처:</span> 📞 043)216-0550 · 010-5835-7010</span>
+  <span><span class="pf-label">날짜:</span> <span id="pf-date"></span></span>
+  <span><span class="pf-label">시간:</span> <span id="pf-time"></span></span>
+</div>
+<script>
+(function(){function pfUpdate(){var d=new Date();document.getElementById('pf-date').textContent=d.getFullYear()+'.'+(''+(d.getMonth()+1)).padStart(2,'0')+'.'+(''+d.getDate()).padStart(2,'0');document.getElementById('pf-time').textContent=(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');}pfUpdate();setInterval(pfUpdate,30000);window.addEventListener('beforeprint',pfUpdate);})();
+</script>
+
+<script>
+/* ===== 사용자/관리자 모드 구분 ===== */
+(function(){
+  var isAdmin = new URLSearchParams(location.search).has('edit');
+  if(isAdmin) return;
+
+  // 관리자 전용 버튼 숨기기
+  ['check-btn'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.style.display='none';
+  });
+  var header = document.querySelector('header') || document.querySelector('.toolbar');
+  if(!header) return;
+
+  header.querySelectorAll('button, label').forEach(function(el){
+    var t = el.textContent;
+    if(t.indexOf('좌표') !== -1 || t.indexOf('이미지 교체') !== -1) el.style.display='none';
+  });
+
+  // T 텍스트 → ✏️ 자유입력 으로 변경하고 활성화 텍스트도 유지
+  var tb = document.getElementById('text-btn');
+  if(tb){
+    tb.textContent = '✏️ 자유입력';
+    // offAll() 이 텍스트를 'T 텍스트'로 되돌리는 것을 막기 위해 MutationObserver 사용
+    var obs = new MutationObserver(function(){
+      if(tb.textContent === 'T 텍스트') tb.textContent = '✏️ 자유입력';
+      if(tb.textContent === 'T 끄기')   tb.textContent = '✏️ 끄기';
+    });
+    obs.observe(tb, {characterData:true, childList:true, subtree:true});
+  }
+
+  // 버튼 오른쪽 정렬: 남은 버튼들을 flex-end 그룹으로 묶기
+  var btnGroup = document.createElement('div');
+  btnGroup.style.cssText = 'display:flex;gap:8px;align-items:center;margin-left:auto;';
+  var toMove = [];
+  header.querySelectorAll('button, label').forEach(function(el){
+    if(el.style.display !== 'none') toMove.push(el);
+  });
+  toMove.forEach(function(el){ btnGroup.appendChild(el); });
+  header.appendChild(btnGroup);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제한기간이내 번호이동 신청서</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Malgun Gothic","맑은 고딕",sans-serif; background:#ececec; margin:0; padding:0 0 40px; }
+
+  header {
+    background: #16283f; color:#fff;
+    padding:12px 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
+    position:sticky; top:0; z-index:50;
+  }
+  header a.back { color:#cdd9e4; text-decoration:none; font-size:13px; font-weight:600; flex-shrink:0; }
+  header a.back:hover { color:#fff; }
+  header h1 { margin:0; font-size:14px; font-weight:800; flex:1; text-align:center; }
+  .hdr-btn {
+    padding:7px 12px; font-size:12px; font-weight:700;
+    border:1px solid rgba(255,255,255,0.18); border-radius:8px; cursor:pointer; color:#fff;
+    background:#1e3252; flex-shrink:0;
+  }
+  .hdr-btn.active-check { background:#d0021b; border-color:#d0021b; }
+  .hdr-btn.active-input { background:#475569; border-color:#475569; }
+  .hdr-btn.active-text  { background:#0060df; border-color:#0060df; }
+  .btn-print { background:#475569 !important; border-color:#475569 !important; }
+
+  .doc-wrap {
+    position:relative; max-width:900px; margin:20px auto;
+    background:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.15); cursor:default;
+  }
+  .doc-wrap img { display:block; width:100%; height:auto; user-select:none; }
+
+  .overlay-input {
+    position:absolute; transform:translate(0,-50%);
+    border:none; background:transparent;
+    font-family:"Malgun Gothic","맑은 고딕",sans-serif;
+    font-size: min(2.2vw, 15px); font-weight: 700; color:#1a1a1a;
+    padding:0; outline:none; border-bottom:1px dashed transparent;
+  }
+  .overlay-input:focus { border-bottom:1px dashed #475569; background:rgba(241,245,249,0.5); }
+  .overlay-input::placeholder { color:#bbb; font-size:0.85em; }
+
+  .click-wrap {
+    position:absolute; min-width:50px; min-height:22px;
+    border:1px solid rgba(71,85,105,0.55); border-left:7px solid rgba(71,85,105,0.75);
+    background:rgba(241,245,249,0.72); border-radius:4px; cursor:move; resize:both; overflow:hidden; z-index:10;
+  }
+  .click-wrap:focus-within { border-color:rgba(71,85,105,0.9); box-shadow:0 0 0 2px rgba(71,85,105,0.22); z-index:20; }
+  .click-wrap input {
+    display:block; width:100%; height:100%; border:none; background:transparent;
+    font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:13px; font-weight:700; color:#1a1a1a;
+    padding:2px 4px; outline:none; cursor:text;
+  }
+  .checkmark { position:absolute; transform:translate(-50%,-50%); font-size:1.6%; font-weight:900; color:#d0021b; pointer-events:none; line-height:1; }
+  .textbox {
+    position:absolute; border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55);
+    outline:none; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:13px; font-weight:700; color:#111;
+    padding:0 3px; overflow:hidden; line-height:1.3; cursor:text;
+  }
+  .textbox:focus { background:rgba(255,255,200,0.9); border-color:#0078ff; }
+  .sel-rect { position:absolute; border:2px dashed #0078ff; background:rgba(0,120,255,0.08); pointer-events:none; }
+
+  @media print {
+    header { display:none; }
+    body { background:#fff; padding:0; }
+    .doc-wrap { box-shadow:none; margin:0; max-width:100%; }
+    .overlay-input { color:#000; border-bottom:none; background:transparent;   font-size: 11pt;
+      font-weight: 700;
+    }
+    .click-wrap { border:none; background:transparent; resize:none; overflow:visible; cursor:default; }
+    .checkmark { display:block; }
+    .textbox { border:none; background:transparent; }
+    .sel-rect { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="hub.html">← 허브로</a>
+  <h1>제한기간이내 번호이동 신청서</h1>
+  <button class="hdr-btn" id="check-btn">✓ 체크</button>
+  <button class="hdr-btn" id="input-btn">✏️ 입력</button>
+  <button class="hdr-btn" id="text-btn">T 텍스트</button>
+  <button class="hdr-btn" id="undo-btn">↩ 되돌리기</button>
+  <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="새 서류 이미지로 교체">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this)"></label> <button class="hdr-btn" id="img-reset-btn" onclick="resetFormImage()" style="display:none;" title="원본 이미지로 복원">↺ 복원</button> <button class="hdr-btn btn-print" id="print-btn">인쇄 / PDF저장</button>
+</header>
+
+<div class="doc-wrap" id="doc-wrap">
+  <img src="기타_중립기관_p1.jpg" alt="제한기간이내 번호이동 신청서" id="doc-img">
+</div>
+
+<script>
+const wrap=document.getElementById('doc-wrap'),img=document.getElementById('doc-img');
+const checkBtn=document.getElementById('check-btn'),inputBtn=document.getElementById('input-btn');
+const textBtn=document.getElementById('text-btn'),undoBtn=document.getElementById('undo-btn');
+
+document.getElementById('print-btn').addEventListener('click',()=>window.print());
+
+let checkOn=false,inputOn=false,textOn=false;
+let checks=[],clickFields=[],textBoxes=[],dragStart=null,selRect=null;
+const undoStack=[];
+
+function setMode(m){
+  checkOn=m==='check';inputOn=m==='input';textOn=m==='text';
+  checkBtn.classList.toggle('active-check',checkOn);
+  inputBtn.classList.toggle('active-input',inputOn);
+  textBtn.classList.toggle('active-text',textOn);
+  checkBtn.textContent=checkOn?'✓ 체크 끄기':'✓ 체크';
+  inputBtn.textContent=inputOn?'✏️ 입력 끄기':'✏️ 입력';
+  textBtn.textContent=textOn?'T 끄기':'T 텍스트';
+  wrap.style.cursor=(checkOn||inputOn||textOn)?'crosshair':'';
+  wrap.style.userSelect=textOn?'none':'';
+}
+checkBtn.addEventListener('click',()=>setMode(checkOn?'':'check'));
+inputBtn.addEventListener('click',()=>setMode(inputOn?'':'input'));
+textBtn.addEventListener('click',()=>setMode(textOn?'':'text'));
+
+function renderChecks(){
+  document.querySelectorAll('.checkmark').forEach(el=>el.remove());
+  checks.forEach(c=>{const el=document.createElement('div');el.className='checkmark';el.style.left=c.x+'%';el.style.top=c.y+'%';el.textContent='✓';wrap.appendChild(el);});
+}
+function createClickField(x,y){
+  const w=document.createElement('div');w.className='click-wrap';
+  w.style.left=x+'%';w.style.top=y+'%';w.style.width='18%';w.style.height='28px';w.style.transform='translate(-50%,-50%)';
+  const inp=document.createElement('input');inp.type='text';w.appendChild(inp);wrap.appendChild(w);
+  let xf=false;
+  w.addEventListener('mousedown',e=>{
+    if(e.target.tagName==='INPUT')return;
+    const r=w.getBoundingClientRect();if(e.clientX>r.right-20&&e.clientY>r.bottom-20)return;
+    e.preventDefault();e.stopPropagation();
+    if(!xf){const ir=img.getBoundingClientRect();w.style.left=((r.left-ir.left)/ir.width*100).toFixed(2)+'%';w.style.top=((r.top-ir.top)/img.offsetHeight*100).toFixed(2)+'%';w.style.transform='';xf=true;}
+    const sx=e.clientX,sy=e.clientY,sl=parseFloat(w.style.left),st=parseFloat(w.style.top);
+    const mv=ev=>{w.style.left=(sl+(ev.clientX-sx)/img.offsetWidth*100).toFixed(2)+'%';w.style.top=(st+(ev.clientY-sy)/img.offsetHeight*100).toFixed(2)+'%';};
+    const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);};
+    window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
+  });
+  inp.addEventListener('keydown',ev=>{if((ev.key==='Delete'||ev.key==='Backspace')&&inp.value===''){ev.preventDefault();w.remove();clickFields=clickFields.filter(f=>f!==w);}});
+  clickFields.push(w);undoStack.push({type:'field',el:w});inp.focus();
+}
+wrap.addEventListener('click',e=>{
+  if(e.target.closest('.click-wrap')||e.target.classList.contains('checkmark')||e.target.classList.contains('textbox'))return;
+  const r=img.getBoundingClientRect();
+  const x=Math.round(((e.clientX-r.left)/r.width)*10000)/100;
+  const y=Math.round(((e.clientY-r.top)/r.height)*10000)/100;
+  if(checkOn){checks.push({x,y});renderChecks();undoStack.push({type:'check'});}
+  else if(inputOn){createClickField(x,y);}
+});
+wrap.addEventListener('mousedown',e=>{
+  if(!textOn||e.target.closest('.click-wrap')||e.target.classList.contains('textbox'))return;
+  e.preventDefault();const r=wrap.getBoundingClientRect();
+  dragStart={x:e.clientX-r.left,y:e.clientY-r.top};
+  selRect=document.createElement('div');selRect.className='sel-rect';selRect.style.left=dragStart.x+'px';selRect.style.top=dragStart.y+'px';wrap.appendChild(selRect);
+});
+window.addEventListener('mousemove',e=>{
+  if(!textOn||!dragStart)return;const r=wrap.getBoundingClientRect();
+  const cx=e.clientX-r.left,cy=e.clientY-r.top,x=Math.min(dragStart.x,cx),y=Math.min(dragStart.y,cy);
+  selRect.style.left=x+'px';selRect.style.top=y+'px';selRect.style.width=Math.abs(cx-dragStart.x)+'px';selRect.style.height=Math.abs(cy-dragStart.y)+'px';
+});
+window.addEventListener('mouseup',e=>{
+  if(!textOn||!dragStart)return;const r=wrap.getBoundingClientRect();
+  const cx=e.clientX-r.left,cy=e.clientY-r.top,x=Math.min(dragStart.x,cx),y=Math.min(dragStart.y,cy);
+  const ww=Math.abs(cx-dragStart.x),h=Math.abs(cy-dragStart.y);
+  selRect.remove();selRect=null;dragStart=null;if(ww<10||h<6)return;
+  const iw=wrap.offsetWidth,ih=img.offsetHeight;
+  const box=document.createElement('div');box.className='textbox';box.contentEditable='true';
+  box.style.left=(x/iw*100)+'%';box.style.top=(y/ih*100)+'%';box.style.width=(ww/iw*100)+'%';box.style.minHeight=(h/ih*100)+'%';
+  box.addEventListener('keydown',ev=>{if((ev.key==='Delete'||ev.key==='Backspace')&&box.textContent===''){ev.preventDefault();box.remove();textBoxes=textBoxes.filter(b=>b!==box);}});
+  wrap.appendChild(box);textBoxes.push(box);box.focus();undoStack.push({type:'textbox',el:box});
+});
+function undo(){
+  const last=undoStack.pop();if(!last)return;
+  if(last.type==='check'){checks.pop();renderChecks();}
+  else if(last.type==='field'){last.el.remove();clickFields=clickFields.filter(f=>f!==last.el);}
+  else if(last.type==='textbox'){last.el.remove();textBoxes=textBoxes.filter(b=>b!==last.el);}
+}
+undoBtn.addEventListener('click',undo);
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='z'){const a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.contentEditable==='true'))return;e.preventDefault();undo();}});
+
+const FORM_IMG_KEY = 'fimg_' + encodeURIComponent(document.title);
+(function(){
+  ['','_p2'].forEach(function(sfx){
+    var k = FORM_IMG_KEY + sfx;
+    var imgId = sfx === '_p2' ? 'img2' : (document.getElementById('doc-img') ? 'doc-img' : 'img1');
+    var el = document.getElementById(imgId) || document.querySelector('.doc-wrap img');
+    if(!el) return;
+    try { var s = localStorage.getItem(k); if(s){ el.src=s; var rb=document.getElementById('img-reset-btn'); if(rb)rb.style.display=''; } } catch(e){}
+  });
+})();
+function replaceFormImage(input, imgId, sfx){
+  var file = input.files[0]; if(!file) return;
+  if(file.size > 8*1024*1024){ alert('파일이 8MB를 초과합니다. 더 작은 이미지를 사용해주세요.'); return; }
+  var key = FORM_IMG_KEY + (sfx||'');
+  var r = new FileReader();
+  r.onload = function(ev){
+    var el = document.getElementById(imgId||'doc-img') || document.querySelector('.doc-wrap img');
+    if(el) el.src = ev.target.result;
+    var rb = document.getElementById('img-reset-btn'); if(rb) rb.style.display = '';
+    try { localStorage.setItem(key, ev.target.result); }
+    catch(ex){ alert('저장 공간 부족 - 이번 세션에서만 적용됩니다.'); }
+  };
+  r.readAsDataURL(file); input.value = '';
+}
+function resetFormImage(){
+  if(!confirm('기본 이미지로 복원할까요?')) return;
+  try { [FORM_IMG_KEY, FORM_IMG_KEY+'_p2'].forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
+  location.reload();
+}
+</script>
+<style>
+#print-footer { max-width:900px; margin:0 auto; padding:7px 16px; background:#f1f5f9; border-top:1px solid #e2e7ec; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:12px; color:#334155; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+#print-footer span { white-space:nowrap; }
+#print-footer .pf-label { font-weight:700; color:#16283f; }
+@media print { #print-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #bbb; padding:4px 16px; font-size:11px; margin:0; max-width:none; } }
+</style>
+<div id="print-footer">
+  <span><span class="pf-label">접수처:</span> 현성네트워크</span>
+  <span><span class="pf-label">연락처:</span> 📞 043)216-0550 · 010-5835-7010</span>
+  <span><span class="pf-label">날짜:</span> <span id="pf-date"></span></span>
+  <span><span class="pf-label">시간:</span> <span id="pf-time"></span></span>
+</div>
+<script>
+(function(){function pfUpdate(){var d=new Date();document.getElementById('pf-date').textContent=d.getFullYear()+'.'+(''+(d.getMonth()+1)).padStart(2,'0')+'.'+(''+d.getDate()).padStart(2,'0');document.getElementById('pf-time').textContent=(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');}pfUpdate();setInterval(pfUpdate,30000);window.addEventListener('beforeprint',pfUpdate);})();
+</script>
+
+<script>
+/* ===== 사용자/관리자 모드 구분 ===== */
+(function(){
+  var isAdmin = new URLSearchParams(location.search).has('edit');
+  if(isAdmin) return;
+
+  // 관리자 전용 버튼 숨기기
+  ['check-btn'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.style.display='none';
+  });
+  var header = document.querySelector('header') || document.querySelector('.toolbar');
+  if(!header) return;
+
+  header.querySelectorAll('button, label').forEach(function(el){
+    var t = el.textContent;
+    if(t.indexOf('좌표') !== -1 || t.indexOf('이미지 교체') !== -1) el.style.display='none';
+  });
+
+  // T 텍스트 → ✏️ 자유입력 으로 변경하고 활성화 텍스트도 유지
+  var tb = document.getElementById('text-btn');
+  if(tb){
+    tb.textContent = '✏️ 자유입력';
+    // offAll() 이 텍스트를 'T 텍스트'로 되돌리는 것을 막기 위해 MutationObserver 사용
+    var obs = new MutationObserver(function(){
+      if(tb.textContent === 'T 텍스트') tb.textContent = '✏️ 자유입력';
+      if(tb.textContent === 'T 끄기')   tb.textContent = '✏️ 끄기';
+    });
+    obs.observe(tb, {characterData:true, childList:true, subtree:true});
+  }
+
+  // 버튼 오른쪽 정렬: 남은 버튼들을 flex-end 그룹으로 묶기
+  var btnGroup = document.createElement('div');
+  btnGroup.style.cssText = 'display:flex;gap:8px;align-items:center;margin-left:auto;';
+  var toMove = [];
+  header.querySelectorAll('button, label').forEach(function(el){
+    if(el.style.display !== 'none') toMove.push(el);
+  });
+  toMove.forEach(function(el){ btnGroup.appendChild(el); });
+  header.appendChild(btnGroup);
+})();
+</script>
+</body>
+</html>

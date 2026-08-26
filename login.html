@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>업무 서류 허브 — 로그인</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+  background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.card {
+  background: #fff; border-radius: 18px;
+  padding: 44px 40px; width: 100%; max-width: 400px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+}
+.logo { text-align: center; margin-bottom: 32px; }
+.logo .icon { font-size: 40px; }
+.logo h1 { font-size: 20px; font-weight: 900; color: #1e3a5f; margin-top: 8px; }
+.logo p  { font-size: 12.5px; color: #64748b; margin-top: 4px; }
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; letter-spacing: .3px; }
+.field input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid #e2e8f0; border-radius: 9px;
+  font-size: 14px; font-family: inherit; color: #1e293b;
+  outline: none; transition: border-color .18s;
+}
+.field input:focus { border-color: #1e3a5f; background: #f8fafc; }
+
+.btn-login {
+  width: 100%; padding: 13px;
+  background: #1e3a5f; color: #fff;
+  border: none; border-radius: 9px;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer; margin-top: 6px;
+  font-family: inherit; letter-spacing: .3px;
+  transition: background .15s;
+}
+.btn-login:hover:not(:disabled) { background: #16283f; }
+.btn-login:disabled { opacity: .6; cursor: default; }
+
+.err {
+  background: #fee2e2; color: #b91c1c;
+  border: 1px solid #fca5a5;
+  padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; margin-top: 14px; display: none;
+}
+.loading-bar {
+  height: 3px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin-top: 14px; display: none;
+}
+.loading-bar::after {
+  content: ''; display: block; height: 100%;
+  width: 40%; background: #1e3a5f; border-radius: 3px;
+  animation: slide 1s ease-in-out infinite;
+}
+@keyframes slide { 0%{transform:translateX(-100%)} 100%{transform:translateX(350%)} }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="icon">📋</div>
+    <h1>업무 서류 허브</h1>
+    <p>팀원 계정으로 로그인하세요</p>
+  </div>
+
+  <div class="field">
+    <label>이메일</label>
+    <input type="email" id="email" placeholder="example@email.com" autocomplete="email">
+  </div>
+  <div class="field">
+    <label>비밀번호</label>
+    <input type="password" id="pw" placeholder="비밀번호" autocomplete="current-password">
+  </div>
+
+  <button class="btn-login" id="login-btn" onclick="doLogin()">로그인</button>
+  <div class="loading-bar" id="loading-bar"></div>
+  <div class="err" id="err"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBKoaJ5JnMFg3ioIoj-BGzicBrDMg8C5bI",
+  authDomain: "assist-9109b.firebaseapp.com",
+  databaseURL: "https://assist-9109b-default-rtdb.firebaseio.com",
+  projectId: "assist-9109b",
+  storageBucket: "assist-9109b.firebasestorage.app",
+  messagingSenderId: "830833125281",
+  appId: "1:830833125281:web:fe539ba512048bd8754de0"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+// 이미 로그인돼 있으면 허브로
+auth.onAuthStateChanged(user => {
+  if (user) window.location.replace('hub.html');
+});
+
+function setLoading(on) {
+  document.getElementById('login-btn').disabled = on;
+  document.getElementById('login-btn').textContent = on ? '로그인 중…' : '로그인';
+  document.getElementById('loading-bar').style.display = on ? '' : 'none';
+}
+
+function showErr(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg; el.style.display = '';
+}
+
+async function doLogin() {
+  const email = document.getElementById('email').value.trim();
+  const pw    = document.getElementById('pw').value;
+  document.getElementById('err').style.display = 'none';
+  if (!email || !pw) { showErr('이메일과 비밀번호를 입력해주세요.'); return; }
+  setLoading(true);
+  try {
+    await auth.signInWithEmailAndPassword(email, pw);
+  } catch(e) {
+    const msgs = {
+      'auth/user-not-found':    '등록되지 않은 이메일입니다.',
+      'auth/wrong-password':    '비밀번호가 올바르지 않습니다.',
+      'auth/invalid-credential':'이메일 또는 비밀번호가 올바르지 않습니다.',
+      'auth/too-many-requests': '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.',
+      'auth/invalid-email':     '이메일 형식이 올바르지 않습니다.',
+    };
+    showErr(msgs[e.code] || '로그인 실패: ' + e.message);
+    setLoading(false);
+  }
+}
+
+document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('pw').focus(); });
+document.getElementById('pw').addEventListener('keydown',    e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

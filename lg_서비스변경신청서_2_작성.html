@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LG 서비스 변경 신청서 2/2</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    background: #ececec;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .toolbar {
+    max-width: 700px; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .toolbar a { font-size: 13px; color: #2f6feb; text-decoration: none; }
+  .toolbar button {
+    padding: 9px 16px; font-size: 13px; font-weight: 700;
+    border: none; border-radius: 8px; background: #e6007e; color: #fff; cursor: pointer;
+  }
+
+  .doc-wrap {
+    position: relative; max-width: 700px; margin: 0 auto;
+    background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .doc-wrap img { display: block; width: 100%; height: auto; }
+
+  .overlay-input {
+    position: absolute; transform: translate(0, -50%);
+    border: none; background: transparent;
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    font-size: min(2.2vw, 15px); font-weight: 700; color: #1a1a8c;
+    padding: 0; outline: none;
+    border-bottom: 1px dashed transparent;
+  }
+  .overlay-input:focus { border-bottom: 1px dashed #e6007e; background: rgba(255,230,245,0.3); }
+  .overlay-input::placeholder { color: #bbb; font-size: 0.85em; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .toolbar { display: none; }
+    .doc-wrap { box-shadow: none; max-width: 100%; }
+    .overlay-input { color: #000;   font-size: 11pt;
+      font-weight: 700;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="hub.html">← 허브로 돌아가기</a>
+  <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="새 서류 이미지로 교체">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this)"></label> <button class="hdr-btn" id="img-reset-btn" onclick="resetFormImage()" style="display:none;" title="원본 이미지로 복원">↺ 복원</button> <button id="print-btn" onclick="window.print()">🖨 인쇄하기</button>
+</div>
+
+<div class="doc-wrap" id="doc-wrap">
+  <img src="lg_서비스변경신청서_p2.jpg" alt="LG 서비스 변경 신청서 2/2" id="doc-img">
+
+  <!-- 5G 주생활지역 -->
+  <input class="overlay-input" id="f-city"     placeholder="시/도" style="left:4%;  top:21%;  width:8%;">
+  <input class="overlay-input" id="f-district" placeholder="구/군" style="left:4%;  top:24%;  width:8%;">
+  <input class="overlay-input" id="f-town"     placeholder="동/읍/면" style="left:4%;  top:27%;  width:8%;">
+
+  <!-- 법정대리인 동의 -->
+  <input class="overlay-input" id="f-rel"       placeholder="관계"     style="left:4%;  top:68%;  width:8%;">
+  <input class="overlay-input" id="f-rep-birth" placeholder="생년월일" style="left:19%; top:68%;  width:15%;">
+  <input class="overlay-input" id="f-rep-phone" placeholder="휴대폰"   style="left:40%; top:68%;  width:20%;">
+  <input class="overlay-input" id="f-rep-name"  placeholder="성명"     style="left:69%; top:68%;  width:14%;">
+  <input class="overlay-input" id="f-rep-sign"  placeholder="서명/인"  style="left:87%; top:68%;  width:9%;">
+
+  <!-- 날짜 + 가입자 서명 -->
+  <input class="overlay-input" id="f-year"  placeholder="년"    style="left:7%;  top:88.5%; width:5%;">
+  <input class="overlay-input" id="f-month" placeholder="월"    style="left:17%; top:88.5%; width:3%;">
+  <input class="overlay-input" id="f-day"   placeholder="일"    style="left:24%; top:88.5%; width:3%;">
+  <input class="overlay-input" id="f-sign"  placeholder="서명/인" style="left:72%; top:88.5%; width:21%;">
+
+  <!-- 매장 정보 -->
+  <input class="overlay-input" id="f-store"       placeholder="매장명"     style="left:8%;  top:93.5%; width:22%;">
+  <input class="overlay-input" id="f-store-phone" placeholder="매장 연락처" style="left:37%; top:93.5%; width:26%;">
+  <input class="overlay-input" id="f-staff"       placeholder="직원 이름"  style="left:76%; top:93.5%; width:16%;">
+</div>
+
+<script>
+// 날짜 자동 기입 (오늘)
+const today = new Date();
+document.getElementById('f-year').value  = today.getFullYear();
+document.getElementById('f-month').value = today.getMonth() + 1;
+document.getElementById('f-day').value   = today.getDate();
+
+const order = ['f-city','f-district','f-town','f-rel','f-rep-birth','f-rep-phone','f-rep-name','f-rep-sign','f-sign','f-store','f-store-phone','f-staff'];
+order.forEach((id, i) => {
+  const el = document.getElementById(id);
+  const next = document.getElementById(order[i + 1]);
+  if (el && next) el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); next.focus(); } });
+});
+
+const FORM_IMG_KEY = 'fimg_' + encodeURIComponent(document.title);
+(function(){
+  ['','_p2'].forEach(function(sfx){
+    var k = FORM_IMG_KEY + sfx;
+    var imgId = sfx === '_p2' ? 'img2' : (document.getElementById('doc-img') ? 'doc-img' : 'img1');
+    var el = document.getElementById(imgId) || document.querySelector('.doc-wrap img');
+    if(!el) return;
+    try { var s = localStorage.getItem(k); if(s){ el.src=s; var rb=document.getElementById('img-reset-btn'); if(rb)rb.style.display=''; } } catch(e){}
+  });
+})();
+function replaceFormImage(input, imgId, sfx){
+  var file = input.files[0]; if(!file) return;
+  if(file.size > 8*1024*1024){ alert('파일이 8MB를 초과합니다. 더 작은 이미지를 사용해주세요.'); return; }
+  var key = FORM_IMG_KEY + (sfx||'');
+  var r = new FileReader();
+  r.onload = function(ev){
+    var el = document.getElementById(imgId||'doc-img') || document.querySelector('.doc-wrap img');
+    if(el) el.src = ev.target.result;
+    var rb = document.getElementById('img-reset-btn'); if(rb) rb.style.display = '';
+    try { localStorage.setItem(key, ev.target.result); }
+    catch(ex){ alert('저장 공간 부족 - 이번 세션에서만 적용됩니다.'); }
+  };
+  r.readAsDataURL(file); input.value = '';
+}
+function resetFormImage(){
+  if(!confirm('기본 이미지로 복원할까요?')) return;
+  try { [FORM_IMG_KEY, FORM_IMG_KEY+'_p2'].forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
+  location.reload();
+}
+</script>
+<style>
+#print-footer { max-width:900px; margin:0 auto; padding:7px 16px; background:#f1f5f9; border-top:1px solid #e2e7ec; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:12px; color:#334155; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+#print-footer span { white-space:nowrap; }
+#print-footer .pf-label { font-weight:700; color:#16283f; }
+@media print { #print-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #bbb; padding:4px 16px; font-size:11px; margin:0; max-width:none; } }
+</style>
+<div id="print-footer">
+  <span><span class="pf-label">접수처:</span> 현성네트워크</span>
+  <span><span class="pf-label">연락처:</span> 📞 043)216-0550 · 010-5835-7010</span>
+  <span><span class="pf-label">날짜:</span> <span id="pf-date"></span></span>
+  <span><span class="pf-label">시간:</span> <span id="pf-time"></span></span>
+</div>
+<script>
+(function(){function pfUpdate(){var d=new Date();document.getElementById('pf-date').textContent=d.getFullYear()+'.'+(''+(d.getMonth()+1)).padStart(2,'0')+'.'+(''+d.getDate()).padStart(2,'0');document.getElementById('pf-time').textContent=(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');}pfUpdate();setInterval(pfUpdate,30000);window.addEventListener('beforeprint',pfUpdate);})();
+</script>
+
+<script>
+/* ===== 사용자/관리자 모드 구분 ===== */
+(function(){
+  var isAdmin = new URLSearchParams(location.search).has('edit');
+  if(isAdmin) return;
+
+  // 관리자 전용 버튼 숨기기
+  ['check-btn'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.style.display='none';
+  });
+  var header = document.querySelector('header') || document.querySelector('.toolbar');
+  if(!header) return;
+
+  header.querySelectorAll('button, label').forEach(function(el){
+    var t = el.textContent;
+    if(t.indexOf('좌표') !== -1 || t.indexOf('이미지 교체') !== -1) el.style.display='none';
+  });
+
+  // T 텍스트 → ✏️ 자유입력 으로 변경하고 활성화 텍스트도 유지
+  var tb = document.getElementById('text-btn');
+  if(tb){
+    tb.textContent = '✏️ 자유입력';
+    // offAll() 이 텍스트를 'T 텍스트'로 되돌리는 것을 막기 위해 MutationObserver 사용
+    var obs = new MutationObserver(function(){
+      if(tb.textContent === 'T 텍스트') tb.textContent = '✏️ 자유입력';
+      if(tb.textContent === 'T 끄기')   tb.textContent = '✏️ 끄기';
+    });
+    obs.observe(tb, {characterData:true, childList:true, subtree:true});
+  }
+
+  // 버튼 오른쪽 정렬: 남은 버튼들을 flex-end 그룹으로 묶기
+  var btnGroup = document.createElement('div');
+  btnGroup.style.cssText = 'display:flex;gap:8px;align-items:center;margin-left:auto;';
+  var toMove = [];
+  header.querySelectorAll('button, label').forEach(function(el){
+    if(el.style.display !== 'none') toMove.push(el);
+  });
+  toMove.forEach(function(el){ btnGroup.appendChild(el); });
+  header.appendChild(btnGroup);
+})();
+</script>
+</body>
+</html>

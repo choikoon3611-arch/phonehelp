@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KT 유심변경 서류 작성</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    background: #ececec;
+    margin: 0;
+    padding: 0 0 40px;
+  }
+  header {
+    background: #16283f;
+    color: #fff;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  header a.back {
+    color: #cdd9e4;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  header a.back:hover { color: #fff; }
+  header h1 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    flex: 1;
+    text-align: center;
+  }
+  header button {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    background: #ff5f1a;
+    color: #fff;
+    cursor: pointer;
+  }
+  .doc-wrap {
+    position: relative;
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .doc-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+  }
+  .field {
+    position: absolute;
+    transform: translateY(-50%);
+    border: 1px solid rgba(255,95,26,0.55);
+    background: rgba(255, 236, 179, 0.55);
+    border-radius: 4px;
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    color: #16283f;
+    font-weight: 700;
+    text-align: left;
+    padding: 0 4px;
+    outline: none;
+  }
+  .field:focus {
+    background: rgba(255, 236, 179, 0.95);
+    border-color: #ff5f1a;
+    box-shadow: 0 0 0 2px rgba(255,95,26,0.35);
+    z-index: 20;
+  }
+  .field.sig {
+    width: 12%;
+    height: 1.9%;
+    font-size: 15px;
+  }
+  .field.info {
+    width: 12%;
+    height: 1.9%;
+    font-size: 14px;
+  }
+  .memo-note {
+    position: absolute;
+    left: 50.5%;
+    top: 79.6%;
+    transform: translate(-50%, -50%);
+    width: 68%;
+    text-align: center;
+    color: #d0021b;
+    font-weight: 800;
+    font-size: 34px;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    text-shadow: 0 0 6px rgba(255,255,255,0.9), 0 0 2px rgba(255,255,255,0.9);
+  }
+
+    .textbox {
+    position:absolute; border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55);
+    outline:none; font-family:"Malgun Gothic","맑은 고딕",sans-serif;
+    font-size:13px; font-weight:700; color:#111;
+    padding:0 3px; overflow:hidden; line-height:1.3; cursor:text;
+  }
+  .textbox:focus { background:rgba(255,255,200,0.9); border-color:#0078ff; }
+  .sel-rect { position:absolute; border:2px dashed #0078ff; background:rgba(0,120,255,0.08); pointer-events:none; }
+  @media print {
+    header { display: none; }
+    body { background: #fff; padding: 0; }
+    .doc-wrap { box-shadow: none; margin: 0; max-width: 100%; }
+    .field {
+      border: none;
+      background: transparent;
+      font-size: 11pt;
+      font-weight: 700;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="hub.html">← 허브로</a>
+  <h1>KT 유심변경 서류 작성</h1>
+  <button class="hdr-btn" id="text-btn">T 텍스트</button>
+  <button class="hdr-btn" id="undo-btn">↩ 되돌리기</button>
+  <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="새 서류 이미지로 교체">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this)"></label> <button class="hdr-btn" id="img-reset-btn" onclick="resetFormImage()" style="display:none;" title="원본 이미지로 복원">↺ 복원</button> <button onclick="window.print()">인쇄 / PDF저장</button>
+</header>
+
+<div class="doc-wrap">
+  <img src="kt_usim_form.jpg" alt="KT 서비스신청서 (유심변경)">
+
+  <!-- 통신범죄예방안내 동의 서명란 3곳 -->
+  <input class="field sig" style="left:75.5%; top:9.83%;" placeholder="판매자 서명">
+  <input class="field sig" style="left:76.5%; top:13.13%;" placeholder="신청/가입자 서명">
+  <input class="field sig" style="left:76.5%; top:16.9%;" placeholder="신청/가입자 서명">
+
+  <!-- 고객정보 -->
+  <input class="field info" style="left:23.5%; top:49.56%;" placeholder="고객명">
+  <input class="field info" style="left:50.5%; top:48.54%;" placeholder="생년월일">
+  <input class="field info" style="left:81.7%; top:48.62%;" placeholder="핸드폰">
+
+  <!-- 메모란 안내 문구 -->
+  <div class="memo-note">USIM 번호 자필기재</div>
+</div>
+
+<style>
+#print-footer { max-width:900px; margin:0 auto; padding:7px 16px; background:#f1f5f9; border-top:1px solid #e2e7ec; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:12px; color:#334155; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+#print-footer span { white-space:nowrap; }
+#print-footer .pf-label { font-weight:700; color:#16283f; }
+@media print { #print-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #bbb; padding:4px 16px; font-size:11px; margin:0; max-width:none; } }
+</style>
+<div id="print-footer">
+  <span><span class="pf-label">접수처:</span> 현성네트워크</span>
+  <span><span class="pf-label">연락처:</span> 📞 043)216-0550 · 010-5835-7010</span>
+  <span><span class="pf-label">날짜:</span> <span id="pf-date"></span></span>
+  <span><span class="pf-label">시간:</span> <span id="pf-time"></span></span>
+</div>
+<script>
+(function(){function pfUpdate(){var d=new Date();document.getElementById('pf-date').textContent=d.getFullYear()+'.'+(''+(d.getMonth()+1)).padStart(2,'0')+'.'+(''+d.getDate()).padStart(2,'0');document.getElementById('pf-time').textContent=(''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');}pfUpdate();setInterval(pfUpdate,30000);window.addEventListener('beforeprint',pfUpdate);})();
+</script>
+
+<script>
+/* ===== 사용자/관리자 모드 구분 ===== */
+(function(){
+  var isAdmin = new URLSearchParams(location.search).has('edit');
+  if(isAdmin) return;
+
+  // 관리자 전용 버튼 숨기기
+  ['check-btn'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.style.display='none';
+  });
+  var header = document.querySelector('header') || document.querySelector('.toolbar');
+  if(!header) return;
+
+  header.querySelectorAll('button, label').forEach(function(el){
+    var t = el.textContent;
+    if(t.indexOf('좌표') !== -1 || t.indexOf('이미지 교체') !== -1) el.style.display='none';
+  });
+
+  // T 텍스트 → ✏️ 자유입력 으로 변경하고 활성화 텍스트도 유지
+  var tb = document.getElementById('text-btn');
+  if(tb){
+    tb.textContent = '✏️ 자유입력';
+    // offAll() 이 텍스트를 'T 텍스트'로 되돌리는 것을 막기 위해 MutationObserver 사용
+    var obs = new MutationObserver(function(){
+      if(tb.textContent === 'T 텍스트') tb.textContent = '✏️ 자유입력';
+      if(tb.textContent === 'T 끄기')   tb.textContent = '✏️ 끄기';
+    });
+    obs.observe(tb, {characterData:true, childList:true, subtree:true});
+  }
+
+  // 버튼 오른쪽 정렬: 남은 버튼들을 flex-end 그룹으로 묶기
+  var btnGroup = document.createElement('div');
+  btnGroup.style.cssText = 'display:flex;gap:8px;align-items:center;margin-left:auto;';
+  var toMove = [];
+  header.querySelectorAll('button, label').forEach(function(el){
+    if(el.style.display !== 'none') toMove.push(el);
+  });
+  toMove.forEach(function(el){ btnGroup.appendChild(el); });
+  header.appendChild(btnGroup);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서류 작성 빌더</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family:"Malgun Gothic","맑은 고딕",sans-serif; background:#ececec; margin:0; padding:18px 18px 40px; }
+
+  .workflow-bar {
+    max-width:960px; margin:0 auto 12px;
+    background:#f0e6ff; border:1.5px solid #c17aff;
+    border-radius:10px; padding:10px 16px;
+    font-size:13px; color:#3a006b; line-height:1.7;
+  }
+  .workflow-bar .step { display:inline-block; background:#7b00b8; color:#fff; border-radius:5px; padding:1px 8px; font-weight:700; margin:0 2px; }
+  .workflow-bar .arrow { color:#7b00b8; font-weight:700; margin:0 6px; }
+
+  .toolbar {
+    max-width:960px; margin:0 auto 12px;
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  .tb {
+    padding:8px 14px; font-size:13px; font-weight:700;
+    border:none; border-radius:8px; cursor:pointer; color:#fff;
+    background:#16283f; white-space:nowrap;
+  }
+  .tb:hover { opacity:0.9; }
+  .tb.active      { background:#d0021b; }
+  .tb.active-inp  { background:#7b00b8; }
+  .tb.active-txt  { background:#0060df; }
+  .tb.active-loup { background:#1f9d55; }
+
+  .doc-wrap {
+    position:relative; max-width:960px; margin:0 auto;
+    background:#fff; box-shadow:0 4px 24px rgba(0,0,0,0.15);
+    cursor:crosshair; overflow:hidden;
+  }
+  .doc-wrap img {
+    display:block; width:100%; height:auto;
+    user-select:none; min-height:300px; background:#ddd;
+  }
+
+  /* 좌표 마커 */
+  .marker {
+    position:absolute; width:10px; height:10px; background:red;
+    border:2px solid #fff; border-radius:50%;
+    transform:translate(-50%,-50%); pointer-events:none;
+    box-shadow:0 0 3px rgba(0,0,0,0.6);
+  }
+  .marker-label {
+    position:absolute; transform:translate(-50%,-100%);
+    background:rgba(0,0,0,0.75); color:#fff;
+    font-size:11px; padding:1px 5px; border-radius:4px;
+    white-space:nowrap; pointer-events:none;
+  }
+
+  /* 체크마크 */
+  .checkmark {
+    position:absolute; transform:translate(-50%,-50%);
+    font-size:1.6%; font-weight:900; color:#d0021b;
+    pointer-events:none; line-height:1;
+  }
+
+  /* ✏️ 입력필드 칸 */
+  .click-wrap {
+    position:absolute;
+    min-width:50px; min-height:22px;
+    border:1px solid rgba(123,0,184,0.5);
+    border-left:7px solid rgba(123,0,184,0.8);
+    background:rgba(240,218,255,0.75);
+    border-radius:4px; cursor:move;
+    resize:both; overflow:hidden; z-index:10;
+  }
+  .click-wrap:focus-within {
+    border-color:rgba(123,0,184,0.9);
+    box-shadow:0 0 0 2px rgba(123,0,184,0.25); z-index:20;
+  }
+  .click-wrap input {
+    display:block; width:100%; height:100%;
+    border:none; background:transparent;
+    font-family:"Malgun Gothic",sans-serif;
+    font-size:12px; font-weight:700; color:#3a006b;
+    padding:2px 5px; outline:none; cursor:text;
+  }
+  .click-wrap input::placeholder { color:rgba(90,0,150,0.45); font-weight:400; }
+
+  /* T 텍스트박스 */
+  .textbox {
+    position:absolute;
+    border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55);
+    outline:none; font-family:"Malgun Gothic",sans-serif;
+    font-size:13px; font-weight:700; color:#111;
+    padding:0 3px; overflow:hidden; line-height:1.3; cursor:text;
+  }
+  .textbox:focus { background:rgba(255,255,200,0.9); border-color:#0078ff; }
+  .sel-rect {
+    position:absolute; border:2px dashed #0078ff;
+    background:rgba(0,120,255,0.08); pointer-events:none;
+  }
+
+  /* 형광펜 */
+  .tb.active-hl { background:#d97706; }
+  .highlight-rect {
+    position:absolute; z-index:5; cursor:move;
+    border:1.5px dashed transparent; border-radius:3px;
+  }
+  .highlight-rect:hover { border-color:rgba(0,0,0,0.28); }
+  .hl-del {
+    position:absolute; top:-9px; right:-9px;
+    width:19px; height:19px;
+    background:#374151; color:#fff; border:none;
+    border-radius:50%; font-size:12px; font-weight:900;
+    cursor:pointer; display:none; line-height:1;
+    align-items:center; justify-content:center; padding:0;
+  }
+  .highlight-rect:hover .hl-del { display:flex; }
+  .hl-preview {
+    position:absolute; pointer-events:none; border-radius:2px; opacity:0.55;
+  }
+  .hl-color-btn {
+    width:23px; height:23px; border-radius:50%;
+    border:2px solid rgba(0,0,0,0.12); cursor:pointer;
+    transition:transform 0.1s, border-color 0.1s; flex-shrink:0;
+  }
+  .hl-color-btn.hl-sel { border-color:#333 !important; transform:scale(1.22); }
+
+  /* 돋보기 */
+  .magnifier {
+    position:fixed; width:220px; height:220px;
+    border-radius:50%; border:3px solid #16283f;
+    box-shadow:0 4px 16px rgba(0,0,0,0.35);
+    pointer-events:none; background-repeat:no-repeat;
+    display:none; z-index:999;
+  }
+  .magnifier::after {
+    content:''; position:absolute; left:50%; top:50%;
+    width:8px; height:8px; background:red; border-radius:50%;
+    transform:translate(-50%,-50%);
+  }
+
+  #log {
+    max-width:960px; margin:14px auto 0;
+    background:#fff; border-radius:8px; padding:14px 16px;
+    font-family:monospace; font-size:13px; white-space:pre-wrap; line-height:1.6;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08); min-height:56px; color:#222;
+  }
+
+  @media print {
+    .workflow-bar, .toolbar, #log { display:none; }
+    body { background:#fff; padding:0; }
+    .doc-wrap { box-shadow:none; margin:0; max-width:100%; }
+    .marker, .marker-label, .sel-rect { display:none; }
+    .click-wrap { border:none; background:transparent; resize:none; overflow:visible; cursor:default; }
+    .checkmark { display:block; }
+    .textbox { border:none; background:transparent; }
+    .highlight-rect { border:none !important; cursor:default; }
+    .hl-del { display:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="workflow-bar">
+  <span class="step">①</span> 이미지 불러오기
+  <span class="arrow">→</span>
+  <span class="step">②</span> <strong>✏️ 입력필드</strong> 모드로 칸 위치·크기 잡기 <em style="font-size:12px;">(보라 테두리 드래그=이동, 우하단 핸들=크기)</em>
+  <span class="arrow">→</span>
+  <span class="step">③</span> <strong style="color:#7b00b8;">📋 필드 내보내기</strong> 클릭
+  <span class="arrow">→</span>
+  <span class="step">④</span> Claude에 붙여넣기 + 서류 이름 알려주기 → <strong>작성 페이지 자동 생성</strong>
+</div>
+
+<div class="toolbar">
+  <label class="tb" style="background:#e6007e; cursor:pointer;">
+    📂 이미지 불러오기
+    <input type="file" id="file-input" accept="image/*" style="display:none;">
+  </label>
+  <button class="tb" id="save-btn" style="background:#1f9d55;" disabled>💾 이미지 저장</button>
+  <button class="tb" id="loupe-btn">🔍 돋보기</button>
+  <button class="tb" id="check-btn">✓ 체크</button>
+  <button class="tb" id="input-btn">✏️ 입력필드</button>
+  <button class="tb" id="text-btn">T 텍스트</button>
+  <button class="tb" id="hl-btn">🖍 형광펜</button>
+  <div id="hl-color-row" style="display:none;gap:6px;align-items:center;background:rgba(255,230,100,0.25);padding:5px 10px;border-radius:8px;border:1px solid rgba(217,119,6,0.3);">
+    <span style="font-size:11px;font-weight:700;color:#92400e;white-space:nowrap;">색상:</span>
+    <button class="hl-color-btn hl-sel" data-hlc="rgba(255,255,0,0.45)"    style="background:#ffff00;" title="노랑"></button>
+    <button class="hl-color-btn"        data-hlc="rgba(255,80,150,0.4)"    style="background:#ff5096;" title="핑크"></button>
+    <button class="hl-color-btn"        data-hlc="rgba(0,200,255,0.4)"     style="background:#00c8ff;" title="하늘"></button>
+    <button class="hl-color-btn"        data-hlc="rgba(80,255,160,0.45)"   style="background:#50ffa0;" title="민트"></button>
+    <button class="hl-color-btn"        data-hlc="rgba(255,165,0,0.45)"    style="background:#ffa500;" title="주황"></button>
+  </div>
+  <button class="tb" id="undo-btn">↩ 되돌리기</button>
+  <button class="tb" id="clear-btn">🗑 전체 지우기</button>
+  <button class="tb" id="export-btn" style="background:#7b00b8; font-size:14px;">📋 필드 내보내기</button>
+  <button class="tb" id="copy-btn" style="background:#2c5f9e;">📍 좌표 복사</button>
+  <a class="tb" href="hub.html" style="background:#44566c; text-decoration:none;">← 허브로</a>
+</div>
+
+<div class="doc-wrap" id="doc-wrap">
+  <img src="" alt="이미지를 불러오세요" id="doc-img">
+</div>
+<div id="log">(이미지를 불러온 뒤 ✏️ 입력필드 모드로 칸을 배치하세요)</div>
+<div class="magnifier" id="magnifier"></div>
+
+<script>
+const wrap      = document.getElementById('doc-wrap');
+const img       = document.getElementById('doc-img');
+const log       = document.getElementById('log');
+const magnifier = document.getElementById('magnifier');
+
+// ── 이미지 불러오기 ──
+document.getElementById('file-input').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    img.src = ev.target.result;
+    img.style.minHeight = ''; img.style.background = '';
+    points = []; render();
+    document.getElementById('save-btn').disabled = false;
+    log.textContent = '이미지 로드 완료. ✏️ 입력필드 모드를 눌러 칸을 배치하세요.';
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('save-btn').addEventListener('click', () => {
+  const name = prompt('저장할 파일 이름을 입력하세요:', 'form.jpg');
+  if (!name) return;
+  const a = document.createElement('a'); a.href = img.src; a.download = name; a.click();
+  setTimeout(() => alert(`💾 ${name} 다운로드 완료!\nsk결합서류_v8 폴더로 옮겨주세요.`), 500);
+});
+
+// ── 상태 ──
+let points = [], checks = [], clickFields = [], textBoxes = [], highlights = [];
+let dragStart = null, selRect = null;
+let hlOn = false, hlColor = 'rgba(255,255,0,0.45)';
+const undoStack = [];
+
+// ── 좌표 마커 렌더 ──
+function render() {
+  document.querySelectorAll('.marker,.marker-label').forEach(el => el.remove());
+  points.forEach((p, i) => {
+    const m = document.createElement('div'); m.className='marker';
+    m.style.left=p.x+'%'; m.style.top=p.y+'%'; wrap.appendChild(m);
+    const lb = document.createElement('div'); lb.className='marker-label';
+    lb.style.left=p.x+'%'; lb.style.top=p.y+'%'; lb.textContent=i+1; wrap.appendChild(lb);
+  });
+  if (points.length)
+    log.textContent = points.map((p,i)=>`${i+1}. left: ${p.x}%, top: ${p.y}%`).join('\n');
+}
+
+function renderChecks() {
+  document.querySelectorAll('.checkmark').forEach(el => el.remove());
+  checks.forEach(c => {
+    const el = document.createElement('div'); el.className='checkmark';
+    el.style.left=c.x+'%'; el.style.top=c.y+'%'; el.textContent='✓'; wrap.appendChild(el);
+  });
+}
+
+// ── 모드 ──
+let checkOn=false, inputOn=false, textOn=false, loupeOn=false;
+const checkBtn=document.getElementById('check-btn');
+const inputBtn=document.getElementById('input-btn');
+const textBtn =document.getElementById('text-btn');
+const loupeBtn=document.getElementById('loupe-btn');
+const hlBtn   =document.getElementById('hl-btn');
+
+function setMode(m) {
+  checkOn=m==='check'; inputOn=m==='input'; textOn=m==='text'; hlOn=m==='hl';
+  checkBtn.classList.toggle('active',     checkOn);
+  inputBtn.classList.toggle('active-inp', inputOn);
+  textBtn.classList.toggle('active-txt',  textOn);
+  hlBtn.classList.toggle('active-hl',     hlOn);
+  checkBtn.textContent = checkOn ? '✓ 체크 끄기'       : '✓ 체크';
+  inputBtn.textContent = inputOn ? '✏️ 입력필드 끄기'    : '✏️ 입력필드';
+  textBtn.textContent  = textOn  ? 'T 끄기'             : 'T 텍스트';
+  hlBtn.textContent    = hlOn    ? '🖍 형광펜 끄기'      : '🖍 형광펜';
+  document.getElementById('hl-color-row').style.display = hlOn ? 'flex' : 'none';
+  wrap.style.userSelect = textOn ? 'none' : '';
+}
+checkBtn.addEventListener('click', () => setMode(checkOn?'':'check'));
+inputBtn.addEventListener('click', () => setMode(inputOn?'':'input'));
+textBtn.addEventListener('click',  () => setMode(textOn ?'':'text'));
+hlBtn.addEventListener('click',    () => setMode(hlOn   ?'':'hl'));
+
+document.querySelectorAll('.hl-color-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    hlColor = btn.dataset.hlc;
+    document.querySelectorAll('.hl-color-btn').forEach(b => b.classList.remove('hl-sel'));
+    btn.classList.add('hl-sel');
+  });
+});
+
+// 돋보기
+loupeBtn.addEventListener('click', () => {
+  loupeOn=!loupeOn;
+  loupeBtn.classList.toggle('active-loup', loupeOn);
+  loupeBtn.textContent = loupeOn?'🔍 돋보기 끄기':'🔍 돋보기';
+  magnifier.style.display = loupeOn?'block':'none';
+});
+wrap.addEventListener('mousemove', e => {
+  if (!loupeOn) return;
+  const r=img.getBoundingClientRect();
+  magnifier.style.backgroundImage=`url(${img.src})`;
+  magnifier.style.backgroundSize=`${r.width*3}px ${r.height*3}px`;
+  magnifier.style.backgroundPosition=`-${(e.clientX-r.left)*3-110}px -${(e.clientY-r.top)*3-110}px`;
+  magnifier.style.left=(e.clientX-110)+'px'; magnifier.style.top=(e.clientY-240)+'px';
+});
+wrap.addEventListener('mouseleave',()=>{ magnifier.style.display='none'; });
+wrap.addEventListener('mouseenter',()=>{ if(loupeOn) magnifier.style.display='block'; });
+
+// ── 클릭 핸들러 ──
+wrap.addEventListener('click', e => {
+  if (e.target.closest('.click-wrap')) return;
+  if (e.target.closest('.highlight-rect')) return;
+  if (['textbox','marker','marker-label','checkmark','sel-rect','hl-preview'].some(c=>e.target.classList.contains(c))) return;
+  const r=img.getBoundingClientRect();
+  const x=Math.round(((e.clientX-r.left)/r.width)*10000)/100;
+  const y=Math.round(((e.clientY-r.top)/r.height)*10000)/100;
+  if (checkOn)            { checks.push({x,y}); renderChecks(); undoStack.push({type:'check'}); }
+  else if (inputOn)       { createClickField(x,y); }
+  else if (!hlOn)         { points.push({x,y}); render(); undoStack.push({type:'point'}); }
+});
+
+// ── ✏️ 입력필드 생성 ──
+function createClickField(x, y) {
+  const w = document.createElement('div');
+  w.className='click-wrap';
+  w.style.left=''+x+'%'; w.style.top=''+y+'%';
+  w.style.width='18%'; w.style.height='28px';
+  w.style.transform='translate(-50%,-50%)';
+
+  const inp=document.createElement('input'); inp.type='text'; inp.placeholder='힌트 입력';
+  w.appendChild(inp); wrap.appendChild(w);
+
+  let xformed=false;
+  w.addEventListener('mousedown', e=>{
+    if (e.target.tagName==='INPUT') return;
+    const r=w.getBoundingClientRect();
+    if (e.clientX>r.right-20 && e.clientY>r.bottom-20) return; // resize handle
+    e.preventDefault(); e.stopPropagation();
+    if (!xformed) {
+      const ir=img.getBoundingClientRect();
+      w.style.left=((r.left-ir.left)/ir.width*100).toFixed(2)+'%';
+      w.style.top=((r.top-ir.top)/img.offsetHeight*100).toFixed(2)+'%';
+      w.style.transform=''; xformed=true;
+    }
+    const sx=e.clientX,sy=e.clientY,sl=parseFloat(w.style.left),st=parseFloat(w.style.top);
+    const mv=ev=>{
+      w.style.left=(sl+(ev.clientX-sx)/img.offsetWidth*100).toFixed(2)+'%';
+      w.style.top=(st+(ev.clientY-sy)/img.offsetHeight*100).toFixed(2)+'%';
+    };
+    const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);};
+    window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up);
+  });
+
+  inp.addEventListener('keydown', ev=>{
+    if ((ev.key==='Delete'||ev.key==='Backspace')&&inp.value==='') {
+      ev.preventDefault(); w.remove(); clickFields=clickFields.filter(f=>f!==w);
+      updateFieldLog();
+    }
+  });
+
+  clickFields.push(w); undoStack.push({type:'field',el:w});
+  updateFieldLog();
+  inp.focus();
+}
+
+function updateFieldLog() {
+  const n = clickFields.length;
+  if (n === 0) { log.textContent = '(이미지를 불러온 뒤 ✏️ 입력필드 모드로 칸을 배치하세요.)'; return; }
+  log.textContent = `✏️ 입력필드 ${n}개 배치됨  →  [📋 필드 내보내기] 를 클릭해 좌표를 복사하세요.`;
+}
+
+// ── T 텍스트박스 / 형광펜 드래그 ──
+wrap.addEventListener('mousedown', e=>{
+  if ((!textOn&&!hlOn)||e.target.closest('.click-wrap')||e.target.classList.contains('textbox')||e.target.closest('.highlight-rect')) return;
+  e.preventDefault();
+  const r=wrap.getBoundingClientRect();
+  dragStart={x:e.clientX-r.left,y:e.clientY-r.top,mode:hlOn?'hl':'text'};
+  selRect=document.createElement('div');
+  selRect.className=hlOn?'hl-preview':'sel-rect';
+  if(hlOn){selRect.style.background=hlColor;}
+  selRect.style.left=dragStart.x+'px'; selRect.style.top=dragStart.y+'px';
+  wrap.appendChild(selRect);
+});
+window.addEventListener('mousemove',e=>{
+  if((!textOn&&!hlOn)||!dragStart) return;
+  const r=wrap.getBoundingClientRect();
+  const cx=e.clientX-r.left,cy=e.clientY-r.top;
+  const x=Math.min(dragStart.x,cx),y=Math.min(dragStart.y,cy);
+  selRect.style.left=x+'px'; selRect.style.top=y+'px';
+  selRect.style.width=Math.abs(cx-dragStart.x)+'px'; selRect.style.height=Math.abs(cy-dragStart.y)+'px';
+});
+window.addEventListener('mouseup',e=>{
+  if((!textOn&&!hlOn)||!dragStart) return;
+  const r=wrap.getBoundingClientRect();
+  const cx=e.clientX-r.left,cy=e.clientY-r.top;
+  const x=Math.min(dragStart.x,cx),y=Math.min(dragStart.y,cy);
+  const ww=Math.abs(cx-dragStart.x),h=Math.abs(cy-dragStart.y);
+  const mode=dragStart.mode;
+  selRect.remove(); selRect=null; dragStart=null;
+  if(ww<10||h<6) return;
+  const iw=wrap.offsetWidth,ih=img.offsetHeight;
+  if(mode==='hl'){
+    createHighlight(x/iw*100, y/ih*100, ww/iw*100, h/ih*100, hlColor);
+  } else {
+    const box=document.createElement('div'); box.className='textbox'; box.contentEditable='true';
+    box.style.left=(x/iw*100)+'%'; box.style.top=(y/ih*100)+'%';
+    box.style.width=(ww/iw*100)+'%'; box.style.minHeight=(h/ih*100)+'%';
+    box.addEventListener('keydown',ev=>{
+      if((ev.key==='Delete'||ev.key==='Backspace')&&box.textContent===''){ev.preventDefault();box.remove();textBoxes=textBoxes.filter(b=>b!==box);}
+    });
+    wrap.appendChild(box); textBoxes.push(box); box.focus(); undoStack.push({type:'textbox',el:box});
+  }
+});
+
+// ── 형광펜 생성 ──
+function createHighlight(lx, ly, lw, lh, color) {
+  const hl=document.createElement('div');
+  hl.className='highlight-rect';
+  hl.style.left=lx+'%'; hl.style.top=ly+'%';
+  hl.style.width=lw+'%'; hl.style.height=lh+'%';
+  hl.style.background=color;
+
+  const delBtn=document.createElement('button');
+  delBtn.className='hl-del'; delBtn.textContent='×';
+  delBtn.addEventListener('click', e=>{
+    e.stopPropagation(); hl.remove();
+    highlights=highlights.filter(h=>h!==hl);
+  });
+  hl.appendChild(delBtn);
+
+  hl.addEventListener('mousedown', e=>{
+    if(e.target===delBtn) return;
+    e.preventDefault(); e.stopPropagation();
+    const r=hl.getBoundingClientRect(), ir=img.getBoundingClientRect();
+    let sl=(r.left-ir.left)/ir.width*100, st=(r.top-ir.top)/img.offsetHeight*100;
+    const sx=e.clientX, sy=e.clientY;
+    const mv=ev=>{
+      hl.style.left=(sl+(ev.clientX-sx)/img.offsetWidth*100).toFixed(2)+'%';
+      hl.style.top =(st+(ev.clientY-sy)/img.offsetHeight*100).toFixed(2)+'%';
+    };
+    const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);};
+    window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up);
+  });
+
+  wrap.appendChild(hl); highlights.push(hl);
+  undoStack.push({type:'highlight',el:hl});
+}
+
+// ── 되돌리기 ──
+function undo() {
+  const last=undoStack.pop(); if(!last) return;
+  if(last.type==='point'){points.pop();render();}
+  else if(last.type==='check'){checks.pop();renderChecks();}
+  else if(last.type==='field'){last.el.remove();clickFields=clickFields.filter(f=>f!==last.el);updateFieldLog();}
+  else if(last.type==='textbox'){last.el.remove();textBoxes=textBoxes.filter(b=>b!==last.el);}
+  else if(last.type==='highlight'){last.el.remove();highlights=highlights.filter(h=>h!==last.el);}
+}
+document.getElementById('undo-btn').addEventListener('click', undo);
+document.addEventListener('keydown', e=>{
+  if(e.ctrlKey&&e.key==='z'){
+    const a=document.activeElement;
+    if(a&&(a.tagName==='INPUT'||a.contentEditable==='true')) return;
+    e.preventDefault(); undo();
+  }
+});
+
+document.getElementById('clear-btn').addEventListener('click', ()=>{
+  points=[]; checks=[];
+  clickFields.forEach(f=>f.remove()); clickFields=[];
+  textBoxes.forEach(b=>b.remove()); textBoxes=[];
+  highlights.forEach(h=>h.remove()); highlights=[];
+  render(); renderChecks(); undoStack.length=0;
+  log.textContent='(전체 지우기 완료)';
+});
+
+// ── 📋 필드 내보내기 ──
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  const fields=document.querySelectorAll('.click-wrap');
+  if(!fields.length){ alert('✏️ 입력필드 모드로 칸을 먼저 배치해주세요.'); return; }
+  const iRect=img.getBoundingClientRect();
+  if(!iRect.width){ alert('이미지를 먼저 불러오세요.'); return; }
+
+  const lines=Array.from(fields).map((f,i)=>{
+    const r=f.getBoundingClientRect();
+    const left  =((r.left-iRect.left)/iRect.width *100).toFixed(2);
+    const top   =((r.top + r.height/2 - iRect.top)/iRect.height*100).toFixed(2);
+    const width =(r.width /iRect.width *100).toFixed(2);
+    const height=(r.height/iRect.height*100).toFixed(2);
+    const hint=f.querySelector('input').placeholder||`필드 ${i+1}`;
+    return `필드 ${i+1}: left:${left}%, top:${top}%, width:${width}%, height:${height}% | 힌트: ${hint}`;
+  });
+
+  const text='📋 입력 필드 좌표\n'+lines.join('\n');
+  log.textContent=text;
+  navigator.clipboard.writeText(text)
+    .then(()=>alert('✅ 복사 완료!\nClaude에게 붙여넣고 서류 이름을 알려주시면\n작성 페이지를 자동으로 만들어 드립니다.'))
+    .catch(()=>alert('복사 실패. 아래 텍스트를 직접 선택해서 복사해주세요.'));
+});
+
+// ── 📍 좌표 복사 ──
+document.getElementById('copy-btn').addEventListener('click', ()=>{
+  if(!points.length){ alert('클릭한 좌표가 없어요.'); return; }
+  const text=points.map((p,i)=>`${i+1}. left: ${p.x}%, top: ${p.y}%`).join('\n');
+  navigator.clipboard.writeText(text)
+    .then(()=>alert('복사됐어요!'))
+    .catch(()=>alert('복사 실패. 아래 목록을 직접 선택해서 복사해주세요.'));
+});
+</script>
+</body>
+</html>
