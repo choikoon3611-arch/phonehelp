@@ -1159,7 +1159,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div><label class="sl">개통일자</label><input id="sr-date"    class="scan-field" type="date"></div>
         <div><label class="sl">통신사</label>
-          <select id="sr-carrier" class="scan-field">
+          <select id="sr-carrier" class="scan-field" onchange="applyCarrierDefaults()">
             <option value="SKT">SKT</option><option value="KT">KT</option>
             <option value="LG">LG U+</option><option value="KTM">알뜰통신</option>
           </select>
@@ -1964,6 +1964,14 @@ function actvRender() {
   </tr>`).join('');
 }
 
+function applyCarrierDefaults() {
+  const carrier = document.getElementById('sr-carrier')?.value;
+  const contractEl = document.getElementById('sr-contract');
+  if (!contractEl) return;
+  const defaultVal = carrier === 'KTM' ? '12' : '24';
+  contractEl.value = defaultVal;
+}
+
 function calcPrice() {
   const retail   = Number(document.getElementById('sr-retail')?.value.replace(/,/g,'') || 0);
   const official = Number(document.getElementById('sr-official')?.value.replace(/,/g,'') || 0);
@@ -2018,7 +2026,8 @@ function scanSaveActivation() {
   // 고객DB 자동 등록 (전화번호 기준, 최신 개통 정보로 덮어쓰기)
   if (entry.전화번호) {
     const custKey = entry.전화번호.replace(/[^0-9]/g,'');
-    const 약정기간수 = Number(entry.약정기간) || 24;
+    const defaultContract = entry.통신사 === 'KTM' ? 12 : 24;
+    const 약정기간수 = Number(entry.약정기간) || defaultContract;
     const 할부개월수 = Number(entry.할부개월) || 0;
     let 약정만료일 = '';
     if (entry.date) {
@@ -2145,6 +2154,8 @@ async function runScanExtract(file) {
       const found = map.find(([k]) => d.통신사.toUpperCase().includes(k.toUpperCase()));
       if (found) document.getElementById('sr-carrier').value = found[1];
     }
+    // 약정기간 미입력 시 통신사 기준 기본값 적용
+    if (!document.getElementById('sr-contract').value) applyCarrierDefaults();
     if (d.개통유형) {
       const tmap = [['신규','신규'],['번호이동','번호이동'],['번이','번호이동'],['기기변경','기기변경'],['기변','기기변경']];
       const found = tmap.find(([k]) => d.개통유형.includes(k));
