@@ -671,7 +671,8 @@
   <button class="tab-btn" data-tab="fav">⭐ 즐겨찾기</button>
   <button class="tab-btn" data-tab="cred">🔑 ID/PW</button>
   <button class="tab-btn" data-tab="scan">📷 스캔입력</button>
-  <button class="tab-btn" data-tab="actv">📊 개통내역</button>
+  <button class="tab-btn" data-tab="cust">👤 고객DB</button>
+  <button class="tab-btn" data-tab="renewal">📅 약정관리</button>
   <button id="logout-btn" style="margin-left:auto;padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
 </nav>
 
@@ -923,9 +924,8 @@
   <div class="tab-panel" id="panel-sms">
     <div class="section-head">
       <h2>💬 문자 생성기</h2>
-      <p>고객명과 요금제만 입력하면 문자가 자동 완성됩니다</p>
+      <p>서류를 스캔해서 고객명·요금제를 자동 인식하고 문자를 완성합니다</p>
     </div>
-
 
     <!-- 템플릿 목록 -->
     <div id="sms-templates-wrap"></div>
@@ -964,6 +964,66 @@
       <button class="btn-add-card" onclick="credAdd()">+ 추가</button>
     </div>
     <div id="cred-list" class="cred-list"></div>
+  </div>
+
+  <!-- 👤 고객DB 탭 -->
+  <div class="tab-panel" id="panel-cust">
+    <div class="section-head"><h2>👤 고객 DB</h2><p>스캔 저장 시 자동 등록 · 전화번호 기준 중복 관리</p></div>
+    <div style="max-width:960px;margin:0 auto;">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <input id="cust-search" class="scan-field" type="text" placeholder="고객명 또는 전화번호 검색" style="max-width:280px;" oninput="custRender()">
+        <select id="cust-carrier-filter" class="scan-field" style="width:auto;min-width:100px;" onchange="custRender()">
+          <option value="">전체 통신사</option>
+          <option>SKT</option><option>KT</option><option>LG</option><option>KTM</option>
+        </select>
+        <span id="cust-count" style="font-size:13px;font-weight:700;color:var(--ink);"></span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:var(--panel);text-align:left;">
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">고객명</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">전화번호</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">통신사</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">단말기</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">요금제</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">개통일</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">약정기간</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">할부개월</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">약정만료</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">D-day</th>
+              <th style="padding:8px 10px;border-bottom:2px solid var(--line);">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="cust-tbody"></tbody>
+        </table>
+        <div id="cust-empty" style="display:none;text-align:center;padding:40px;color:#888;">저장된 고객이 없습니다. 스캔 저장 시 자동 등록됩니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📅 약정관리 탭 -->
+  <div class="tab-panel" id="panel-renewal">
+    <div class="section-head"><h2>📅 약정 만료 관리</h2><p>약정 만료 임박 고객 알림 · 재약정 문자 자동 생성</p></div>
+    <div style="max-width:900px;margin:0 auto;">
+      <!-- 필터 -->
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <button class="renewal-filter-btn active" data-days="30" onclick="renewalFilter(30)">🔴 30일 이내</button>
+        <button class="renewal-filter-btn" data-days="60" onclick="renewalFilter(60)">🟠 60일 이내</button>
+        <button class="renewal-filter-btn" data-days="90" onclick="renewalFilter(90)">🟡 90일 이내</button>
+        <button class="renewal-filter-btn" data-days="0" onclick="renewalFilter(0)">⚫ 이미 만료</button>
+        <button class="renewal-filter-btn" data-days="999" onclick="renewalFilter(999)">📋 전체</button>
+      </div>
+      <!-- 도구 바 -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+        <button id="btn-minor-toggle" onclick="toggleRenewalMinor()" style="padding:6px 14px;border-radius:8px;border:1.5px solid #f59e0b;background:#fef3c7;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;">👶 미성년자 제외중</button>
+        <button onclick="renewalCopyAllPhones(this)" style="padding:6px 14px;border-radius:8px;background:#0d9488;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📋 전화번호 전체 복사</button>
+        <span id="renewal-count" style="font-size:12px;color:#888;"></span>
+      </div>
+      <!-- 목록 -->
+      <div id="renewal-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="renewal-empty" style="display:none;text-align:center;padding:40px;color:#888;">해당 조건의 고객이 없습니다.</div>
+    </div>
   </div>
 
 </main>
@@ -1123,6 +1183,7 @@
             <div><label class="sl">추가지원금(원)</label><input id="sr-extra-sub" class="scan-field" type="text" inputmode="numeric" placeholder="고객에게 할인해준 금액" oninput="calcPrice()"></div>
             <div><label class="sl" style="color:#0ea5e9;">할부원금 (자동)</label><input id="sr-price" class="scan-field" type="text" inputmode="numeric" style="background:#eff6ff;font-weight:700;color:#0ea5e9;" placeholder="자동계산" readonly></div>
             <div><label class="sl">할부개월</label><input id="sr-months" class="scan-field" type="text" inputmode="numeric"></div>
+            <div><label class="sl">약정기간</label><input id="sr-contract" class="scan-field" type="text" inputmode="numeric" placeholder="24 또는 36"></div>
           </div>
         </div>
         <div style="grid-column:1/-1;"><label class="sl">부가서비스</label><input id="sr-addons" class="scan-field" type="text" placeholder="보험명, 기타 (쉼표 구분)"></div>
@@ -1196,6 +1257,8 @@
 .actv-stat-card { background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:14px;text-align:center; }
 .actv-stat-card .sv { font-size:22px;font-weight:900;color:var(--ink); }
 .actv-stat-card .sk { font-size:11px;color:#888;margin-top:2px; }
+.renewal-filter-btn { padding:7px 16px;border:1.5px solid var(--line);border-radius:20px;background:var(--panel);color:var(--ink);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit; }
+.renewal-filter-btn.active { background:#6366f1;color:#fff;border-color:#6366f1; }
 </style>
 
 <!-- 공유업무 모달 -->
@@ -1680,6 +1743,165 @@ document.getElementById('card-modal-bg').addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') cardCloseModal(); });
 
+// ── 고객 DB (Firebase) ──────────────────────────────
+let custList = [];
+db.ref(HUB + '/customers').on('value', snap => {
+  const d = snap.val() || {};
+  custList = Object.values(d).sort((a,b) => (a.고객명||'').localeCompare(b.고객명||''));
+  custRender();
+  renewalRender(30);
+});
+
+function custRender() {
+  const q      = (document.getElementById('cust-search')?.value || '').toLowerCase();
+  const carrier= document.getElementById('cust-carrier-filter')?.value || '';
+  const tbody  = document.getElementById('cust-tbody');
+  const empty  = document.getElementById('cust-empty');
+  const count  = document.getElementById('cust-count');
+  if (!tbody) return;
+  let rows = custList;
+  if (q)       rows = rows.filter(c => (c.고객명||'').toLowerCase().includes(q) || (c.전화번호||'').includes(q));
+  if (carrier) rows = rows.filter(c => c.통신사 === carrier);
+  if (count)   count.textContent = rows.length + '명';
+  if (!rows.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const today = new Date(); today.setHours(0,0,0,0);
+  tbody.innerHTML = rows.map(c => {
+    let dday = '', ddayColor = '#888';
+    if (c.약정만료일) {
+      const exp = new Date(c.약정만료일); exp.setHours(0,0,0,0);
+      const diff = Math.round((exp - today) / 86400000);
+      if (diff < 0)       { dday = `만료 ${-diff}일 경과`; ddayColor='#dc2626'; }
+      else if (diff === 0){ dday = 'D-Day'; ddayColor='#dc2626'; }
+      else if (diff <= 30){ dday = `D-${diff}`; ddayColor='#f59e0b'; }
+      else                { dday = `D-${diff}`; ddayColor='#16a34a'; }
+    }
+    return `<tr style="border-bottom:1px solid var(--line);">
+      <td style="padding:7px 10px;font-weight:700;">${c.고객명||''}</td>
+      <td style="padding:7px 10px;">${c.전화번호||''}</td>
+      <td style="padding:7px 10px;">${c.통신사||''}</td>
+      <td style="padding:7px 10px;font-size:12px;">${c.단말기||''}</td>
+      <td style="padding:7px 10px;font-size:12px;">${c.요금제||''}</td>
+      <td style="padding:7px 10px;white-space:nowrap;">${c.개통일||''}</td>
+      <td style="padding:7px 10px;text-align:center;">${c.약정기간?c.약정기간+'개월':''}</td>
+      <td style="padding:7px 10px;text-align:center;">${c.할부개월?c.할부개월+'개월':''}</td>
+      <td style="padding:7px 10px;white-space:nowrap;">${c.약정만료일||''}</td>
+      <td style="padding:7px 10px;font-weight:700;color:${ddayColor};">${dday}</td>
+      <td style="padding:7px 10px;"><button onclick="custDelete('${c.전화번호?.replace(/[^0-9]/g,'')}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function custDelete(key) {
+  if (!confirm('삭제할까요?')) return;
+  db.ref(HUB + '/customers/' + key).remove();
+}
+
+// ── 약정 관리 ─────────────────────────────────────────
+let renewalDays = 30;
+let renewalExcludeMinors = true;
+
+function isMinor(jumin) {
+  if (!jumin || jumin.length < 2) return false;
+  const yy = parseInt(jumin.slice(0,2));
+  const year = yy <= 26 ? 2000 + yy : 1900 + yy;
+  return year >= 2008;
+}
+
+function toggleRenewalMinor() {
+  renewalExcludeMinors = !renewalExcludeMinors;
+  const btn = document.getElementById('btn-minor-toggle');
+  if (btn) {
+    btn.textContent = renewalExcludeMinors ? '👶 미성년자 제외중' : '👶 미성년자 포함중';
+    btn.style.background = renewalExcludeMinors ? '#fef3c7' : '#f3f4f6';
+    btn.style.borderColor = renewalExcludeMinors ? '#f59e0b' : '#d1d5db';
+    btn.style.color = renewalExcludeMinors ? '#92400e' : '#374151';
+  }
+  renewalRender(renewalDays);
+}
+
+function renewalCopyAllPhones(btn) {
+  const cards = document.querySelectorAll('#renewal-list [data-phone]');
+  const phones = [...cards].map(el => el.dataset.phone).filter(Boolean);
+  if (!phones.length) { alert('표시된 고객이 없습니다.'); return; }
+  navigator.clipboard.writeText(phones.join('\n')).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = `✅ ${phones.length}명 복사됨!`;
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function renewalFilter(days) {
+  renewalDays = days;
+  document.querySelectorAll('.renewal-filter-btn').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.days) === days);
+  });
+  renewalRender(days);
+}
+
+function renewalRender(days) {
+  const list  = document.getElementById('renewal-list');
+  const empty = document.getElementById('renewal-empty');
+  if (!list) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  const filtered = custList.filter(c => {
+    if (!c.약정만료일) return false;
+    if (renewalExcludeMinors && isMinor(c.주민번호)) return false;
+    const exp = new Date(c.약정만료일); exp.setHours(0,0,0,0);
+    const diff = Math.round((exp - today) / 86400000);
+    if (days === 0)   return diff < 0;
+    if (days === 999) return true;
+    return diff >= 0 && diff <= days;
+  }).sort((a,b) => (a.약정만료일||'').localeCompare(b.약정만료일||''));
+
+  const countEl = document.getElementById('renewal-count');
+  if (!filtered.length) { list.innerHTML=''; empty.style.display='block'; if(countEl) countEl.textContent=''; return; }
+  empty.style.display='none';
+  if (countEl) countEl.textContent = `총 ${filtered.length}명`;
+
+  list.innerHTML = filtered.map(c => {
+    const exp  = new Date(c.약정만료일); exp.setHours(0,0,0,0);
+    const diff = Math.round((exp - today) / 86400000);
+    let badge, badgeColor;
+    if (diff < 0)       { badge=`만료 ${-diff}일 경과`; badgeColor='#dc2626'; }
+    else if (diff===0)  { badge='오늘 만료!'; badgeColor='#dc2626'; }
+    else if (diff<=30)  { badge=`D-${diff}`; badgeColor='#f59e0b'; }
+    else                { badge=`D-${diff}`; badgeColor='#16a34a'; }
+
+    const sms1 = `${c.고객명}고객님 이쁜핸드폰집입니다^^ 고객님 이용중이신 ${c.요금제} 약정이 ${c.약정만료일} 만료됩니다. 재약정 시 혜택 안내드리오니 114연결 또는 매장내방 부탁드립니다 :)`;
+    const safeId = (c.전화번호||'').replace(/[^0-9]/g,'');
+    const phone = c.전화번호||'';
+    return `<div data-phone="${phone}" style="background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;">
+      <div style="flex:1;min-width:200px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-weight:900;font-size:15px;">${c.고객명}</span>
+          <span style="background:${badgeColor};color:#fff;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;">${badge}</span>
+          <span style="font-size:12px;color:#888;">${c.통신사||''}</span>
+        </div>
+        <div style="font-size:12px;color:#666;line-height:1.8;">
+          📞 ${c.전화번호||''} &nbsp;|&nbsp; 📅 개통: ${c.개통일||''} &nbsp;|&nbsp; 만료: ${c.약정만료일||''}<br>
+          📱 ${c.단말기||''} &nbsp;|&nbsp; 요금제: ${c.요금제||''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;min-width:160px;">
+        <textarea id="rn-sms-${safeId}" style="width:100%;padding:8px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;background:var(--bg);color:var(--ink);resize:none;font-family:inherit;line-height:1.5;" rows="4">${sms1}</textarea>
+        <button onclick="renewalCopy('rn-sms-${safeId}',this)" style="padding:6px;background:#6366f1;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;">📋 문자 복사</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renewalCopy(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ 복사됨!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
 // ── 개통 내역 (Firebase) ─────────────────────────────
 let actvList = [];
 db.ref(HUB + '/activations').on('value', snap => {
@@ -1781,6 +2003,7 @@ function scanSaveActivation() {
     추가지원금: g('sr-extra-sub'),
     할부원금:  g('sr-price'),
     할부개월:  g('sr-months'),
+    약정기간:  g('sr-contract'),
     부가서비스: g('sr-addons'),
     기본정책:  g('sr-base'),
     추가정책:  g('sr-extra-policy'),
@@ -1791,6 +2014,24 @@ function scanSaveActivation() {
   };
   if (!entry.고객명) { alert('고객명을 입력하세요.'); return; }
   db.ref(HUB + '/activations/' + entry.id).set(entry);
+  // 고객DB 자동 등록 (전화번호 기준, 최신 개통 정보로 덮어쓰기)
+  if (entry.전화번호) {
+    const custKey = entry.전화번호.replace(/[^0-9]/g,'');
+    const 약정기간수 = Number(entry.약정기간) || 24;
+    const 할부개월수 = Number(entry.할부개월) || 0;
+    let 약정만료일 = '';
+    if (entry.date) {
+      const d = new Date(entry.date);
+      d.setMonth(d.getMonth() + 약정기간수);
+      약정만료일 = d.toISOString().slice(0,10);
+    }
+    db.ref(HUB + '/customers/' + custKey).set({
+      고객명: entry.고객명, 전화번호: entry.전화번호, 주민번호: entry.주민번호,
+      통신사: entry.통신사, 단말기: entry.단말기, 요금제: entry.요금제,
+      개통일: entry.date, 약정기간: 약정기간수, 할부개월: 할부개월수, 약정만료일,
+      업데이트: new Date().toISOString().slice(0,10)
+    });
+  }
   document.getElementById('scan-result-box').style.display = 'none';
   document.getElementById('scan-preview-wrap').style.display = 'none';
   const st = document.getElementById('scan-tab-status');
@@ -1853,7 +2094,8 @@ async function runScanExtract(file) {
   "추가지원금": "대리점이 고객에게 추가로 할인해준 금액, 숫자만(없으면 0)",
   "선납금": "고객이 선납한 금액, 숫자만(없으면 0)",
   "할부원금": "숫자만(쉼표 없이)",
-  "할부개월": "숫자만",
+  "할부개월": "단말기 할부 개월수, 숫자만",
+  "약정기간": "요금제 약정 개월수(약정기간/약정개월), 숫자만",
   "부가서비스": "가입된 부가서비스 전체를 쉼표로 구분 (없으면 빈 문자열)"
 }`;
 
@@ -1884,6 +2126,7 @@ async function runScanExtract(file) {
     set('sr-retail',    d.출고가);
     set('sr-official',  d.공시지원금);
     set('sr-months',    d.할부개월);
+    set('sr-contract',  d.약정기간);
     set('sr-addons',    d.부가서비스);
     // 추가지원금·선납금 → 할인금액 자동 합산
     const extraSub = Number(d.추가지원금 || 0);
@@ -1982,7 +2225,8 @@ async function scanAndFill(input) {
   "추가지원금": "대리점이 고객에게 추가로 할인해준 금액, 숫자만(없으면 0)",
   "선납금": "고객이 선납한 금액, 숫자만(없으면 0)",
   "할부원금": "숫자만(쉼표 없이)",
-  "할부개월": "숫자만",
+  "할부개월": "단말기 할부 개월수, 숫자만",
+  "약정기간": "요금제 약정 개월수(약정기간/약정개월), 숫자만",
   "부가서비스": "가입된 부가서비스 전체를 쉼표로 구분 (없으면 빈 문자열)"
 }`;
 
@@ -2179,6 +2423,98 @@ async function smsSend() {
     setStatus('err', '❌ 오류: ' + e.message);
   }
 }
+// ── SMS 스캔 문자 생성 ──────────────────────────────
+async function smsScanFiles(files) {
+  if (!files || !files.length) return;
+  const apiKey = localStorage.getItem('gemini_api_key');
+  if (!apiKey) { alert('Gemini API 키가 없습니다. 스캔입력 탭에서 먼저 설정해 주세요.'); return; }
+
+  // 파일명 표시
+  const namesEl = document.getElementById('sms-file-names');
+  if (namesEl) namesEl.textContent = '📎 ' + Array.from(files).map(f=>f.name).join(' · ');
+
+  const st = document.getElementById('sms-scan-status');
+  st.style.display = 'block';
+  st.style.background = '#fef9c3'; st.style.color = '#92400e';
+  st.textContent = `⏳ 서류 ${files.length}장 인식 중...`;
+
+  try {
+    const toB64 = f => new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = e => res({ data: e.target.result.split(',')[1], mime: f.type || 'image/jpeg' });
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+    const imgs = await Promise.all(Array.from(files).slice(0,2).map(toB64));
+
+    const prompt = `통신사 휴대폰 가입/변경 서류 이미지(1~2장)에서 아래 정보를 추출해 JSON으로만 반환하세요. 다른 텍스트 없이 JSON만.
+
+- 고객명: 서류 하단 "고객명" 란
+- 전화번호: 서류 하단 "HP" 또는 개통번호 란 (010-XXXX-XXXX 형식)
+- 변경요금제: "변경 시 청구금액" 섹션 또는 파란 박스 안에 표시된 나중에 변경할 요금제명 (예: 5GX 레귤러, 5G 심플+ 등). 현재 가입 요금제가 아닌 변경 예정 요금제.
+- 삭제부가서비스: 서류에 삭제 또는 해지 표시된 부가서비스명 (없으면 빈 문자열)
+
+{
+  "고객명": "",
+  "전화번호": "",
+  "변경요금제": "",
+  "삭제부가서비스": ""
+}`;
+
+    const parts = [{ text: prompt }, ...imgs.map(i => ({ inline_data: { mime_type: i.mime, data: i.data } }))];
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ contents:[{ parts }]})
+      }
+    );
+    const json = await resp.json();
+    const raw = json.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('인식 실패 — ' + (json.error?.message || raw));
+    const d = JSON.parse(m[0]);
+
+    document.getElementById('sms-name').value   = d.고객명 || '';
+    document.getElementById('sms-phone').value  = d.전화번호 || '';
+    document.getElementById('sms-plan').value   = d.변경요금제 || '';
+    document.getElementById('sms-addon').value  = d.삭제부가서비스 || '';
+
+    document.getElementById('sms-scan-result').style.display = 'block';
+    st.style.background = '#dcfce7'; st.style.color = '#16a34a';
+    st.textContent = '✅ 인식 완료! 내용을 확인하고 수정하세요.';
+    smsScanGenerate();
+  } catch(e) {
+    st.style.background = '#fee2e2'; st.style.color = '#dc2626';
+    st.textContent = '❌ 인식 실패: ' + e.message;
+  }
+}
+
+function smsScanGenerate() {
+  const name  = document.getElementById('sms-name')?.value.trim() || '';
+  const plan  = document.getElementById('sms-plan')?.value.trim() || '';
+  const addon = document.getElementById('sms-addon')?.value.trim() || '';
+
+  const planMsg = `${name}고객님 이쁜핸드폰집입니다^^114연결또는 매장내방하셔서 요금제(${plan})변경부탁드립니다`;
+  document.getElementById('sms-msg-plan').value = planMsg;
+
+  const addonMsg = `${name}고객님 이쁜핸드폰집입니다^^114연결또는매장내방하셔서부가서비스(${addon}) 삭제부탁드립니다`;
+  document.getElementById('sms-msg-addon').value = addonMsg;
+
+  const addonWrap = document.getElementById('sms-addon-wrap');
+  if (addonWrap) addonWrap.style.display = addon ? 'block' : 'none';
+}
+
+function smsCopy(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => {
+    const btn = el.parentElement.querySelector('button');
+    const orig = btn.textContent;
+    btn.textContent = '✅ 복사됨!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
 var smsTemplates = [];  // [{id, title, template, vars:[{key,label}], quickVals:{key:[...]}}]
 
 db.ref(HUB + '/smsTemplates').on('value', snap => {
