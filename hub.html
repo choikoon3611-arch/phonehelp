@@ -1086,9 +1086,11 @@
       </div>
 
       <!-- 결과 도구 바 -->
-      <div id="excel-result-bar" style="display:none;margin-bottom:12px;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div id="excel-result-bar" style="display:none;margin-bottom:12px;gap:8px;align-items:center;flex-wrap:wrap;">
         <span id="excel-count" style="font-size:13px;font-weight:700;color:var(--ink);"></span>
-        <button onclick="excelCopyPhones(this)" style="padding:6px 16px;border-radius:8px;background:#0d9488;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📋 전화번호 전체 복사</button>
+        <button onclick="excelCopyPhones(this)" style="padding:6px 14px;border-radius:8px;background:#0d9488;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📋 전화번호 전체 복사</button>
+        <button onclick="excelExport()" style="padding:6px 14px;border-radius:8px;background:#2563eb;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📥 엑셀 내보내기</button>
+        <button onclick="excelSaveSession()" style="padding:6px 14px;border-radius:8px;background:#7c3aed;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">💾 작업 저장</button>
       </div>
 
       <!-- 테이블 -->
@@ -1103,6 +1105,7 @@
               <th style="padding:8px 10px;text-align:left;font-weight:700;">요금제</th>
               <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">만료일</th>
               <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">비고</th>
+              <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;min-width:140px;">메모</th>
               <th style="padding:8px 10px;text-align:center;font-weight:700;white-space:nowrap;">제외</th>
             </tr>
           </thead>
@@ -1116,6 +1119,13 @@
       <div id="excel-batch-wrap" style="display:none;margin-top:20px;">
         <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:var(--ink);">📨 30개 단위 발송 메모장</div>
         <div id="excel-batch-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+
+      <!-- 저장된 작업 목록 -->
+      <div id="excel-sessions-wrap" style="margin-top:24px;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:var(--ink);">💾 저장된 작업</div>
+        <div id="excel-session-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="excel-session-empty" style="font-size:12px;color:var(--ink-soft);padding:12px 0;">저장된 작업이 없습니다.</div>
       </div>
     </div>
   </div>
@@ -3805,6 +3815,13 @@ function exportExcel() {
 let excelRows = [];
 let excelExpDays = 999;    // 0=이미만료, 30/60/90=N일이내, 999=전체
 let excelShowReopen = false;
+let excelMemos = JSON.parse(localStorage.getItem('excel_memos') || '{}');
+
+function excelSaveMemo(key, value) {
+  if (value.trim()) excelMemos[key] = value;
+  else delete excelMemos[key];
+  localStorage.setItem('excel_memos', JSON.stringify(excelMemos));
+}
 
 function excelLoad(input) {
   if (input.files?.[0]) excelLoadFile(input.files[0]);
@@ -3988,6 +4005,9 @@ function excelRender() {
       <td style="padding:7px 10px;">${r.요금제}</td>
       <td style="padding:7px 10px;white-space:nowrap;${expStyle}">${r.만료일||'-'}</td>
       <td style="padding:7px 10px;">${tags}</td>
+      <td style="padding:5px 8px;">
+        <textarea rows="2" placeholder="메모..." onchange="excelSaveMemo('${r.전화번호}_${r.개통일}',this.value)" style="width:100%;min-width:130px;resize:vertical;border:1.5px solid var(--line);border-radius:6px;padding:4px 7px;font-size:11.5px;font-family:inherit;background:var(--bg);color:var(--ink);">${(excelMemos[r.전화번호+'_'+r.개통일]||'').replace(/</g,'&lt;')}</textarea>
+      </td>
       <td style="padding:7px 10px;text-align:center;">${exclBtn}</td>
     </tr>`;
   }).join('');
@@ -4061,6 +4081,105 @@ function excelCopyPhones(btn) {
     setTimeout(() => btn.textContent = orig, 2500);
   });
 }
+
+function excelGetFilteredRows() {
+  const monthFilter = document.getElementById('excel-month-filter')?.value || '';
+  const fMinor    = document.getElementById('excel-filter-minor')?.checked;
+  const fInternet = document.getElementById('excel-filter-internet')?.checked;
+  const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
+  const fManual   = document.getElementById('excel-filter-manual')?.checked;
+  return excelRows.filter(r => {
+    if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
+    if (fMinor && r.고객명.includes('법대')) return false;
+    if (!excelPassesExpiry(r)) return false;
+    if (fInternet && (r.요금제.includes('인터넷') || r.개통종류.includes('인터넷'))) return false;
+    if (fPrepaid  && (r.요금제.includes('선불')   || r.개통종류.includes('선불')))   return false;
+    if (fManual && r.제외) return false;
+    return true;
+  });
+}
+
+function excelExport() {
+  const rows = excelGetFilteredRows();
+  if (!rows.length) { alert('내보낼 데이터가 없습니다.'); return; }
+  const header = ['개통일','통신사','고객명','전화번호','요금제','만료일','비고','메모','재개통여부'];
+  const data = [header, ...rows.map(r => {
+    const key = r.전화번호 + '_' + r.개통일;
+    const tags = [
+      excelIsReOpened(r.전화번호, r.개통일) ? '재개통' : '',
+      r.고객명.includes('법대') ? '미성년자' : '',
+      r.제외 ? '수동제외' : ''
+    ].filter(Boolean).join(', ');
+    const reopenDate = excelGetReopenDate(r.전화번호, r.개통일) || '';
+    return [r.개통일, r.통신사, r.고객명, r.전화번호, r.요금제, r.만료일||'', tags, excelMemos[key]||'', reopenDate];
+  })];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = [10,8,10,14,20,12,14,20,12].map(w => ({wch:w}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '발송대상');
+  XLSX.writeFile(wb, `발송대상_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// ── 작업 저장/불러오기 ─────────────────────────────────────────────
+function excelSaveSession() {
+  const name = prompt('작업명을 입력하세요\n예: 2024년 2월 개통자 1차 발송');
+  if (!name?.trim()) return;
+  const phones = excelGetCopyPhones();
+  const sessions = JSON.parse(localStorage.getItem('excel_sessions') || '[]');
+  sessions.unshift({
+    id: Date.now(),
+    name: name.trim(),
+    savedAt: new Date().toLocaleString('ko-KR'),
+    count: phones.length,
+    monthFilter: document.getElementById('excel-month-filter')?.value || '',
+    expDays: excelExpDays,
+    phones,
+    memos: {...excelMemos},
+    excluded: excelRows.filter(r => r.제외).map(r => r.전화번호 + '_' + r.개통일),
+  });
+  localStorage.setItem('excel_sessions', JSON.stringify(sessions));
+  excelRenderSessions();
+  alert(`"${name.trim()}" 저장 완료 (${phones.length}건)`);
+}
+
+function excelDeleteSession(id) {
+  if (!confirm('이 작업을 삭제할까요?')) return;
+  const sessions = JSON.parse(localStorage.getItem('excel_sessions') || '[]')
+    .filter(s => s.id !== id);
+  localStorage.setItem('excel_sessions', JSON.stringify(sessions));
+  excelRenderSessions();
+}
+
+function excelRenderSessions() {
+  const sessions = JSON.parse(localStorage.getItem('excel_sessions') || '[]');
+  const list = document.getElementById('excel-session-list');
+  const empty = document.getElementById('excel-session-empty');
+  if (!sessions.length) { list.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  list.innerHTML = sessions.map(s => `
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:180px;">
+        <div style="font-weight:700;font-size:13px;">${s.name}</div>
+        <div style="font-size:11px;color:var(--ink-soft);margin-top:2px;">${s.savedAt} · ${s.count}건</div>
+      </div>
+      <button onclick="excelCopySessionPhones(${s.id},this)" style="padding:5px 12px;border-radius:7px;background:#0d9488;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📋 전화번호 복사</button>
+      <button onclick="excelDeleteSession(${s.id})" style="padding:5px 10px;border-radius:7px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;font-size:12px;font-weight:700;cursor:pointer;">🗑 삭제</button>
+    </div>`).join('');
+}
+
+function excelCopySessionPhones(id, btn) {
+  const sessions = JSON.parse(localStorage.getItem('excel_sessions') || '[]');
+  const s = sessions.find(x => x.id === id);
+  if (!s) return;
+  navigator.clipboard.writeText(s.phones.join('\n')).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = `✅ ${s.phones.length}개 복사됨`;
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+// 탭 전환 시 저장 목록 로드
+document.addEventListener('DOMContentLoaded', () => excelRenderSessions());
 </script>
 
 <script>
