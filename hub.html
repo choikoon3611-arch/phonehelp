@@ -674,6 +674,7 @@
   <button class="tab-btn" data-tab="cred">🔑 ID/PW</button>
   <button class="tab-btn" data-tab="excel">📊 엑셀분석</button>
   <button id="store-badge" onclick="changeStoreName()" title="클릭해서 매장코드 변경" style="margin-left:auto;padding:5px 12px;background:rgba(126,184,247,0.15);color:#7eb8f7;border:1px solid rgba(126,184,247,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
+  <button onclick="copyStoreUrl(this)" title="초대 링크 복사" style="padding:5px 10px;background:rgba(13,148,136,0.15);color:#0d9488;border:1px solid rgba(13,148,136,0.35);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🔗 초대링크</button>
   <button id="logout-btn" style="padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
 </nav>
 
@@ -1492,6 +1493,11 @@ function storeNameToHUB(name) {
 }
 
 function initStore() {
+  // URL ?store=코드 파라미터 우선 적용
+  const urlStore = new URLSearchParams(location.search).get('store');
+  if (urlStore) {
+    localStorage.setItem('hub_store_name', urlStore);
+  }
   const saved = localStorage.getItem('hub_store_name');
   if (saved) {
     HUB = storeNameToHUB(saved);
@@ -1516,6 +1522,17 @@ function confirmStoreName() {
 function updateStoreBadge(name) {
   const btn = document.getElementById('store-badge');
   if (btn) btn.textContent = '🏪 ' + name;
+}
+
+function copyStoreUrl(btn) {
+  const code = localStorage.getItem('hub_store_name') || '';
+  if (!code) return;
+  const url = location.origin + location.pathname + '?store=' + encodeURIComponent(code);
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ 복사됨';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
 }
 
 function changeStoreName() {
