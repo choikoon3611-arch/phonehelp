@@ -3843,12 +3843,18 @@ function excelToggleReopen() {
   excelRender();
 }
 
-function excelIsReOpened(phone, 개통일) {
-  const laterInFile = excelRows.some(r => r.전화번호 === phone && r.개통일 > 개통일);
-  if (laterInFile) return true;
+function excelGetReopenDate(phone, 개통일) {
+  // 파일 내에서 더 최신 개통일 찾기
+  const later = excelRows.filter(r => r.전화번호 === phone && r.개통일 > 개통일);
+  if (later.length > 0) return later.sort((a,b) => b.개통일.localeCompare(a.개통일))[0].개통일;
+  // Firebase DB에서 확인
   const cust = custList.find(c => (c.전화번호||'').replace(/[^0-9]/g,'') === phone);
-  if (cust?.개통일 && cust.개통일 > 개통일) return true;
-  return false;
+  if (cust?.개통일 && cust.개통일 > 개통일) return cust.개통일;
+  return null;
+}
+
+function excelIsReOpened(phone, 개통일) {
+  return excelGetReopenDate(phone, 개통일) !== null;
 }
 
 function excelPassesExpiry(r) {
@@ -3872,8 +3878,12 @@ function excelRender() {
     return true;
   });
 
-  // 재개통자: 기본 필터 통과한 것 중 재개통 여부 판별
-  const reopen = new Set(base.filter(r => excelIsReOpened(r.전화번호, r.개통일)).map(r => r.전화번호 + r.개통일));
+  // 재개통자: 기본 필터 통과한 것 중 재개통 여부 판별 (key → 재개통날짜)
+  const reopen = new Map();
+  base.forEach(r => {
+    const date = excelGetReopenDate(r.전화번호, r.개통일);
+    if (date) reopen.set(r.전화번호 + r.개통일, date);
+  });
 
   // 표시할 행: 재개통자 제외 + 수동제외 처리
   let visible = base.filter(r => {
@@ -3885,7 +3895,7 @@ function excelRender() {
 
   // 카운트: 복사 대상 = 재개통 아니고 수동제외 아닌 것
   const copyCount = base.filter(r => !reopen.has(r.전화번호 + r.개통일) && !r.제외).length;
-  const reopenCount = [...reopen].length;
+  const reopenCount = reopen.size;
   document.getElementById('excel-count').textContent =
     `표시 ${visible.length}명 · 복사 대상 ${copyCount}명${reopenCount ? ` · 재개통 제외 ${reopenCount}명` : ''}`;
 
@@ -3901,12 +3911,13 @@ function excelRender() {
   const today = new Date().toISOString().slice(0,10);
   tbody.innerHTML = visible.map(r => {
     const idx = excelRows.indexOf(r);
-    const isReopen = reopen.has(r.전화번호 + r.개통일);
+    const reopenDate = reopen.get(r.전화번호 + r.개통일);
+    const isReopen = !!reopenDate;
     const rowStyle = isReopen
       ? 'opacity:0.5;background:rgba(99,102,241,0.05);'
       : (r.제외 ? 'opacity:0.4;text-decoration:line-through;' : '');
     const tag = isReopen
-      ? '<span style="background:#e0e7ff;color:#4338ca;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">재개통</span>'
+      ? `<span style="background:#e0e7ff;color:#4338ca;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">재개통 ${reopenDate}</span>`
       : '';
     const expired = r.만료일 && r.만료일 < today;
     const expStyle = expired ? 'color:#ef4444;font-weight:700;' : '';
