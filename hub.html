@@ -1051,15 +1051,22 @@
 
       <!-- 필터 바 -->
       <div id="excel-filter-bar" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:14px;">
+        <!-- 개통월 선택 -->
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+          <span style="font-weight:700;font-size:13px;white-space:nowrap;">개통월</span>
+          <select id="excel-month-filter" onchange="excelRender()" style="padding:5px 10px;border-radius:7px;border:1.5px solid var(--line);font-size:13px;background:var(--bg);color:var(--ink);min-width:140px;">
+            <option value="">전체</option>
+          </select>
+          <span id="excel-file-name" style="font-size:11px;color:var(--ink-soft);"></span>
+        </div>
         <!-- 약정만료 기준 필터 -->
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
           <span style="font-weight:700;font-size:13px;white-space:nowrap;">약정만료</span>
-          <button class="excel-exp-btn active" data-exp="0" onclick="excelSetExp(0)">⚫ 이미 만료</button>
+          <button class="excel-exp-btn active" data-exp="999" onclick="excelSetExp(999)">📋 전체</button>
+          <button class="excel-exp-btn" data-exp="0" onclick="excelSetExp(0)">⚫ 이미 만료</button>
           <button class="excel-exp-btn" data-exp="30" onclick="excelSetExp(30)">🔴 1개월 이내</button>
           <button class="excel-exp-btn" data-exp="60" onclick="excelSetExp(60)">🟠 2개월 이내</button>
           <button class="excel-exp-btn" data-exp="90" onclick="excelSetExp(90)">🟡 3개월 이내</button>
-          <button class="excel-exp-btn" data-exp="999" onclick="excelSetExp(999)">📋 전체</button>
-          <span id="excel-file-name" style="font-size:11px;color:var(--ink-soft);margin-left:4px;"></span>
         </div>
         <!-- 체크박스 필터 -->
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
@@ -3764,7 +3771,7 @@ function exportExcel() {
 
 // ── 엑셀 분석 ─────────────────────────────────────────────────────
 let excelRows = [];
-let excelExpDays = 0;      // 0=이미만료, 30/60/90=N일이내, 999=전체
+let excelExpDays = 999;    // 0=이미만료, 30/60/90=N일이내, 999=전체
 let excelShowReopen = false;
 
 function excelLoad(input) {
@@ -3815,6 +3822,14 @@ function excelLoadFile(file) {
           제외: false,
         });
       }
+      // 개통월 드롭다운 채우기
+      const months = [...new Set(excelRows.map(r => r.개통일.slice(0,7)).filter(Boolean))].sort().reverse();
+      const sel = document.getElementById('excel-month-filter');
+      sel.innerHTML = '<option value="">전체</option>';
+      months.forEach(m => {
+        const [yr, mo] = m.split('-');
+        sel.innerHTML += `<option value="${m}">${yr}년 ${parseInt(mo)}월</option>`;
+      });
       document.getElementById('excel-filter-bar').style.display = '';
       document.getElementById('excel-result-bar').style.display = 'flex';
       document.getElementById('excel-table-wrap').style.display = '';
@@ -3866,12 +3881,14 @@ function excelPassesExpiry(r) {
 }
 
 function excelRender() {
+  const monthFilter = document.getElementById('excel-month-filter')?.value || '';
   const fInternet = document.getElementById('excel-filter-internet')?.checked;
   const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
   const fManual   = document.getElementById('excel-filter-manual')?.checked;
 
-  // 인터넷/선불/약정만료 기본 필터 통과한 행
+  // 개통월/인터넷/선불/약정만료 기본 필터 통과한 행
   const base = excelRows.filter(r => {
+    if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
     if (fInternet && (r.요금제.includes('인터넷') || r.개통종류.includes('인터넷'))) return false;
     if (fPrepaid  && (r.요금제.includes('선불')   || r.개통종류.includes('선불')))   return false;
     if (!excelPassesExpiry(r)) return false;
@@ -3946,11 +3963,13 @@ function excelToggleExclude(idx) {
 }
 
 function excelCopyPhones(btn) {
+  const monthFilter = document.getElementById('excel-month-filter')?.value || '';
   const fInternet = document.getElementById('excel-filter-internet')?.checked;
   const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
 
   const phones = excelRows.filter(r => {
     if (r.제외) return false;
+    if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
     if (!excelPassesExpiry(r)) return false;
     if (fInternet && (r.요금제.includes('인터넷') || r.개통종류.includes('인터넷'))) return false;
     if (fPrepaid  && (r.요금제.includes('선불')   || r.개통종류.includes('선불')))   return false;
