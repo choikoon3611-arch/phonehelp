@@ -583,6 +583,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <!-- html2canvas: 정책표 이미지 캡처용 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- SheetJS: 엑셀 파싱용 -->
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -673,6 +675,7 @@
   <button class="tab-btn" data-tab="scan">📷 스캔입력</button>
   <button class="tab-btn" data-tab="cust">👤 고객DB</button>
   <button class="tab-btn" data-tab="renewal">📅 약정관리</button>
+  <button class="tab-btn" data-tab="excel">📊 엑셀분석</button>
   <button id="store-badge" onclick="changeStoreName()" title="클릭해서 매장코드 변경" style="margin-left:auto;padding:5px 12px;background:rgba(126,184,247,0.15);color:#7eb8f7;border:1px solid rgba(126,184,247,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
   <button id="logout-btn" style="padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
 </nav>
@@ -1025,6 +1028,79 @@
       <!-- 목록 -->
       <div id="renewal-list" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div id="renewal-empty" style="display:none;text-align:center;padding:40px;color:#888;">해당 조건의 고객이 없습니다.</div>
+    </div>
+  </div>
+
+  <!-- 📊 엑셀분석 탭 -->
+  <div class="tab-panel" id="panel-excel">
+    <div class="section-head"><h2>📊 엑셀 분석</h2><p>개통 엑셀 업로드 → 재개통·인터넷·선불 필터 → 문자 대상 전화번호 추출</p></div>
+    <div style="max-width:960px;margin:0 auto;">
+
+      <!-- 업로드 -->
+      <div id="excel-drop-zone"
+           onclick="document.getElementById('excel-file-input').click()"
+           ondragover="event.preventDefault();this.style.background='rgba(126,184,247,0.08)'"
+           ondragleave="this.style.background=''"
+           ondrop="event.preventDefault();this.style.background='';const f=event.dataTransfer.files[0];if(f)excelLoadFile(f)"
+           style="border:2px dashed var(--line);border-radius:12px;padding:36px;text-align:center;cursor:pointer;margin-bottom:20px;transition:background 0.2s;">
+        <div style="font-size:36px;margin-bottom:8px;">📂</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px;">엑셀 파일 클릭 또는 드래그</div>
+        <div style="font-size:12px;color:var(--ink-soft);">.xls / .xlsx 지원 · 개통 내역서</div>
+        <input type="file" id="excel-file-input" accept=".xls,.xlsx" style="display:none;" onchange="excelLoad(this)">
+      </div>
+
+      <!-- 필터 바 -->
+      <div id="excel-filter-bar" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:14px;">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+          <span style="font-weight:700;font-size:13px;">개통월</span>
+          <select id="excel-month-filter" onchange="excelRender()" style="padding:5px 10px;border-radius:7px;border:1.5px solid var(--line);font-size:13px;background:var(--bg);color:var(--ink);min-width:130px;">
+            <option value="">전체</option>
+          </select>
+          <span id="excel-file-name" style="font-size:12px;color:var(--ink-soft);"></span>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;font-weight:600;">
+            <input type="checkbox" id="excel-filter-reopen" checked onchange="excelRender()"> 재개통 제외
+            <span style="font-size:11px;font-weight:400;color:var(--ink-soft);">(DB 대조)</span>
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;font-weight:600;">
+            <input type="checkbox" id="excel-filter-internet" checked onchange="excelRender()"> 인터넷 제외
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;font-weight:600;">
+            <input type="checkbox" id="excel-filter-prepaid" checked onchange="excelRender()"> 선불폰 제외
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;font-weight:600;">
+            <input type="checkbox" id="excel-filter-manual" checked onchange="excelRender()"> 수동제외 숨김
+          </label>
+        </div>
+      </div>
+
+      <!-- 결과 도구 바 -->
+      <div id="excel-result-bar" style="display:none;margin-bottom:12px;gap:10px;align-items:center;flex-wrap:wrap;">
+        <span id="excel-count" style="font-size:13px;font-weight:700;color:var(--ink);"></span>
+        <button onclick="excelCopyPhones(this)" style="padding:6px 16px;border-radius:8px;background:#0d9488;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📋 전화번호 전체 복사</button>
+      </div>
+
+      <!-- 테이블 -->
+      <div id="excel-table-wrap" style="display:none;overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;">
+        <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:720px;">
+          <thead>
+            <tr style="background:var(--bg);border-bottom:1.5px solid var(--line);">
+              <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">개통일</th>
+              <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">통신사</th>
+              <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">고객명</th>
+              <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">전화번호</th>
+              <th style="padding:8px 10px;text-align:left;font-weight:700;">요금제</th>
+              <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">약정</th>
+              <th style="padding:8px 10px;text-align:left;font-weight:700;white-space:nowrap;">비고</th>
+              <th style="padding:8px 10px;text-align:center;font-weight:700;white-space:nowrap;">제외</th>
+            </tr>
+          </thead>
+          <tbody id="excel-tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="excel-empty" style="display:none;text-align:center;padding:40px;color:var(--ink-soft);">해당 조건의 데이터가 없습니다.</div>
     </div>
   </div>
 
@@ -3681,6 +3757,144 @@ function exportExcel() {
   a.href = url; a.download = `제휴카드발급현황_${today}.csv`;
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── 엑셀 분석 ─────────────────────────────────────────────────────
+let excelRows = [];
+
+function excelLoad(input) {
+  if (input.files?.[0]) excelLoadFile(input.files[0]);
+}
+
+function excelLoadFile(file) {
+  document.getElementById('excel-file-name').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true, dateNF:'yyyy-mm-dd'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, {header:1, defval:'', raw:false});
+      // 2행(index 1)이 헤더, 3행(index 2)부터 데이터
+      const COL = {date:4, carrier:7, name:8, phone:9, type:10, plan:21, contract:22};
+      excelRows = [];
+      for (let i = 2; i < raw.length; i++) {
+        const r = raw[i];
+        const phone = String(r[COL.phone]||'').replace(/[^0-9]/g,'');
+        if (!phone) continue;
+        excelRows.push({
+          개통일: String(r[COL.date]||'').slice(0,10),
+          통신사: String(r[COL.carrier]||'').trim(),
+          고객명: String(r[COL.name]||'').trim(),
+          전화번호: phone,
+          개통종류: String(r[COL.type]||'').trim(),
+          요금제: String(r[COL.plan]||'').trim(),
+          약정개월: String(r[COL.contract]||'').trim(),
+          제외: false,
+        });
+      }
+      // 개통월 드롭다운
+      const months = [...new Set(excelRows.map(r => r.개통일.slice(0,7)).filter(Boolean))].sort().reverse();
+      const sel = document.getElementById('excel-month-filter');
+      sel.innerHTML = '<option value="">전체</option>';
+      months.forEach(m => {
+        const [yr, mo] = m.split('-');
+        sel.innerHTML += `<option value="${m}">${yr}년 ${parseInt(mo)}월</option>`;
+      });
+      document.getElementById('excel-filter-bar').style.display = '';
+      document.getElementById('excel-result-bar').style.display = 'flex';
+      document.getElementById('excel-table-wrap').style.display = '';
+      excelRender();
+    } catch(err) {
+      alert('엑셀 파일 읽기 오류: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function excelIsReOpened(phone, excelDate) {
+  const cust = custList.find(c => (c.전화번호||'').replace(/[^0-9]/g,'') === phone);
+  if (!cust || !cust.개통일) return false;
+  return cust.개통일 > excelDate;
+}
+
+function excelRender() {
+  const monthFilter = document.getElementById('excel-month-filter')?.value || '';
+  const fReopen   = document.getElementById('excel-filter-reopen')?.checked;
+  const fInternet = document.getElementById('excel-filter-internet')?.checked;
+  const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
+  const fManual   = document.getElementById('excel-filter-manual')?.checked;
+
+  const visible = excelRows.filter(r => {
+    if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
+    if (fManual   && r.제외) return false;
+    if (fInternet && (r.요금제.includes('인터넷') || r.개통종류.includes('인터넷'))) return false;
+    if (fPrepaid  && (r.요금제.includes('선불')   || r.개통종류.includes('선불')))   return false;
+    if (fReopen   && excelIsReOpened(r.전화번호, r.개통일)) return false;
+    return true;
+  });
+
+  const copyCount = visible.filter(r => !r.제외).length;
+  document.getElementById('excel-count').textContent =
+    `총 ${visible.length}명 표시 · 복사 대상 ${copyCount}명`;
+
+  const tbody = document.getElementById('excel-tbody');
+  const empty = document.getElementById('excel-empty');
+  if (visible.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = visible.map(r => {
+    const idx = excelRows.indexOf(r);
+    const isReopen = excelIsReOpened(r.전화번호, r.개통일);
+    const tag = isReopen ? '<span style="background:#dbeafe;color:#1e40af;padding:2px 6px;border-radius:5px;font-size:11px;font-weight:700;">재개통</span>' : '';
+    const rowStyle = r.제외 ? 'opacity:0.4;text-decoration:line-through;' : '';
+    const btnStyle = r.제외
+      ? 'background:#ccfbf1;color:#0d9488;border-color:#0d9488;'
+      : 'background:#fee2e2;color:#dc2626;border-color:#ef4444;';
+    const contract = r.약정개월 ? r.약정개월 + '개월' : '-';
+    return `<tr style="border-bottom:1px solid var(--line);${rowStyle}">
+      <td style="padding:7px 10px;white-space:nowrap;">${r.개통일}</td>
+      <td style="padding:7px 10px;white-space:nowrap;">${r.통신사}</td>
+      <td style="padding:7px 10px;">${r.고객명}</td>
+      <td style="padding:7px 10px;white-space:nowrap;font-family:monospace;">${r.전화번호}</td>
+      <td style="padding:7px 10px;">${r.요금제}</td>
+      <td style="padding:7px 10px;white-space:nowrap;">${contract}</td>
+      <td style="padding:7px 10px;">${tag}</td>
+      <td style="padding:7px 10px;text-align:center;">
+        <button onclick="excelToggleExclude(${idx})" style="padding:3px 9px;border-radius:6px;border:1.5px solid;${btnStyle}font-size:11px;font-weight:700;cursor:pointer;">${r.제외?'복원':'제외'}</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function excelToggleExclude(idx) {
+  excelRows[idx].제외 = !excelRows[idx].제외;
+  excelRender();
+}
+
+function excelCopyPhones(btn) {
+  const monthFilter = document.getElementById('excel-month-filter')?.value || '';
+  const fReopen   = document.getElementById('excel-filter-reopen')?.checked;
+  const fInternet = document.getElementById('excel-filter-internet')?.checked;
+  const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
+
+  const phones = excelRows.filter(r => {
+    if (r.제외) return false;
+    if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
+    if (fInternet && (r.요금제.includes('인터넷') || r.개통종류.includes('인터넷'))) return false;
+    if (fPrepaid  && (r.요금제.includes('선불')   || r.개통종류.includes('선불')))   return false;
+    if (fReopen   && excelIsReOpened(r.전화번호, r.개통일)) return false;
+    return true;
+  }).map(r => r.전화번호);
+
+  navigator.clipboard.writeText(phones.join('\n')).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = `✅ ${phones.length}개 복사됨`;
+    setTimeout(() => btn.textContent = orig, 2500);
+  });
 }
 </script>
 
