@@ -1071,6 +1071,10 @@
         <!-- 체크박스 필터 -->
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
           <label style="display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;font-weight:600;">
+            <input type="checkbox" id="excel-filter-minor" checked onchange="excelRender()"> 미성년자 제외
+            <span style="font-size:11px;font-weight:400;color:var(--ink-soft);">(법대)</span>
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;font-weight:600;">
             <input type="checkbox" id="excel-filter-internet" checked onchange="excelRender()"> 인터넷 제외
           </label>
           <label style="display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;font-weight:600;">
@@ -3882,13 +3886,15 @@ function excelPassesExpiry(r) {
 
 function excelRender() {
   const monthFilter = document.getElementById('excel-month-filter')?.value || '';
+  const fMinor    = document.getElementById('excel-filter-minor')?.checked;
   const fInternet = document.getElementById('excel-filter-internet')?.checked;
   const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
   const fManual   = document.getElementById('excel-filter-manual')?.checked;
 
-  // 개통월/인터넷/선불/약정만료 기본 필터 통과한 행
+  // 개통월/미성년자/인터넷/선불/약정만료 기본 필터 통과한 행
   const base = excelRows.filter(r => {
     if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
+    if (fMinor && r.고객명.includes('법대')) return false;
     if (fInternet && (r.요금제.includes('인터넷') || r.개통종류.includes('인터넷'))) return false;
     if (fPrepaid  && (r.요금제.includes('선불')   || r.개통종류.includes('선불')))   return false;
     if (!excelPassesExpiry(r)) return false;
@@ -3930,12 +3936,14 @@ function excelRender() {
     const idx = excelRows.indexOf(r);
     const reopenDate = reopen.get(r.전화번호 + r.개통일);
     const isReopen = !!reopenDate;
+    const isMinor = r.고객명.includes('법대');
     const rowStyle = isReopen
       ? 'opacity:0.5;background:rgba(99,102,241,0.05);'
       : (r.제외 ? 'opacity:0.4;text-decoration:line-through;' : '');
-    const tag = isReopen
-      ? `<span style="background:#e0e7ff;color:#4338ca;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">재개통 ${reopenDate}</span>`
-      : '';
+    const tags = [
+      isReopen ? `<span style="background:#e0e7ff;color:#4338ca;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">재개통 ${reopenDate}</span>` : '',
+      isMinor  ? `<span style="background:#fef9c3;color:#854d0e;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:700;">미성년자</span>` : '',
+    ].filter(Boolean).join(' ');
     const expired = r.만료일 && r.만료일 < today;
     const expStyle = expired ? 'color:#ef4444;font-weight:700;' : '';
     const btnStyle = r.제외
@@ -3951,7 +3959,7 @@ function excelRender() {
       <td style="padding:7px 10px;white-space:nowrap;font-family:monospace;">${r.전화번호}</td>
       <td style="padding:7px 10px;">${r.요금제}</td>
       <td style="padding:7px 10px;white-space:nowrap;${expStyle}">${r.만료일||'-'}</td>
-      <td style="padding:7px 10px;">${tag}</td>
+      <td style="padding:7px 10px;">${tags}</td>
       <td style="padding:7px 10px;text-align:center;">${exclBtn}</td>
     </tr>`;
   }).join('');
@@ -3964,12 +3972,14 @@ function excelToggleExclude(idx) {
 
 function excelCopyPhones(btn) {
   const monthFilter = document.getElementById('excel-month-filter')?.value || '';
+  const fMinor    = document.getElementById('excel-filter-minor')?.checked;
   const fInternet = document.getElementById('excel-filter-internet')?.checked;
   const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
 
   const phones = excelRows.filter(r => {
     if (r.제외) return false;
     if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
+    if (fMinor && r.고객명.includes('법대')) return false;
     if (!excelPassesExpiry(r)) return false;
     if (fInternet && (r.요금제.includes('인터넷') || r.개통종류.includes('인터넷'))) return false;
     if (fPrepaid  && (r.요금제.includes('선불')   || r.개통종류.includes('선불')))   return false;
