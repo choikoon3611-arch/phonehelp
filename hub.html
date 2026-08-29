@@ -674,6 +674,7 @@
   <button class="tab-btn" data-tab="cred">🔑 ID/PW</button>
   <button class="tab-btn" data-tab="excel">📊 엑셀분석</button>
   <button class="tab-btn" data-tab="solapi">📱 문자발송</button>
+  <button class="tab-btn" data-tab="library">📚 자료실</button>
   <button id="store-badge" onclick="changeStoreName()" title="클릭해서 매장코드 변경" style="margin-left:auto;padding:5px 12px;background:rgba(126,184,247,0.15);color:#7eb8f7;border:1px solid rgba(126,184,247,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
   <button onclick="copyStoreUrl(this)" title="초대 링크 복사" style="padding:5px 10px;background:rgba(13,148,136,0.15);color:#0d9488;border:1px solid rgba(13,148,136,0.35);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🔗 초대링크</button>
   <button id="logout-btn" style="padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
@@ -1144,6 +1145,169 @@
 
       <!-- 결과 -->
       <div id="solapi-result" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;"></div>
+    </div>
+  </div>
+
+  <!-- 📚 자료실 탭 -->
+  <div class="tab-panel" id="panel-library">
+    <div class="section-head"><h2>📚 자료실</h2><p>업무에 도움이 되는 안내자료 모음</p></div>
+    <div style="max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:16px;">
+
+      <!-- 아이폰 자료이전 가이드 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;">
+        <!-- 헤더 -->
+        <div style="background:linear-gradient(135deg,#1d4ed8,#7c3aed);padding:20px 24px;color:#fff;">
+          <div style="font-size:28px;margin-bottom:6px;">📱➡️📱</div>
+          <div style="font-weight:900;font-size:17px;margin-bottom:4px;">아이폰에서 아이폰으로 자료 옮기기</div>
+          <div style="font-size:12px;opacity:.85;">초등학생도 할 수 있는 쉬운 설명</div>
+        </div>
+
+        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:20px;">
+
+          <!-- 방법 1: 퀵스타트 -->
+          <div style="border:2px solid #dbeafe;border-radius:12px;overflow:hidden;">
+            <div style="background:#dbeafe;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">⭐</span>
+              <div>
+                <div style="font-weight:900;font-size:14px;color:#1e3a8a;">방법 1 · 퀵스타트 (가장 쉽고 완벽!)</div>
+                <div style="font-size:11px;color:#3b82f6;font-weight:700;">새 아이폰 + 기존 아이폰 둘 다 있을 때</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:2px;">📌 사진, 앱, 연락처, 설정 모든 것이 그대로 옮겨져요!</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#1d4ed8;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">1</span>
+                  <span style="font-size:13px;">새 아이폰을 켜세요. 언어 선택 화면이 나옵니다.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#1d4ed8;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">2</span>
+                  <span style="font-size:13px;">기존 아이폰을 새 아이폰 <b>바로 옆</b>에 갖다 놓으세요.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#1d4ed8;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">3</span>
+                  <span style="font-size:13px;">기존 아이폰에 <b>"새 iPhone 설정하기"</b> 팝업이 뜨면 <b>계속</b>을 눌러요.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#1d4ed8;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">4</span>
+                  <span style="font-size:13px;">새 아이폰 화면에 동그라미 무늬가 나오면, 기존 아이폰 카메라로 <b>그 동그라미를 찍어요</b>.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#1d4ed8;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">5</span>
+                  <span style="font-size:13px;">기존 아이폰의 잠금번호를 새 아이폰에 입력하면 자동으로 자료가 옮겨져요!</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#1d4ed8;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">6</span>
+                  <span style="font-size:13px;"><b>"iPhone에서 바로 전송"</b>을 선택하면 두 폰을 붙여놓은 채로 직접 옮겨져요. (시간이 걸려요 🕐)</span>
+                </div>
+              </div>
+              <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;font-size:12px;color:#92400e;">
+                ⚠️ <b>주의!</b> 두 폰 모두 충전기에 꽂아두세요. 배터리가 부족하면 중간에 꺼질 수 있어요.
+              </div>
+            </div>
+          </div>
+
+          <!-- 방법 2: iCloud 백업 -->
+          <div style="border:2px solid #d1fae5;border-radius:12px;overflow:hidden;">
+            <div style="background:#d1fae5;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">☁️</span>
+              <div>
+                <div style="font-weight:900;font-size:14px;color:#065f46;">방법 2 · iCloud 백업 (인터넷으로 옮기기)</div>
+                <div style="font-size:11px;color:#059669;font-weight:700;">기존 아이폰이 없거나 멀리 있을 때</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+              <div style="font-size:12px;color:var(--ink-soft);font-weight:700;">📌 1단계 — 기존 아이폰에서 백업하기</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#059669;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">1</span>
+                  <span style="font-size:13px;">기존 아이폰에서 <b>설정 → 맨 위 이름 → iCloud → iCloud 백업</b>을 눌러요.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#059669;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">2</span>
+                  <span style="font-size:13px;"><b>"지금 백업"</b>을 눌러요. 와이파이에 연결된 상태여야 해요! 📶</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#059669;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">3</span>
+                  <span style="font-size:13px;">백업이 완료되면 <b>"마지막 백업: 방금"</b>이라고 나와요. ✅</span>
+                </div>
+              </div>
+              <div style="font-size:12px;color:var(--ink-soft);font-weight:700;margin-top:4px;">📌 2단계 — 새 아이폰에서 복원하기</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#059669;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">4</span>
+                  <span style="font-size:13px;">새 아이폰을 켜고 설정을 진행하다 보면 <b>"앱 및 데이터"</b> 화면이 나와요.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#059669;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">5</span>
+                  <span style="font-size:13px;"><b>"iCloud 백업에서 복원"</b>을 선택해요.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#059669;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">6</span>
+                  <span style="font-size:13px;">Apple ID로 로그인하면 백업 목록이 나와요. <b>가장 최근 날짜</b>의 백업을 선택해요.</span>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:#059669;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">7</span>
+                  <span style="font-size:13px;">기다리면 자동으로 모든 자료가 옮겨져요! ☁️→📱</span>
+                </div>
+              </div>
+              <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;font-size:12px;color:#92400e;">
+                ⚠️ iCloud 무료 용량은 <b>5GB</b>예요. 사진이 많으면 용량이 부족할 수 있어요. 그럴 땐 iCloud+ 유료 구독이 필요해요.
+              </div>
+            </div>
+          </div>
+
+          <!-- 방법 3: AirDrop -->
+          <div style="border:2px solid #fce7f3;border-radius:12px;overflow:hidden;">
+            <div style="background:#fce7f3;padding:12px 16px;display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">📡</span>
+              <div>
+                <div style="font-weight:900;font-size:14px;color:#831843;">방법 3 · 에어드롭 (사진·동영상만 빠르게!)</div>
+                <div style="font-size:11px;color:#db2777;font-weight:700;">일부 파일만 골라서 옮길 때</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:12.5px;color:var(--ink-soft);">📌 앱, 설정은 못 옮겨요. 사진·동영상·연락처 등 파일만 가능해요.</div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="background:#db2777;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">1</span>
+                <span style="font-size:13px;">두 아이폰 모두 <b>블루투스·와이파이를 켜고</b> 서로 가까이 놓아요.</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="background:#db2777;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">2</span>
+                <span style="font-size:13px;">기존 아이폰에서 보내고 싶은 사진을 선택 → <b>공유 버튼(□↑)</b> → <b>에어드롭</b>을 눌러요.</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="background:#db2777;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">3</span>
+                <span style="font-size:13px;">새 아이폰 이름이 나오면 누르고, 새 아이폰에서 <b>"수락"</b>을 눌러요.</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="background:#db2777;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;margin-top:1px;">4</span>
+                <span style="font-size:13px;">완료! 사진이 새 폰 사진첩에 저장돼요. 📸</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 어떤 방법 선택? -->
+          <div style="background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;">
+            <div style="font-weight:900;font-size:13px;margin-bottom:12px;">🤔 어떤 방법을 골라야 할까요?</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;gap:10px;align-items:center;font-size:13px;">
+                <span style="font-size:16px;">⭐</span>
+                <span><b>새 폰 구매 직후 처음 설정할 때</b> → 방법 1 (퀵스타트)</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;font-size:13px;">
+                <span style="font-size:16px;">☁️</span>
+                <span><b>이미 새 폰 설정을 끝냈거나 폰이 없을 때</b> → 방법 2 (iCloud)</span>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;font-size:13px;">
+                <span style="font-size:16px;">📡</span>
+                <span><b>사진 몇 장만 빠르게 옮기고 싶을 때</b> → 방법 3 (에어드롭)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
 
