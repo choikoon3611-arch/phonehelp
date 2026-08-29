@@ -1111,6 +1111,12 @@
       </div>
 
       <div id="excel-empty" style="display:none;text-align:center;padding:40px;color:var(--ink-soft);">해당 조건의 데이터가 없습니다.</div>
+
+      <!-- 30개 단위 분할 발송 -->
+      <div id="excel-batch-wrap" style="display:none;margin-top:20px;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:var(--ink);">📨 30개 단위 발송 메모장</div>
+        <div id="excel-batch-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
     </div>
   </div>
 
@@ -3985,20 +3991,17 @@ function excelRender() {
       <td style="padding:7px 10px;text-align:center;">${exclBtn}</td>
     </tr>`;
   }).join('');
+
+  // 30개 단위 배치 메모장 렌더
+  excelRenderBatch();
 }
 
-function excelToggleExclude(idx) {
-  excelRows[idx].제외 = !excelRows[idx].제외;
-  excelRender();
-}
-
-function excelCopyPhones(btn) {
+function excelGetCopyPhones() {
   const monthFilter = document.getElementById('excel-month-filter')?.value || '';
   const fMinor    = document.getElementById('excel-filter-minor')?.checked;
   const fInternet = document.getElementById('excel-filter-internet')?.checked;
   const fPrepaid  = document.getElementById('excel-filter-prepaid')?.checked;
-
-  const phones = excelRows.filter(r => {
+  return excelRows.filter(r => {
     if (r.제외) return false;
     if (monthFilter && !r.개통일.startsWith(monthFilter)) return false;
     if (fMinor && r.고객명.includes('법대')) return false;
@@ -4008,7 +4011,50 @@ function excelCopyPhones(btn) {
     if (excelIsReOpened(r.전화번호, r.개통일)) return false;
     return true;
   }).map(r => r.전화번호);
+}
 
+function excelRenderBatch() {
+  const phones = excelGetCopyPhones();
+  const wrap = document.getElementById('excel-batch-wrap');
+  const list = document.getElementById('excel-batch-list');
+  if (phones.length === 0) { wrap.style.display = 'none'; return; }
+
+  const SIZE = 30;
+  const batches = [];
+  for (let i = 0; i < phones.length; i += SIZE) {
+    batches.push(phones.slice(i, i + SIZE));
+  }
+
+  wrap.style.display = '';
+  list.innerHTML = batches.map((batch, i) => {
+    const id = `batch-ta-${i}`;
+    const label = `${i+1}차 발송 · ${batch.length}건 (${i*SIZE+1}~${i*SIZE+batch.length}번)`;
+    return `<div style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-weight:700;font-size:13px;">${label}</span>
+        <button onclick="excelCopyBatch('${id}',this)" style="padding:5px 14px;border-radius:7px;background:#0d9488;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📋 복사</button>
+      </div>
+      <textarea id="${id}" readonly rows="4" style="width:100%;resize:vertical;border:1.5px solid var(--line);border-radius:7px;padding:8px 10px;font-size:12px;font-family:monospace;background:var(--bg);color:var(--ink);line-height:1.6;">${batch.join('\n')}</textarea>
+    </div>`;
+  }).join('');
+}
+
+function excelCopyBatch(taId, btn) {
+  const text = document.getElementById(taId)?.value || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ 복사됨';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function excelToggleExclude(idx) {
+  excelRows[idx].제외 = !excelRows[idx].제외;
+  excelRender();
+}
+
+function excelCopyPhones(btn) {
+  const phones = excelGetCopyPhones();
   navigator.clipboard.writeText(phones.join('\n')).then(() => {
     const orig = btn.textContent;
     btn.textContent = `✅ ${phones.length}개 복사됨`;
