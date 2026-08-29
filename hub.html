@@ -1468,6 +1468,12 @@ const auth = firebase.auth();
 const db   = firebase.database();
 let HUB    = 'hub';
 
+// ?store= 파라미터를 로그인 리다이렉트 전에 세션에 보존
+(function() {
+  const s = new URLSearchParams(location.search).get('store');
+  if (s) sessionStorage.setItem('hub_pending_store', s);
+})();
+
 // 로그인 안 됐으면 login.html로
 document.body.style.visibility = 'hidden';
 const ADMIN_EMAIL = 'choikoon3611@gmail.com';
@@ -1493,10 +1499,12 @@ function storeNameToHUB(name) {
 }
 
 function initStore() {
-  // URL ?store=코드 파라미터 우선 적용
-  const urlStore = new URLSearchParams(location.search).get('store');
+  // URL 파라미터 또는 로그인 리다이렉트 전에 보존해둔 세션값 적용
+  const urlStore = new URLSearchParams(location.search).get('store')
+                || sessionStorage.getItem('hub_pending_store');
   if (urlStore) {
     localStorage.setItem('hub_store_name', urlStore);
+    sessionStorage.removeItem('hub_pending_store');
   }
   const saved = localStorage.getItem('hub_store_name');
   if (saved) {
