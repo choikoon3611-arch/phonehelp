@@ -3812,9 +3812,15 @@ function excelLoadFile(file) {
 }
 
 function excelIsReOpened(phone, excelDate) {
+  // 1) 같은 파일 안에서 더 최신 날짜로 같은 전화번호가 있으면 재개통
+  const laterInFile = excelRows.some(r =>
+    r.전화번호 === phone && r.개통일 > excelDate
+  );
+  if (laterInFile) return true;
+  // 2) Firebase 고객DB에 더 최신 개통일이 있으면 재개통
   const cust = custList.find(c => (c.전화번호||'').replace(/[^0-9]/g,'') === phone);
-  if (!cust || !cust.개통일) return false;
-  return cust.개통일 > excelDate;
+  if (cust?.개통일 && cust.개통일 > excelDate) return true;
+  return false;
 }
 
 function excelRender() {
