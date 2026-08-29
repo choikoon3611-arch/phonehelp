@@ -1132,6 +1132,24 @@
 
 </main>
 
+<!-- 메모 확대 모달 -->
+<div id="excel-memo-modal-bg" onclick="if(event.target===this)excelCloseMemoModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--panel);border-radius:16px;padding:28px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.4);">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+      <div>
+        <div id="excel-memo-modal-name" style="font-weight:800;font-size:16px;"></div>
+        <div id="excel-memo-modal-info" style="font-size:12px;color:var(--ink-soft);margin-top:3px;"></div>
+      </div>
+      <button onclick="excelCloseMemoModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft);padding:0 4px;">✕</button>
+    </div>
+    <textarea id="excel-memo-modal-ta" rows="10" placeholder="메모를 입력하세요..." style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;background:var(--bg);color:var(--ink);resize:vertical;line-height:1.7;"></textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">
+      <button onclick="excelCloseMemoModal()" style="padding:8px 20px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer;">닫기</button>
+      <button onclick="excelSaveMemoModal()" style="padding:8px 20px;border-radius:9px;border:none;background:#0d9488;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- 사전예약 모달 -->
 <div class="modal-bg" id="pr-modal-bg">
   <div class="modal">
@@ -3823,6 +3841,29 @@ function excelSaveMemo(key, value) {
   localStorage.setItem('excel_memos', JSON.stringify(excelMemos));
 }
 
+let _memoModalKey = '';
+function excelOpenMemoModal(key, name, info) {
+  _memoModalKey = key;
+  document.getElementById('excel-memo-modal-name').textContent = name;
+  document.getElementById('excel-memo-modal-info').textContent = info;
+  document.getElementById('excel-memo-modal-ta').value = excelMemos[key] || '';
+  const bg = document.getElementById('excel-memo-modal-bg');
+  bg.style.display = 'flex';
+  setTimeout(() => document.getElementById('excel-memo-modal-ta').focus(), 80);
+}
+function excelSaveMemoModal() {
+  const val = document.getElementById('excel-memo-modal-ta').value;
+  excelSaveMemo(_memoModalKey, val);
+  excelCloseMemoModal();
+  excelRender();
+}
+function excelCloseMemoModal() {
+  document.getElementById('excel-memo-modal-bg').style.display = 'none';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') excelCloseMemoModal();
+});
+
 function excelLoad(input) {
   if (input.files?.[0]) excelLoadFile(input.files[0]);
 }
@@ -4005,8 +4046,8 @@ function excelRender() {
       <td style="padding:7px 10px;">${r.요금제}</td>
       <td style="padding:7px 10px;white-space:nowrap;${expStyle}">${r.만료일||'-'}</td>
       <td style="padding:7px 10px;">${tags}</td>
-      <td style="padding:5px 8px;">
-        <textarea rows="2" placeholder="메모..." onchange="excelSaveMemo('${r.전화번호}_${r.개통일}',this.value)" style="width:100%;min-width:130px;resize:vertical;border:1.5px solid var(--line);border-radius:6px;padding:4px 7px;font-size:11.5px;font-family:inherit;background:var(--bg);color:var(--ink);">${(excelMemos[r.전화번호+'_'+r.개통일]||'').replace(/</g,'&lt;')}</textarea>
+      <td style="padding:5px 8px;min-width:140px;" onclick="excelOpenMemoModal('${r.전화번호}_${r.개통일}','${r.고객명.replace(/'/g,"\\'")}','${r.전화번호} · ${r.개통일} · ${r.요금제.replace(/'/g,"\\'")}')">
+        <div style="border:1.5px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11.5px;min-height:36px;cursor:pointer;background:var(--bg);color:var(--ink);white-space:pre-wrap;line-height:1.5;">${(excelMemos[r.전화번호+'_'+r.개통일]||'<span style="color:var(--ink-soft);">클릭해서 메모 입력</span>')}</div>
       </td>
       <td style="padding:7px 10px;text-align:center;">${exclBtn}</td>
     </tr>`;
