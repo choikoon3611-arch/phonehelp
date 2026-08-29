@@ -673,6 +673,7 @@
   <button class="tab-btn" data-tab="fav">⭐ 즐겨찾기</button>
   <button class="tab-btn" data-tab="cred">🔑 ID/PW</button>
   <button class="tab-btn" data-tab="excel">📊 엑셀분석</button>
+  <button class="tab-btn" data-tab="solapi">📱 문자발송</button>
   <button id="store-badge" onclick="changeStoreName()" title="클릭해서 매장코드 변경" style="margin-left:auto;padding:5px 12px;background:rgba(126,184,247,0.15);color:#7eb8f7;border:1px solid rgba(126,184,247,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
   <button onclick="copyStoreUrl(this)" title="초대 링크 복사" style="padding:5px 10px;background:rgba(13,148,136,0.15);color:#0d9488;border:1px solid rgba(13,148,136,0.35);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🔗 초대링크</button>
   <button id="logout-btn" style="padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
@@ -1026,6 +1027,83 @@
       <!-- 목록 -->
       <div id="renewal-list" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div id="renewal-empty" style="display:none;text-align:center;padding:40px;color:#888;">해당 조건의 고객이 없습니다.</div>
+    </div>
+  </div>
+
+  <!-- 📱 문자발송 탭 -->
+  <div class="tab-panel" id="panel-solapi">
+    <div class="section-head"><h2>📱 문자 발송</h2><p>솔라피 API 연동 · 엑셀분석 결과 바로 발송</p></div>
+    <div style="max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:16px;">
+
+      <!-- API 설정 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <span style="font-weight:700;font-size:14px;">⚙️ API 설정</span>
+          <span id="solapi-status" style="font-size:12px;color:var(--ink-soft);">미설정</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <label style="font-size:12px;font-weight:700;width:80px;flex-shrink:0;">API Key</label>
+            <input id="solapi-key-input" type="text" placeholder="API Key 입력" style="flex:1;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:13px;background:var(--bg);color:var(--ink);font-family:monospace;">
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <label style="font-size:12px;font-weight:700;width:80px;flex-shrink:0;">API Secret</label>
+            <input id="solapi-secret-input" type="password" placeholder="API Secret 입력" style="flex:1;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:13px;background:var(--bg);color:var(--ink);font-family:monospace;">
+            <button onclick="const i=document.getElementById('solapi-secret-input');i.type=i.type==='password'?'text':'password';" style="padding:5px 8px;border-radius:6px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink-soft);font-size:11px;cursor:pointer;white-space:nowrap;">표시</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <label style="font-size:12px;font-weight:700;width:80px;flex-shrink:0;">발신번호</label>
+            <input id="solapi-from-input" type="tel" placeholder="01012345678 (- 없이)" style="flex:1;padding:7px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:13px;background:var(--bg);color:var(--ink);">
+          </div>
+          <button onclick="solapiSaveSettings()" style="align-self:flex-end;padding:7px 20px;border-radius:8px;background:#6366f1;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;">저장</button>
+        </div>
+      </div>
+
+      <!-- 발송 대상 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px;">📋 발송 대상</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <button onclick="solapiLoadFromExcel()" style="padding:6px 14px;border-radius:8px;background:#0d9488;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">📊 엑셀분석 결과 불러오기</button>
+          <button onclick="solapiClearPhones()" style="padding:6px 12px;border-radius:8px;background:var(--bg);color:var(--ink-soft);border:1.5px solid var(--line);font-size:12px;font-weight:700;cursor:pointer;">초기화</button>
+        </div>
+        <textarea id="solapi-phones-ta" rows="5" placeholder="전화번호를 한 줄에 하나씩 입력하거나 엑셀분석에서 불러오세요.&#10;01012345678&#10;01023456789" oninput="solapiCountPhones()" style="width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px;font-family:monospace;background:var(--bg);color:var(--ink);resize:vertical;line-height:1.7;"></textarea>
+        <div id="solapi-phone-count" style="font-size:12px;color:var(--ink-soft);margin-top:5px;"></div>
+      </div>
+
+      <!-- 메시지 내용 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px;">💬 메시지 내용</div>
+        <textarea id="solapi-msg-ta" rows="6" placeholder="메시지 내용을 입력하세요." oninput="solapiCheckMsgType()" style="width:100%;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--ink);resize:vertical;line-height:1.7;"></textarea>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;">
+          <span id="solapi-msg-type" style="font-size:12px;font-weight:700;color:#6366f1;">SMS 단문 · 건당 약 9원</span>
+          <span id="solapi-msg-len" style="font-size:12px;color:var(--ink-soft);">0자</span>
+        </div>
+      </div>
+
+      <!-- 이미지 첨부 (MMS) -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-weight:700;font-size:14px;">🖼 이미지 첨부 <span style="font-size:11px;font-weight:400;color:var(--ink-soft);">(선택 · MMS · 건당 약 35원)</span></span>
+          <button onclick="solapiClearImage()" id="solapi-img-clear-btn" style="display:none;padding:4px 10px;border-radius:6px;border:1.5px solid var(--line);background:var(--bg);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">✕ 제거</button>
+        </div>
+        <label id="solapi-img-drop" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:2px dashed var(--line);border-radius:10px;padding:24px;cursor:pointer;min-height:100px;transition:background .15s;" ondragover="event.preventDefault();this.style.background='rgba(99,102,241,0.07)'" ondragleave="this.style.background=''" ondrop="event.preventDefault();this.style.background='';solapiHandleImageFile(event.dataTransfer.files[0])">
+          <span style="font-size:28px;">📎</span>
+          <span style="font-size:13px;color:var(--ink-soft);">클릭하거나 이미지를 드래그하세요</span>
+          <span style="font-size:11px;color:var(--ink-soft);">JPG · PNG · GIF · 최대 200KB</span>
+          <input type="file" id="solapi-img-input" accept="image/jpeg,image/png,image/gif" style="display:none;" onchange="solapiHandleImageFile(this.files[0])">
+        </label>
+        <div id="solapi-img-preview" style="display:none;margin-top:12px;text-align:center;">
+          <img id="solapi-img-thumb" style="max-width:200px;max-height:200px;border-radius:8px;border:1px solid var(--line);">
+          <div id="solapi-img-info" style="font-size:11px;color:var(--ink-soft);margin-top:6px;"></div>
+          <div id="solapi-img-upload-status" style="font-size:12px;font-weight:700;margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <!-- 발송 버튼 -->
+      <button onclick="solapiSend()" id="solapi-send-btn" style="padding:14px;border-radius:12px;background:#6366f1;color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.3px;">📤 문자 발송하기</button>
+
+      <!-- 결과 -->
+      <div id="solapi-result" style="display:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;"></div>
     </div>
   </div>
 
@@ -4271,7 +4349,198 @@ function excelRenderSessions() {
 }
 
 // 탭 전환 시 저장 목록 로드
-document.addEventListener('DOMContentLoaded', () => excelRenderSessions());
+document.addEventListener('DOMContentLoaded', () => { excelRenderSessions(); solapiLoadSettings(); });
+
+// ── 솔라피 문자발송 ───────────────────────────────────────────────
+function solapiLoadSettings() {
+  const key    = localStorage.getItem('solapi_key') || '';
+  const secret = localStorage.getItem('solapi_secret') || '';
+  const from   = localStorage.getItem('solapi_from') || '';
+  const ki = document.getElementById('solapi-key-input');
+  const si = document.getElementById('solapi-secret-input');
+  const fi = document.getElementById('solapi-from-input');
+  if (ki) { ki.value = key; ki.dataset.saved = '1'; }
+  if (si) { si.value = secret; si.dataset.saved = '1'; }
+  if (fi) fi.value = from;
+  const st = document.getElementById('solapi-status');
+  if (st) st.textContent = (key && secret && from) ? '✅ 설정 완료' : '⚠️ 미설정';
+  if (st) st.style.color = (key && secret && from) ? '#0d9488' : '#f59e0b';
+}
+
+function solapiSaveSettings() {
+  const key    = document.getElementById('solapi-key-input')?.value.trim();
+  const secret = document.getElementById('solapi-secret-input')?.value.trim();
+  const from   = document.getElementById('solapi-from-input')?.value.replace(/[^0-9]/g,'');
+  if (!key || !secret || !from) { alert('API Key, Secret, 발신번호를 모두 입력해주세요.'); return; }
+  localStorage.setItem('solapi_key', key);
+  localStorage.setItem('solapi_secret', secret);
+  localStorage.setItem('solapi_from', from);
+  solapiLoadSettings();
+  alert('설정이 저장됐습니다.');
+}
+
+function solapiLoadFromExcel() {
+  const phones = excelGetCopyPhones();
+  if (!phones.length) { alert('엑셀분석 탭에서 먼저 파일을 업로드하고 필터를 설정해주세요.'); return; }
+  document.getElementById('solapi-phones-ta').value = phones.join('\n');
+  solapiCountPhones();
+}
+
+function solapiClearPhones() {
+  document.getElementById('solapi-phones-ta').value = '';
+  solapiCountPhones();
+}
+
+function solapiCountPhones() {
+  const phones = solapiGetPhones();
+  const el = document.getElementById('solapi-phone-count');
+  if (el) el.textContent = phones.length ? `총 ${phones.length}명` : '';
+}
+
+function solapiGetPhones() {
+  return (document.getElementById('solapi-phones-ta')?.value || '')
+    .split('\n').map(s => s.replace(/[^0-9]/g,'')).filter(s => s.length >= 10);
+}
+
+function solapiCheckMsgType() {
+  const len = (document.getElementById('solapi-msg-ta')?.value || '').length;
+  const typeEl = document.getElementById('solapi-msg-type');
+  const lenEl  = document.getElementById('solapi-msg-len');
+  if (lenEl) lenEl.textContent = len + '자';
+  if (typeEl) {
+    if (solapiImageFile)  { typeEl.textContent = 'MMS 이미지 · 건당 약 35원'; typeEl.style.color='#8b5cf6'; }
+    else if (len <= 90)   { typeEl.textContent = 'SMS 단문 · 건당 약 9원'; typeEl.style.color='#0d9488'; }
+    else if (len <= 2000) { typeEl.textContent = 'LMS 장문 · 건당 약 30원'; typeEl.style.color='#f59e0b'; }
+    else                  { typeEl.textContent = '⚠️ 2000자 초과 — 발송 불가'; typeEl.style.color='#ef4444'; }
+  }
+}
+
+async function solapiHmac(secret, message) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), {name:'HMAC',hash:'SHA-256'}, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
+  return Array.from(new Uint8Array(sig)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function solapiGetAuth(apiKey, apiSecret) {
+  const date = new Date().toISOString();
+  const salt = Array.from(crypto.getRandomValues(new Uint8Array(8))).map(b=>b.toString(16).padStart(2,'0')).join('');
+  const signature = await solapiHmac(apiSecret, date + salt);
+  return `HMAC-SHA256 apiKey=${apiKey}, date=${date}, salt=${salt}, signature=${signature}`;
+}
+
+let solapiImageId = null;
+let solapiImageFile = null;
+
+function solapiHandleImageFile(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('이미지 파일만 첨부할 수 있습니다.'); return; }
+  if (file.size > 200 * 1024) { alert(`파일 크기가 너무 큽니다.\n현재: ${(file.size/1024).toFixed(0)}KB / 최대: 200KB`); return; }
+  solapiImageFile = file;
+  solapiImageId = null;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('solapi-img-thumb').src = e.target.result;
+    document.getElementById('solapi-img-preview').style.display = '';
+    document.getElementById('solapi-img-info').textContent = `${file.name} · ${(file.size/1024).toFixed(0)}KB`;
+    document.getElementById('solapi-img-upload-status').textContent = '⏳ 발송 시 자동 업로드됩니다';
+    document.getElementById('solapi-img-upload-status').style.color = '#f59e0b';
+    document.getElementById('solapi-img-clear-btn').style.display = '';
+    document.getElementById('solapi-img-drop').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+  solapiCheckMsgType();
+}
+
+function solapiClearImage() {
+  solapiImageFile = null;
+  solapiImageId = null;
+  document.getElementById('solapi-img-input').value = '';
+  document.getElementById('solapi-img-preview').style.display = 'none';
+  document.getElementById('solapi-img-clear-btn').style.display = 'none';
+  document.getElementById('solapi-img-drop').style.display = '';
+  solapiCheckMsgType();
+}
+
+async function solapiUploadImage(apiKey, apiSecret) {
+  if (!solapiImageFile) return null;
+  const statusEl = document.getElementById('solapi-img-upload-status');
+  statusEl.textContent = '⬆ 이미지 업로드 중…'; statusEl.style.color = '#6366f1';
+  try {
+    const auth = await solapiGetAuth(apiKey, apiSecret);
+    const fd = new FormData();
+    fd.append('file', solapiImageFile);
+    fd.append('type', 'MMS');
+    const res = await fetch('https://api.solapi.com/storage/v1/files', {
+      method: 'POST', headers: { 'Authorization': auth }, body: fd
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || JSON.stringify(data));
+    solapiImageId = data.fileId || data.imageId || data.id;
+    statusEl.textContent = '✅ 업로드 완료'; statusEl.style.color = '#0d9488';
+    return solapiImageId;
+  } catch(e) {
+    statusEl.textContent = '❌ 업로드 실패: ' + e.message; statusEl.style.color = '#ef4444';
+    throw e;
+  }
+}
+
+async function solapiSend() {
+  const phones  = solapiGetPhones();
+  const text    = document.getElementById('solapi-msg-ta')?.value.trim() || '';
+  const apiKey  = localStorage.getItem('solapi_key') || '';
+  const apiSec  = localStorage.getItem('solapi_secret') || '';
+  const from    = localStorage.getItem('solapi_from') || '';
+
+  if (!apiKey || !apiSec || !from) { alert('⚠️ API 설정을 먼저 완료해주세요.'); return; }
+  if (!phones.length) { alert('발송 대상 전화번호가 없습니다.'); return; }
+  if (!text) { alert('메시지 내용을 입력해주세요.'); return; }
+  if (text.length > 2000) { alert('메시지가 너무 깁니다 (2000자 초과).'); return; }
+
+  const hasMms = !!solapiImageFile;
+  const type = hasMms ? 'MMS' : (text.length <= 90 ? 'SMS' : 'LMS');
+  const cost = hasMms ? 35 : (text.length <= 90 ? 9 : 30);
+  if (!confirm(`📤 발송 확인\n\n대상: ${phones.length}명\n유형: ${type}${hasMms ? ' (이미지 첨부)' : ''}\n예상 비용: 약 ${(phones.length * cost).toLocaleString()}원\n\n발송하시겠습니까?`)) return;
+
+  const btn = document.getElementById('solapi-send-btn');
+  btn.disabled = true; btn.textContent = '발송 중…';
+
+  try {
+    if (solapiImageFile) {
+      await solapiUploadImage(apiKey, apiSec);
+      if (!solapiImageId) throw new Error('이미지 업로드에 실패했습니다.');
+    }
+    const auth = await solapiGetAuth(apiKey, apiSec);
+    const messages = phones.map(to => {
+      const msg = { to, from, text };
+      if (solapiImageId) { msg.type = 'MMS'; msg.imageId = solapiImageId; }
+      return msg;
+    });
+    const res = await fetch('https://api.solapi.com/messages/v4/send-many', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': auth },
+      body: JSON.stringify({ messages })
+    });
+    const data = await res.json();
+
+    const resultEl = document.getElementById('solapi-result');
+    resultEl.style.display = '';
+    if (res.ok) {
+      const ok  = data.resultList?.filter(r => r.statusCode === '2000').length ?? phones.length;
+      const fail = phones.length - ok;
+      resultEl.innerHTML = `<div style="font-weight:700;font-size:14px;color:#0d9488;margin-bottom:6px;">✅ 발송 완료</div>
+        <div style="font-size:13px;">성공 <b>${ok}건</b>${fail ? ` · 실패 <b style="color:#ef4444;">${fail}건</b>` : ''}</div>
+        <div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">${new Date().toLocaleString('ko-KR')}</div>`;
+    } else {
+      resultEl.innerHTML = `<div style="font-weight:700;color:#ef4444;margin-bottom:4px;">❌ 발송 실패</div>
+        <div style="font-size:12px;color:var(--ink-soft);">${data.errorCode || ''} ${data.message || JSON.stringify(data)}</div>`;
+    }
+  } catch(e) {
+    alert('오류: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '📤 문자 발송하기';
+  }
+}
 </script>
 
 <script>
