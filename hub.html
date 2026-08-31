@@ -1153,12 +1153,19 @@
     <div class="section-head no-print"><h2>📚 자료실</h2><p>손님께 드릴 안내자료</p></div>
     <div style="max-width:780px;margin:0 auto;">
 
+      <!-- 서브메뉴 탭 -->
+      <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="lib-tab-btn active" data-lib="iphone" style="padding:8px 18px;border-radius:20px;border:2px solid #1d4ed8;background:#1d4ed8;color:#fff;font-size:13px;font-weight:800;cursor:pointer;">📱 아이폰 마이그레이션</button>
+        <button class="lib-tab-btn" data-lib="smartswitch" style="padding:8px 18px;border-radius:20px;border:2px solid #d1d5db;background:#fff;color:#374151;font-size:13px;font-weight:700;cursor:pointer;">🔄 스마트스위치</button>
+      </div>
+
       <!-- 인쇄 버튼 (화면에서만 보임) -->
       <div class="no-print" style="display:flex;justify-content:flex-end;margin-bottom:14px;">
         <button onclick="window.print()" style="padding:9px 22px;border-radius:9px;background:#1d4ed8;color:#fff;border:none;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:7px;">🖨 인쇄하기</button>
       </div>
 
-      <!-- ===== 인쇄 대상 안내문 ===== -->
+      <!-- ===== 아이폰 마이그레이션 ===== -->
+      <div class="lib-panel" id="lib-panel-iphone">
       <div id="lib-guide" style="background:#fff;color:#111;border-radius:14px;overflow:hidden;border:1px solid #d1d5db;font-family:'Malgun Gothic','맑은 고딕',sans-serif;">
 
         <!-- 제목 헤더 -->
@@ -1422,7 +1429,24 @@
 
         </div>
       </div>
-      <!-- ===== 인쇄 대상 끝 ===== -->
+      </div><!-- lib-panel-iphone 끝 -->
+
+      <!-- ===== 스마트스위치 ===== -->
+      <div class="lib-panel" id="lib-panel-smartswitch" style="display:none;">
+        <div style="background:#fff;color:#111;border-radius:14px;overflow:hidden;border:1px solid #d1d5db;font-family:'Malgun Gothic','맑은 고딕',sans-serif;">
+          <div style="background:linear-gradient(135deg,#047857,#065f46);padding:24px 28px;color:#fff;text-align:center;">
+            <div style="font-size:36px;margin-bottom:8px;">📲 ➡️ 📱</div>
+            <div style="font-weight:900;font-size:20px;margin-bottom:6px;">스마트스위치 자료 이전</div>
+            <div style="font-size:13px;opacity:.85;">갤럭시 ↔ 갤럭시 · 아이폰 → 갤럭시</div>
+          </div>
+          <div style="padding:40px;text-align:center;color:#6b7280;">
+            <div style="font-size:48px;margin-bottom:12px;">🚧</div>
+            <div style="font-size:16px;font-weight:700;color:#374151;">준비 중입니다</div>
+            <div style="font-size:13px;margin-top:6px;">곧 내용이 추가될 예정이에요</div>
+          </div>
+        </div>
+      </div><!-- lib-panel-smartswitch 끝 -->
+
     </div>
   </div>
 
@@ -1430,9 +1454,13 @@
   @media print {
     .no-print { display: none !important; }
     body { background: #fff !important; }
-    .tab-nav, .cust-bar { display: none !important; }
-    .tab-panel { display: block !important; }
-    #panel-library { padding: 0 !important; }
+    .tab-nav, .cust-bar, .section-head { display: none !important; }
+    /* 자료실 탭만 인쇄 — 다른 탭 패널은 모두 숨김 */
+    .tab-panel { display: none !important; }
+    #panel-library { display: block !important; padding: 0 !important; }
+    /* 비활성 자료 패널 숨김, 활성 패널만 인쇄 */
+    .lib-panel { display: none !important; }
+    .lib-panel.lib-active { display: block !important; }
     #lib-guide { border: none !important; box-shadow: none !important; }
   }
   </style>
@@ -4679,7 +4707,35 @@ function excelRenderSessions() {
 }
 
 // 탭 전환 시 저장 목록 로드
-document.addEventListener('DOMContentLoaded', () => { excelRenderSessions(); solapiLoadSettings(); });
+document.addEventListener('DOMContentLoaded', () => {
+  excelRenderSessions();
+  solapiLoadSettings();
+
+  // 자료실 서브메뉴 탭 전환
+  const libBtns = document.querySelectorAll('.lib-tab-btn');
+  const libPanels = document.querySelectorAll('.lib-panel');
+  // 초기 활성 패널 설정
+  const initPanel = document.getElementById('lib-panel-iphone');
+  if (initPanel) initPanel.classList.add('lib-active');
+
+  libBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      libBtns.forEach(b => {
+        b.style.background = '#fff';
+        b.style.color = '#374151';
+        b.style.borderColor = '#d1d5db';
+        b.classList.remove('active');
+      });
+      btn.style.background = '#1d4ed8';
+      btn.style.color = '#fff';
+      btn.style.borderColor = '#1d4ed8';
+      btn.classList.add('active');
+      libPanels.forEach(p => { p.style.display = 'none'; p.classList.remove('lib-active'); });
+      const target = document.getElementById('lib-panel-' + btn.dataset.lib);
+      if (target) { target.style.display = 'block'; target.classList.add('lib-active'); }
+    });
+  });
+});
 
 // ── 솔라피 문자발송 ───────────────────────────────────────────────
 function solapiLoadSettings() {
