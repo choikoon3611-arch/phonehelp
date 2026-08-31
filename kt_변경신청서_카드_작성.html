@@ -387,6 +387,7 @@ var textBtn=document.getElementById('text-btn');
   document.addEventListener('keydown',function(e){
     if(e.ctrlKey&&e.key==='z'){var a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.contentEditable==='true'))return;e.preventDefault();undo();}
   });
+  var _pb=document.getElementById('print-btn'); if(_pb) _pb.addEventListener('click', function(){ window.print(); });
 })();</script>
 
 <style>
