@@ -1434,15 +1434,221 @@
       <!-- ===== 스마트스위치 ===== -->
       <div class="lib-panel" id="lib-panel-smartswitch" style="display:none;">
         <div style="background:#fff;color:#111;border-radius:14px;overflow:hidden;border:1px solid #d1d5db;font-family:'Malgun Gothic','맑은 고딕',sans-serif;">
+
+          <!-- 헤더 -->
           <div style="background:linear-gradient(135deg,#047857,#065f46);padding:24px 28px;color:#fff;text-align:center;">
             <div style="font-size:36px;margin-bottom:8px;">📲 ➡️ 📱</div>
             <div style="font-weight:900;font-size:20px;margin-bottom:6px;">스마트스위치 자료 이전</div>
-            <div style="font-size:13px;opacity:.85;">갤럭시 ↔ 갤럭시 · 아이폰 → 갤럭시</div>
+            <div style="font-size:13px;opacity:.85;">갤럭시 ↔ 갤럭시 &nbsp;·&nbsp; 아이폰 → 갤럭시</div>
           </div>
-          <div style="padding:40px;text-align:center;color:#6b7280;">
-            <div style="font-size:48px;margin-bottom:12px;">🚧</div>
-            <div style="font-size:16px;font-weight:700;color:#374151;">준비 중입니다</div>
-            <div style="font-size:13px;margin-top:6px;">곧 내용이 추가될 예정이에요</div>
+
+          <div style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+
+            <!-- 안내 배너 -->
+            <div style="background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:10px;padding:11px 14px;font-size:13px;color:#065f46;display:flex;gap:8px;align-items:center;">
+              <span style="font-size:18px;">ℹ️</span>
+              <span><b>스마트스위치</b>는 삼성 갤럭시 폰의 자료이전 앱이에요. 갤럭시↔갤럭시는 물론, 아이폰→갤럭시도 가능해요!</span>
+            </div>
+
+            <!-- STEP 1: 앱 설치 -->
+            <div style="border-radius:14px;border:2px solid #fde68a;overflow:hidden;">
+              <div style="background:#fef3c7;padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <div style="background:#f59e0b;color:#fff;font-weight:900;font-size:15px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+                <div style="font-weight:900;font-size:14px;color:#78350f;">두 폰 모두 스마트스위치 앱을 설치하세요</div>
+              </div>
+              <div style="padding:14px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+                <div style="flex:1;min-width:180px;font-size:13px;line-height:2;color:#374151;">
+                  갤럭시는 <b>기본 설치</b>돼 있어요<br>
+                  없으면 <b>Play 스토어</b>에서<br>
+                  <b style="color:#d97706;">"Smart Switch"</b> 검색 후 설치<br>
+                  아이폰은 <b>App Store</b>에서 설치<br>
+                  <span style="font-size:12px;color:#9ca3af;">👉 두 폰 모두 최신버전 유지!</span>
+                </div>
+                <svg width="160" height="110" viewBox="0 0 160 110" style="border-radius:10px;border:1.5px solid #fde68a;flex-shrink:0;">
+                  <rect width="160" height="110" fill="#fffbeb"/>
+                  <!-- 갤럭시 폰 -->
+                  <rect x="8" y="18" width="30" height="52" rx="5" fill="#1a1a2e"/>
+                  <rect x="10" y="20" width="26" height="44" rx="3" fill="#16213e"/>
+                  <text x="23" y="36" text-anchor="middle" font-size="6.5" fill="#4ade80" font-family="Malgun Gothic">Galaxy</text>
+                  <rect x="11" y="42" width="24" height="12" rx="3" fill="#047857"/>
+                  <text x="23" y="51" text-anchor="middle" font-size="6" fill="#fff" font-family="Malgun Gothic">스마트스위치</text>
+                  <text x="23" y="78" text-anchor="middle" font-size="8" fill="#374151" font-family="Malgun Gothic">갤럭시</text>
+                  <!-- 화살표 -->
+                  <text x="44" y="52" font-size="12" fill="#f59e0b">✓</text>
+                  <!-- 아이폰 -->
+                  <rect x="55" y="18" width="30" height="52" rx="5" fill="#6b7280"/>
+                  <rect x="57" y="20" width="26" height="44" rx="3" fill="#e5e7eb"/>
+                  <text x="70" y="36" text-anchor="middle" font-size="6.5" fill="#374151" font-family="Malgun Gothic">iPhone</text>
+                  <rect x="58" y="42" width="24" height="12" rx="3" fill="#16a34a"/>
+                  <text x="70" y="51" text-anchor="middle" font-size="6" fill="#fff" font-family="Malgun Gothic">Smart Switch</text>
+                  <text x="70" y="78" text-anchor="middle" font-size="8" fill="#374151" font-family="Malgun Gothic">아이폰</text>
+                  <!-- 설치 완료 -->
+                  <rect x="96" y="22" width="56" height="44" rx="8" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+                  <text x="124" y="42" text-anchor="middle" font-size="18" fill="#059669">✅</text>
+                  <text x="124" y="56" text-anchor="middle" font-size="8" fill="#065f46" font-family="Malgun Gothic" font-weight="bold">설치 완료!</text>
+                  <text x="124" y="78" text-anchor="middle" font-size="7" fill="#78350f" font-family="Malgun Gothic">둘 다 설치!</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- STEP 2: 연결 방법 선택 -->
+            <div style="border-radius:14px;border:2px solid #bfdbfe;overflow:hidden;">
+              <div style="background:#dbeafe;padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <div style="background:#2563eb;color:#fff;font-weight:900;font-size:15px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+                <div style="font-weight:900;font-size:14px;color:#1e3a8a;">스마트스위치 앱을 열고 연결 방법을 선택해요</div>
+              </div>
+              <div style="padding:14px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+                <div style="flex:1;min-width:180px;font-size:13px;line-height:1.9;color:#374151;">
+                  새 갤럭시에서 앱 열기<br>
+                  <b>→ "데이터 가져오기"</b> 선택<br>
+                  연결 방법 두 가지 중 선택:<br>
+                  <span style="display:inline-block;background:#dbeafe;border-radius:6px;padding:2px 8px;font-size:12px;color:#1e3a8a;font-weight:700;margin-top:2px;">📶 무선 — 케이블 없이 와이파이</span><br>
+                  <span style="display:inline-block;background:#dcfce7;border-radius:6px;padding:2px 8px;font-size:12px;color:#14532d;font-weight:700;margin-top:4px;">🔌 케이블 — USB OTG 케이블 연결</span>
+                </div>
+                <svg width="160" height="130" viewBox="0 0 160 130" style="border-radius:10px;border:1.5px solid #bfdbfe;flex-shrink:0;">
+                  <rect width="160" height="130" fill="#eff6ff"/>
+                  <!-- 새 갤럭시 -->
+                  <rect x="55" y="6" width="50" height="84" rx="8" fill="#1a1a2e"/>
+                  <rect x="58" y="9" width="44" height="72" rx="5" fill="#16213e"/>
+                  <!-- 앱 화면 -->
+                  <rect x="61" y="12" width="38" height="9" rx="2" fill="#047857"/>
+                  <text x="80" y="20" text-anchor="middle" font-size="6" fill="#fff" font-family="Malgun Gothic">Smart Switch</text>
+                  <rect x="61" y="24" width="38" height="13" rx="3" fill="#2563eb"/>
+                  <text x="80" y="33" text-anchor="middle" font-size="6.5" fill="#fff" font-family="Malgun Gothic">데이터 가져오기</text>
+                  <!-- 연결 옵션 -->
+                  <rect x="61" y="40" width="38" height="11" rx="3" fill="#1e3a8a"/>
+                  <text x="80" y="49" text-anchor="middle" font-size="6" fill="#93c5fd" font-family="Malgun Gothic">📶 무선으로 연결</text>
+                  <rect x="61" y="54" width="38" height="11" rx="3" fill="#065f46"/>
+                  <text x="80" y="63" text-anchor="middle" font-size="6" fill="#6ee7b7" font-family="Malgun Gothic">🔌 케이블로 연결</text>
+                  <!-- 화살표 -->
+                  <text x="80" y="104" text-anchor="middle" font-size="10" fill="#6366f1">↑ 선택!</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- STEP 3: 기존 폰에서 허용 -->
+            <div style="border-radius:14px;border:2px solid #c4b5fd;overflow:hidden;">
+              <div style="background:#ede9fe;padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <div style="background:#7c3aed;color:#fff;font-weight:900;font-size:15px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+                <div style="font-weight:900;font-size:14px;color:#4c1d95;">기존 폰에서 연결 요청을 허용해요</div>
+              </div>
+              <div style="padding:14px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+                <div style="flex:1;min-width:180px;font-size:13px;line-height:1.9;color:#374151;">
+                  기존 폰(구 갤럭시 또는 아이폰)에<br>
+                  연결 요청 팝업이 떠요<br>
+                  <b style="color:#7c3aed;">→ "허용"</b> 또는 <b style="color:#7c3aed;">"연결"</b> 버튼 누르기<br>
+                  <span style="font-size:12px;color:#9ca3af;">📶 두 폰이 같은 와이파이에 있어야 해요 (무선 선택 시)</span>
+                </div>
+                <svg width="160" height="110" viewBox="0 0 160 110" style="border-radius:10px;border:1.5px solid #c4b5fd;flex-shrink:0;">
+                  <rect width="160" height="110" fill="#f5f3ff"/>
+                  <!-- 기존 폰 -->
+                  <rect x="8" y="15" width="32" height="55" rx="5" fill="#6b7280"/>
+                  <rect x="10" y="17" width="28" height="47" rx="3" fill="#e5e7eb"/>
+                  <text x="24" y="32" text-anchor="middle" font-size="7" fill="#374151" font-family="Malgun Gothic">기존 폰</text>
+                  <!-- 팝업 -->
+                  <rect x="2" y="40" width="60" height="32" rx="5" fill="#fff" stroke="#a78bfa" stroke-width="1.5"/>
+                  <text x="32" y="52" text-anchor="middle" font-size="6" fill="#4c1d95" font-family="Malgun Gothic" font-weight="bold">연결 요청</text>
+                  <text x="32" y="61" text-anchor="middle" font-size="5.5" fill="#374151" font-family="Malgun Gothic">스마트스위치</text>
+                  <rect x="14" y="65" width="22" height="7" rx="3" fill="#7c3aed"/>
+                  <text x="25" y="71" text-anchor="middle" font-size="6" fill="#fff" font-family="Malgun Gothic">허용</text>
+                  <!-- 새 폰 -->
+                  <rect x="118" y="15" width="32" height="55" rx="5" fill="#1a1a2e"/>
+                  <rect x="120" y="17" width="28" height="47" rx="3" fill="#16213e"/>
+                  <text x="134" y="32" text-anchor="middle" font-size="7" fill="#4ade80" font-family="Malgun Gothic">새 폰</text>
+                  <text x="134" y="50" text-anchor="middle" font-size="8" fill="#047857" font-family="Malgun Gothic">대기 중...</text>
+                  <!-- 연결 표시 -->
+                  <text x="80" y="48" text-anchor="middle" font-size="20" fill="#a78bfa">↔</text>
+                  <text x="80" y="88" text-anchor="middle" font-size="8" fill="#6d28d9" font-family="Malgun Gothic">연결 완료!</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- STEP 4: 전송 항목 선택 -->
+            <div style="border-radius:14px;border:2px solid #99f6e4;overflow:hidden;">
+              <div style="background:#ccfbf1;padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <div style="background:#0d9488;color:#fff;font-weight:900;font-size:15px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+                <div style="font-weight:900;font-size:14px;color:#134e4a;">전송할 항목을 선택하고 "전송" 버튼을 눌러요</div>
+              </div>
+              <div style="padding:14px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+                <div style="flex:1;min-width:180px;font-size:13px;line-height:2;color:#374151;">
+                  새 폰 화면에 항목 목록이 나와요<br>
+                  원하는 항목을 체크해요:<br>
+                  <span style="font-size:12.5px;">☑ 연락처 &nbsp;☑ 사진·동영상<br>☑ 문자 &nbsp;&nbsp;&nbsp;☑ 앱 &nbsp;☑ 설정</span><br>
+                  <b style="color:#0d9488;">"전송"</b> 버튼 누르고 기다려요 🔌
+                </div>
+                <svg width="160" height="130" viewBox="0 0 160 130" style="border-radius:10px;border:1.5px solid #99f6e4;flex-shrink:0;">
+                  <rect width="160" height="130" fill="#f0fdfa"/>
+                  <rect x="40" y="6" width="80" height="118" rx="10" fill="#1a1a2e"/>
+                  <rect x="43" y="9" width="74" height="108" rx="7" fill="#16213e"/>
+                  <rect x="46" y="12" width="68" height="9" rx="2" fill="#047857"/>
+                  <text x="80" y="20" text-anchor="middle" font-size="6.5" fill="#fff" font-family="Malgun Gothic">전송 항목 선택</text>
+                  <!-- 체크 항목들 -->
+                  <rect x="48" y="24" width="62" height="9" rx="2" fill="#065f46"/>
+                  <text x="56" y="31" font-size="6" fill="#6ee7b7" font-family="Malgun Gothic">☑ 연락처</text>
+                  <rect x="48" y="35" width="62" height="9" rx="2" fill="#065f46"/>
+                  <text x="56" y="42" font-size="6" fill="#6ee7b7" font-family="Malgun Gothic">☑ 사진 · 동영상</text>
+                  <rect x="48" y="46" width="62" height="9" rx="2" fill="#065f46"/>
+                  <text x="56" y="53" font-size="6" fill="#6ee7b7" font-family="Malgun Gothic">☑ 문자 메시지</text>
+                  <rect x="48" y="57" width="62" height="9" rx="2" fill="#065f46"/>
+                  <text x="56" y="64" font-size="6" fill="#6ee7b7" font-family="Malgun Gothic">☑ 앱</text>
+                  <rect x="48" y="68" width="62" height="9" rx="2" fill="#065f46"/>
+                  <text x="56" y="75" font-size="6" fill="#6ee7b7" font-family="Malgun Gothic">☑ 설정</text>
+                  <!-- 전송 버튼 -->
+                  <rect x="53" y="90" width="54" height="14" rx="7" fill="#0d9488"/>
+                  <text x="80" y="101" text-anchor="middle" font-size="8" fill="#fff" font-family="Malgun Gothic" font-weight="bold">전송</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- STEP 5: 전송 완료 대기 -->
+            <div style="border-radius:14px;border:2px solid #bbf7d0;overflow:hidden;">
+              <div style="background:#dcfce7;padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <div style="background:#16a34a;color:#fff;font-weight:900;font-size:15px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</div>
+                <div style="font-weight:900;font-size:14px;color:#14532d;">전송이 끝날 때까지 기다려요</div>
+              </div>
+              <div style="padding:14px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+                <div style="flex:1;min-width:180px;font-size:13px;line-height:1.9;color:#374151;">
+                  데이터 양에 따라 <b>수분~수십 분</b> 걸려요<br>
+                  두 폰 모두 <b>충전기 꽂고</b> 기다려요 🔌<br>
+                  완료 알림이 뜨면 <b style="color:#16a34a;">전송 끝!</b><br>
+                  <span style="font-size:12px;color:#dc2626;">⚠ 중간에 폰 끄거나 앱 닫지 마세요!</span>
+                </div>
+                <svg width="160" height="110" viewBox="0 0 160 110" style="border-radius:10px;border:1.5px solid #bbf7d0;flex-shrink:0;">
+                  <rect width="160" height="110" fill="#f0fdf4"/>
+                  <!-- 기존 폰 -->
+                  <rect x="10" y="20" width="32" height="55" rx="5" fill="#6b7280"/>
+                  <rect x="12" y="22" width="28" height="47" rx="3" fill="#d1fae5"/>
+                  <text x="26" y="40" text-anchor="middle" font-size="7" fill="#065f46" font-family="Malgun Gothic">기존</text>
+                  <!-- 전송 물결 -->
+                  <path d="M44 35 Q60 28 76 35" stroke="#16a34a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <path d="M44 45 Q60 38 76 45" stroke="#22c55e" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <path d="M44 55 Q60 48 76 55" stroke="#4ade80" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <path d="M44 65 Q60 58 76 65" stroke="#86efac" stroke-width="1" fill="none" stroke-linecap="round"/>
+                  <!-- 새 갤럭시 -->
+                  <rect x="78" y="20" width="32" height="55" rx="5" fill="#1a1a2e"/>
+                  <rect x="80" y="22" width="28" height="47" rx="3" fill="#16213e"/>
+                  <text x="94" y="40" text-anchor="middle" font-size="7" fill="#4ade80" font-family="Malgun Gothic">새 폰</text>
+                  <!-- 진행바 -->
+                  <rect x="80" y="52" width="26" height="5" rx="2" fill="#374151"/>
+                  <rect x="80" y="52" width="20" height="5" rx="2" fill="#16a34a"/>
+                  <!-- 완료 -->
+                  <rect x="118" y="25" width="34" height="40" rx="6" fill="#dcfce7" stroke="#86efac" stroke-width="1.5"/>
+                  <text x="135" y="44" text-anchor="middle" font-size="18" fill="#16a34a">✅</text>
+                  <text x="135" y="58" text-anchor="middle" font-size="7" fill="#14532d" font-family="Malgun Gothic">완료!</text>
+                  <text x="80" y="96" text-anchor="middle" font-size="8" fill="#15803d" font-family="Malgun Gothic" font-weight="bold">충전기 꽂고 기다려요!</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- 완료 -->
+            <div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;padding:16px 20px;display:flex;gap:14px;align-items:center;">
+              <span style="font-size:40px;">🎉</span>
+              <div>
+                <div style="font-weight:900;font-size:16px;color:#14532d;margin-bottom:4px;">스마트스위치 전송 완료!</div>
+                <div style="font-size:13px;color:#166534;">연락처·사진·문자·앱이 새 갤럭시에 그대로 옮겨졌습니다.</div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div><!-- lib-panel-smartswitch 끝 -->
