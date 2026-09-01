@@ -46,7 +46,8 @@
   .field-xs { font-size:11px; letter-spacing:-0.2px; }
 
   /* ─── 체크박스 오버레이 ─── */
-  .ck { position:absolute; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#be185d; font-weight:900; cursor:pointer; transform:translate(-50%,-50%); user-select:none; }
+  .ck { position:absolute; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#be185d; font-weight:900; cursor:move; transform:translate(-50%,-50%); user-select:none; }
+  @media print { .ck { color:#000; } }
 
   /* ─── T 텍스트박스 ─── */
   .textbox { position:absolute; border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55); outline:none; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:13px; font-weight:700; color:#111; padding:0 3px; overflow:visible; white-space:nowrap; line-height:1.3; cursor:text; }
@@ -91,15 +92,16 @@
   <input class="field" id="f-phone"     style="left:23.08%; top:18.61%; width:24%;  height:2%;" placeholder="010-0000-0000">
   <input class="field" id="f-open-date" style="left:63.42%; top:18.72%; width:22%;  height:2%;" placeholder="개통일">
 
-  <!-- ══ 제휴카드 정보: 카드 종류 체크 ══ -->
-  <span class="ck" id="ck-shin" data-group="cardtype" style="left:21.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-kook" data-group="cardtype" style="left:29%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-hyun" data-group="cardtype" style="left:36.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-hana" data-group="cardtype" style="left:44%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-wuri" data-group="cardtype" style="left:51.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-lott" data-group="cardtype" style="left:59%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-sam"  data-group="cardtype" style="left:66.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-nh"   data-group="cardtype" style="left:74%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
+
+  <!-- ══ 카드 종류 체크 (수동) ══ -->
+  <span class="ck" id="ck-shin" data-group="cardtype" style="left:35.08%; top:23.01%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-kook" data-group="cardtype" style="left:42.44%; top:23.12%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-hyun" data-group="cardtype" style="left:50.08%; top:23.01%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-hana" data-group="cardtype" style="left:57.58%; top:22.91%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-wuri" data-group="cardtype" style="left:65.50%; top:22.91%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-lott" data-group="cardtype" style="left:74.13%; top:23.01%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-sam"  data-group="cardtype" style="left:81.49%; top:23.01%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-nh"   data-group="cardtype" style="left:89.84%; top:23.12%;" onclick="toggleCkGroup(this)"></span>
 
   <!-- 카드 명의자 성명 / 생년월일 -->
   <input class="field" id="f-card-holder" style="left:31.71%; top:26.23%; width:26%; height:2%;" placeholder="카드 명의자 성명">
@@ -109,9 +111,9 @@
   <input class="field" id="f-amount" style="left:31.99%; top:29.94%; width:38%; height:2%;" placeholder="결제금액">
 
   <!-- 할부 개월 체크 (18/24/36) -->
-  <span class="ck" id="ck-18" data-group="inst" style="left:60.5%; top:29.94%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-24" data-group="inst" style="left:70%;   top:29.94%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-36" data-group="inst" style="left:80%;   top:29.94%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-18" data-group="inst" data-label="18개월" style="left:72.81%; top:29.94%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-24" data-group="inst" data-label="24개월" style="left:81.46%; top:29.94%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-36" data-group="inst" data-label="36개월" style="left:90.47%; top:29.83%;" onclick="toggleCkGroup(this)"></span>
 
   <!-- 카드번호 + 유효기간 -->
   <input class="field field-sm" id="f-cnum1" style="left:28.74%; top:32.90%; width:12%; height:2%;" placeholder="0000">
@@ -127,26 +129,10 @@
   <span class="ck" id="ck-bun" data-group="guan" style="left:65%;   top:36.7%;" onclick="toggleCkGroup(this)"></span>
   <input class="field field-sm" id="f-bun-month" style="left:59.87%; top:32.80%; width:10%; height:2%;" placeholder="">
 
-  <!-- ══ LGU+ 전산 ══ -->
-  <span class="ck" id="ck-uplus"   data-group="lgutype" style="left:4.5%; top:42%;"   onclick="toggleCkGroup(this)"></span>
-  <input class="field" id="f-remain"      style="left:39.33%; top:41.63%; width:28%; height:2%;" placeholder="잔여할부금(원)">
-  <input class="field field-sm" id="f-uplus-month" style="left:85.30%; top:41.73%; width:12%; height:2%;" placeholder="개월">
-
-  <span class="ck" id="ck-gencard" data-group="lgutype" style="left:4.5%; top:48%;" onclick="toggleCkGroup(this)"></span>
-  <input class="field field-sm" id="f-gen-name"   style="left:39.43%; top:45.08%; width:22%; height:2%;" placeholder="카드주 성명">
-  <input class="field field-sm" id="f-gen-birth"  style="left:66.00%; top:45.50%; width:20%; height:2%;" placeholder="생년월일">
-  <input class="field field-sm" id="f-gen-card"   style="left:39.00%; top:48.17%; width:33%; height:2%;" placeholder="카드번호">
-  <input class="field field-sm" id="f-gen-exp"    style="left:88.54%; top:47.85%; width:14%; height:2%;" placeholder="MM/YY">
-  <input class="field field-sm" id="f-gen-amount" style="left:38.86%; top:51.47%; width:28%; height:2%;" placeholder="결제금액">
-  <input class="field field-sm" id="f-gen-month"  style="left:70.00%; top:52.00%; width:16%; height:2%;" placeholder="개월">
-
-  <span class="ck" id="ck-cash" data-group="lgutype" style="left:4.5%; top:55%;" onclick="toggleCkGroup(this)"></span>
-  <input class="field" id="f-cash-amount" style="left:38.86%; top:54.52%; width:33%; height:2%;" placeholder="결제금액(원)">
-  <input class="field field-sm" id="f-cash-ssn" style="left:38.44%; top:58.05%; width:55%; height:2%;" placeholder="명의자 주민번호 전체">
 
   <!-- ══ 자동이체 등록 ══ -->
-  <span class="ck" id="ck-auto-y" data-group="auto" style="left:21.5%; top:63.5%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-auto-n" data-group="auto" style="left:33%;   top:63.5%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-auto-y" data-group="auto" data-label="신청" style="left:29.28%; top:62.97%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-auto-n" data-group="auto" data-label="미신청" style="left:40.36%; top:62.97%;" onclick="toggleCkGroup(this)"></span>
 
   <!-- ══ 하단 ══ -->
   <input class="field" id="f-store" style="left:14.86%; top:86.44%; width:42%; height:2%;" placeholder="매장명">
@@ -197,11 +183,10 @@ function resetFormImage() {
   location.reload();
 }
 
-// ── 좌표 내보내기 (.field + .textbox 모두) ────
+// ── 좌표 내보내기 (.field + .ck + .textbox 모두) ────
 function exportCoords() {
   var wrap = document.getElementById('wrap1');
   var lines = [];
-  // 기존 .field 입력 필드 좌표
   wrap.querySelectorAll('.field').forEach(function(b) {
     var id = b.id || '(id없음)';
     var ph = b.placeholder || '';
@@ -210,7 +195,12 @@ function exportCoords() {
     var w = parseFloat(b.style.width).toFixed(2);
     lines.push('#'+id+' ('+ph+'): left:'+l+'%, top:'+t+'%, width:'+w+'%');
   });
-  // 새로 그린 .textbox 좌표
+  wrap.querySelectorAll('.ck').forEach(function(b) {
+    var id = b.id || '(id없음)';
+    var l = parseFloat(b.style.left).toFixed(2);
+    var t = parseFloat(b.style.top).toFixed(2);
+    lines.push('[ck] #'+id+': left:'+l+'%, top:'+t+'%');
+  });
   wrap.querySelectorAll('.textbox').forEach(function(b, i) {
     var l = parseFloat(b.style.left).toFixed(2);
     var t = parseFloat(b.style.top).toFixed(2);
@@ -219,14 +209,14 @@ function exportCoords() {
     lines.push('새박스'+(i+1)+': left:'+l+'%, top:'+t+'%, width:'+w+'%, height:'+h+'%');
   });
   if (!lines.length) { alert('필드가 없습니다.'); return; }
-  var result = '📋 필드 좌표\n' + lines.join('\n');
+  var result = '📋 필드+체크박스 좌표\n' + lines.join('\n');
   var ta = document.createElement('textarea');
   ta.value = result;
-  ta.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);width:640px;max-width:95vw;height:220px;z-index:9999;font-family:monospace;font-size:12px;padding:10px;border:2px solid #0078d4;border-radius:8px;resize:vertical;';
+  ta.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);width:640px;max-width:95vw;height:280px;z-index:9999;font-family:monospace;font-size:12px;padding:10px;border:2px solid #0078d4;border-radius:8px;resize:vertical;';
   document.body.appendChild(ta); ta.select(); document.execCommand('copy');
   ta.addEventListener('blur', function(){ ta.remove(); });
   ta.addEventListener('keydown', function(e){ if (e.key==='Escape') ta.remove(); });
-  alert('좌표가 클립보드에 복사됐습니다!\nClaude에게 붙여넣기 하세요.\n(ESC 또는 바깥 클릭으로 닫힙니다)');
+  alert('좌표가 클립보드에 복사됐습니다!\n(ESC 또는 바깥 클릭으로 닫힙니다)');
 }
 
 // ── 필드 드래그 이동 (항상 활성) ────────────────
@@ -236,16 +226,20 @@ function exportCoords() {
   var movingField = null, moveOffset = {x:0,y:0}, moveOrigPos = null, undoStack = [];
   var undoBtn = document.getElementById('undo-btn');
 
-  // 모든 .field에 move 커서 + mousedown
+  // .field + .ck 모두 드래그 이동
   function initFields() {
     wrap.querySelectorAll('.field').forEach(function(f){
       f.style.cursor = 'move';
       f.addEventListener('mousedown', onFieldDown);
     });
+    wrap.querySelectorAll('.ck').forEach(function(f){
+      f.style.cursor = 'move';
+      f.addEventListener('mousedown', onFieldDown);
+    });
   }
   function onFieldDown(e) {
-    // 입력 중(포커스)일 때는 드래그 대신 타이핑 허용 — Shift 누르면 이동
-    if (document.activeElement === e.currentTarget && !e.shiftKey) return;
+    // input 포커스 중(타이핑)일 때는 Shift 없으면 드래그 안 함
+    if (e.currentTarget.tagName === 'INPUT' && document.activeElement === e.currentTarget && !e.shiftKey) return;
     e.preventDefault();
     var f = e.currentTarget;
     var r = wrap.getBoundingClientRect();
@@ -301,10 +295,12 @@ function exportCoords() {
   var custId = params.get('id');
   if (!custId) return;
   try {
-    var list = JSON.parse(localStorage.getItem('issuance_list') || '[]');
-    var c = list.find(function(e){ return String(e.id) === custId; });
+    // hub.html이 cardOpenDoc에서 card_entry_{id}로 저장해 줌
+    var c = null;
+    var raw = localStorage.getItem('card_entry_' + custId);
+    if (raw) { c = JSON.parse(raw); }
     if (!c) {
-      list = JSON.parse(localStorage.getItem('card_issuance_list') || '[]');
+      var list = JSON.parse(localStorage.getItem('card_issuance_list') || '[]');
       c = list.find(function(e){ return String(e.id) === custId; });
     }
     if (!c) return;

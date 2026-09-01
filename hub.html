@@ -368,6 +368,36 @@
   .pr-check-label { display:flex; align-items:center; gap:5px; font-size:13px; cursor:pointer; }
   .pr-radio-row { display:flex; gap:16px; flex-wrap:wrap; }
 
+  /* ── 공유업무 서브탭 ── */
+  .consult-sub-tabs { display:flex; gap:6px; margin-bottom:16px; border-bottom:2px solid var(--line); padding-bottom:0; }
+  .csub-btn { padding:8px 18px; font-size:13px; font-weight:700; border:none; border-radius:8px 8px 0 0; background:transparent; color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; }
+  .csub-btn.active { color:#7c3aed; border-bottom:3px solid #7c3aed; background:rgba(124,58,237,0.07); }
+  .csub-panel { display:none; }
+  .csub-panel.active { display:block; }
+
+  /* ── 문자업무공유 ── */
+  .sms-task-input-wrap { background:var(--panel); border:1.5px solid var(--line); border-radius:12px; padding:14px; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
+  .sms-task-input-wrap textarea { width:100%; min-height:80px; padding:10px; border:1.5px solid var(--line); border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:var(--bg); color:var(--ink); outline:none; }
+  .sms-task-input-wrap textarea:focus { border-color:#7c3aed; }
+  .sms-task-filter { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .sms-ftab { padding:5px 14px; font-size:12px; font-weight:700; border:1.5px solid var(--line); border-radius:20px; background:var(--panel); color:var(--ink-soft); cursor:pointer; }
+  .sms-ftab.active { background:#7c3aed; color:#fff; border-color:#7c3aed; }
+  .sms-task-list { display:flex; flex-direction:column; gap:10px; }
+  .sms-task-card { background:var(--panel); border:1.5px solid var(--line); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .sms-task-card.done { opacity:0.6; }
+  .sms-task-card-top { display:flex; align-items:flex-start; gap:10px; }
+  .sms-task-content { flex:1; font-size:13px; color:var(--ink); white-space:pre-wrap; word-break:break-all; line-height:1.6; max-height:80px; overflow:hidden; cursor:pointer; }
+  .sms-task-content.expanded { max-height:none; }
+  .sms-task-badge { flex-shrink:0; padding:3px 10px; font-size:11px; font-weight:800; border-radius:20px; }
+  .sms-task-badge.undone { background:#fee2e2; color:#dc2626; }
+  .sms-task-badge.done   { background:#dcfce7; color:#16a34a; }
+  .sms-task-meta { font-size:11px; color:var(--ink-soft); display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .sms-task-actions { display:flex; gap:8px; justify-content:flex-end; }
+  .sms-done-btn  { padding:5px 14px; font-size:12px; font-weight:700; border:none; border-radius:7px; cursor:pointer; }
+  .sms-done-btn.complete { background:#16a34a; color:#fff; }
+  .sms-done-btn.undo     { background:#e5e7eb; color:#374151; }
+  .sms-del-btn  { padding:5px 10px; font-size:12px; font-weight:700; border:1.5px solid #fca5a5; border-radius:7px; background:transparent; color:#dc2626; cursor:pointer; }
+
   /* ── 공유업무 ── */
   .consult-toolbar {
     display: flex; align-items: center; justify-content: space-between;
@@ -756,6 +786,15 @@
       <p>상담 내용을 기록하고 팀원과 공유하세요</p>
     </div>
 
+    <!-- 서브탭 -->
+    <div class="consult-sub-tabs">
+      <button class="csub-btn active" data-csub="csub-consult">📋 상담업무</button>
+      <button class="csub-btn" data-csub="csub-sms">💬 문자업무공유</button>
+    </div>
+
+    <!-- ── 상담업무 (기존) ── -->
+    <div class="csub-panel active" id="csub-consult">
+
     <!-- 텔레그램 알림 설정 -->
     <div id="consult-tg-settings" style="background:var(--panel);border:1px solid #ddd6fe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;">
       <div style="font-size:11px;font-weight:800;color:#7c3aed;width:100%;margin-bottom:2px;">🔔 텔레그램 알림 설정 <span style="font-weight:400;color:#94a3b8;">(업무 등록 시 즉시 + 매일 오전 11시 미처리 알림)</span></div>
@@ -806,7 +845,42 @@
         등록된 상담 내용이 없습니다. <strong>+ 새 상담 등록</strong>을 눌러 추가하세요.
       </div>
     </div>
-  </div>
+    </div><!-- /csub-consult -->
+
+    <!-- ── 문자업무공유 ── -->
+    <div class="csub-panel" id="csub-sms">
+      <!-- 텔레그램 설정 -->
+      <div style="background:var(--panel);border:1px solid #ddd6fe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;">
+        <div style="font-size:11px;font-weight:800;color:#7c3aed;width:100%;margin-bottom:2px;">🔔 텔레그램 알림 설정</div>
+        <div style="flex:1;min-width:120px;">
+          <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px;">문자업무 Topic ID</div>
+          <input id="tg-sms-topic" placeholder="텔레그램 주제 ID (예: 12)"
+            style="width:100%;padding:7px 10px;border:1.5px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+        </div>
+        <button onclick="smsTgSave()" style="padding:7px 14px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">저장</button>
+        <button onclick="smsTgTest()" style="padding:7px 14px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">📨 테스트</button>
+      </div>
+      <!-- 입력 영역 -->
+      <div class="sms-task-input-wrap">
+        <div style="font-size:13px;font-weight:800;color:var(--ink);">📨 문자 붙여넣기</div>
+        <textarea id="sms-task-text" placeholder="받은 문자 내용을 여기에 붙여넣으세요..."></textarea>
+        <div style="display:flex;justify-content:flex-end;">
+          <button onclick="smsTaskAdd()" style="padding:8px 20px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">+ 등록</button>
+        </div>
+      </div>
+      <!-- 필터 -->
+      <div class="sms-task-filter">
+        <button class="sms-ftab active" data-sf="전체" onclick="smsFilterSet(this)">전체</button>
+        <button class="sms-ftab" data-sf="미완료" onclick="smsFilterSet(this)">🔴 미완료</button>
+        <button class="sms-ftab" data-sf="완료" onclick="smsFilterSet(this)">✅ 완료</button>
+      </div>
+      <!-- 목록 -->
+      <div class="sms-task-list" id="sms-task-list">
+        <div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">등록된 문자 업무가 없습니다.</div>
+      </div>
+    </div><!-- /csub-sms -->
+
+  </div><!-- /panel-consult -->
 
   <!-- 정책 업로드 -->
   <div class="tab-panel" id="panel-policy">
@@ -2407,6 +2481,126 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   } catch(e) {}
 })();
 
+/* ===== 공유업무 서브탭 ===== */
+document.querySelectorAll('.csub-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.csub-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.csub-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.csub).classList.add('active');
+  });
+});
+
+/* ===== 문자업무공유 ===== */
+let smsTaskList = [];
+let smsFilter   = '전체';
+
+db.ref(HUB + '/sms_tasks').on('value', snap => {
+  const d = snap.val() || {};
+  smsTaskList = Object.values(d).sort((a, b) => Number(b.id) - Number(a.id));
+  smsTaskRender();
+});
+
+function smsTaskAdd() {
+  const text = document.getElementById('sms-task-text').value.trim();
+  if (!text) { alert('문자 내용을 입력하세요.'); return; }
+  const id = Date.now().toString();
+  const now = new Date().toLocaleString('ko-KR', {hour12:false});
+  const store = localStorage.getItem('hub_store_name') || '미설정';
+  const entry = { id, 내용:text, 등록시간:now, 등록자:store, 완료:false, 완료시간:'', 완료자:'' };
+  db.ref(HUB + '/sms_tasks/' + id).set(entry);
+  document.getElementById('sms-task-text').value = '';
+  // 텔레그램 알림
+  const hubUrl = 'https://dreamy-scone-25c7bc.netlify.app/hub.html#consult';
+  const msg = `📨 <b>문자업무 등록</b>\n\n👤 ${store} | 🕐 ${now}\n\n${text.slice(0,300)}${text.length>300?'...':''}\n\n🔗 <a href="${hubUrl}">바로가기</a>`;
+  sendSmsTgNotify(msg);
+}
+
+function sendSmsTgNotify(msg) {
+  const token  = tgCfg.token;
+  const chatId = tgCfg.chatId;
+  const topic  = tgCfg.smsTopic;
+  if (!token || !chatId) { console.warn('[TG] token/chatId 없음'); return; }
+  const body = { chat_id: chatId, text: msg, parse_mode: 'HTML' };
+  if (topic) body.message_thread_id = parseInt(topic);
+  fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+  }).then(r=>r.json()).then(j=>{ if(!j.ok) console.error('[TG] 문자업무 알림 실패:', j.description); })
+    .catch(e=>console.error('[TG] 문자업무 알림 오류:', e));
+}
+
+function smsTgSave() {
+  const el = document.getElementById('tg-sms-topic');
+  if (el) db.ref(HUB + '/tgSettings/smsTopic').set(el.value.trim());
+  const btn = event?.target;
+  if (btn) { btn.textContent='✅ 저장됨'; setTimeout(()=>btn.textContent='저장',1500); }
+}
+
+function smsTgTest() {
+  if (!tgCfg.token || !tgCfg.chatId) {
+    alert('Bot Token 또는 Chat ID가 없습니다.\n정책 업로드 탭에서 먼저 저장하세요.'); return;
+  }
+  sendSmsTgNotify('✅ 문자업무공유 텔레그램 알림 테스트 메시지입니다.');
+  alert('전송 시도했습니다. 텔레그램을 확인하세요.');
+}
+
+function smsTaskDone(id) {
+  const now   = new Date().toLocaleString('ko-KR', {hour12:false});
+  const store = localStorage.getItem('hub_store_name') || '미설정';
+  db.ref(HUB + '/sms_tasks/' + id).update({ 완료:true, 완료시간:now, 완료자:store });
+}
+function smsTaskUndone(id) {
+  db.ref(HUB + '/sms_tasks/' + id).update({ 완료:false, 완료시간:'', 완료자:'' });
+}
+function smsTaskDel(id) {
+  if (!confirm('삭제할까요?')) return;
+  db.ref(HUB + '/sms_tasks/' + id).remove();
+}
+
+function smsFilterSet(btn) {
+  document.querySelectorAll('.sms-ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  smsFilter = btn.dataset.sf;
+  smsTaskRender();
+}
+
+function smsTaskRender() {
+  const list = document.getElementById('sms-task-list');
+  if (!list) return;
+  let items = smsTaskList;
+  if (smsFilter === '미완료') items = items.filter(e => !e.완료);
+  if (smsFilter === '완료')   items = items.filter(e => e.완료);
+  if (!items.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">해당하는 문자 업무가 없습니다.</div>';
+    return;
+  }
+  list.innerHTML = items.map(e => {
+    const done = !!e.완료;
+    const preview = (e.내용||'').length > 100;
+    return `<div class="sms-task-card${done?' done':''}">
+      <div class="sms-task-card-top">
+        <div class="sms-task-content" id="sms-content-${e.id}" onclick="this.classList.toggle('expanded')">${escHtml(e.내용||'')}${preview?'<span style="color:#7c3aed;font-size:11px;"> …더보기</span>':''}</div>
+        <span class="sms-task-badge ${done?'done':'undone'}">${done?'✅ 완료':'🔴 미완료'}</span>
+      </div>
+      <div class="sms-task-meta">
+        <span>📅 ${e.등록시간||''}</span>
+        <span>👤 ${e.등록자||''}</span>
+        ${done?`<span>✅ ${e.완료시간||''} · ${e.완료자||''}</span>`:''}
+      </div>
+      <div class="sms-task-actions">
+        ${done
+          ? `<button class="sms-done-btn undo" onclick="smsTaskUndone('${e.id}')">↩ 완료취소</button>`
+          : `<button class="sms-done-btn complete" onclick="smsTaskDone('${e.id}')">✅ 완료처리</button>`}
+        <button class="sms-del-btn" onclick="smsTaskDel('${e.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 /* ===== 제휴카드 발급현황 ===== */
 const CARD_KEY  = 'card_issuance_list'; // 레거시 키 (더 이상 사용 안 함)
 const CARD_URLS = { SKT:'sk_변경신청서_카드_작성.html', KT:'kt_변경신청서_카드_작성.html', KTM:'ktm_서비스변경신청서_작성.html', LG:'lg_제휴카드_작성.html' };
@@ -2503,6 +2697,7 @@ document.querySelectorAll('.ftab').forEach(tab => {
 function cardOpenDoc(id) {
   const e = cardList.find(x => x.id === id); if (!e) return;
   const url = CARD_URLS[e.통신사]; if (!url) return;
+  try { localStorage.setItem('card_entry_' + id, JSON.stringify(e)); } catch(_){}
   window.open(`${url}?id=${id}`, 'workarea');
 }
 function cardMarkDone(id) {
@@ -3848,17 +4043,19 @@ db.ref(HUB + '/uploadDealers').on('value', snap => {
 
 // 설정 저장
 // 텔레그램 설정 — Firebase 공유 저장
-var tgCfg = { token:'', chatId:'', consultTopic:'' };
+var tgCfg = { token:'', chatId:'', consultTopic:'', smsTopic:'' };
 
 db.ref(HUB + '/tgSettings').on('value', snap => {
   const d = snap.val() || {};
   tgCfg.token        = d.token        || '';
   tgCfg.chatId       = d.chatId       || '';
   tgCfg.consultTopic = d.consultTopic || '';
+  tgCfg.smsTopic     = d.smsTopic     || '';
   uploadLoadSettings();
-  // 공유업무 Topic 칸도 업데이트
   const ct = document.getElementById('tg-consult-topic');
   if (ct) ct.value = tgCfg.consultTopic;
+  const st = document.getElementById('tg-sms-topic');
+  if (st) st.value = tgCfg.smsTopic;
 });
 
 function uploadTgSaveSettings() {
