@@ -363,7 +363,7 @@ document.getElementById('print-btn').addEventListener('click', function(){ windo
   if (!header) return;
   header.querySelectorAll('button, label').forEach(function(el){
     var t = el.textContent;
-    if (t.indexOf('좌표') !== -1 || t.indexOf('이미지 교체') !== -1 || t.indexOf('복원') !== -1) el.style.display = 'none';
+    if (t.indexOf('이미지 교체') !== -1 || t.indexOf('복원') !== -1) el.style.display = 'none';
   });
   var tb = document.getElementById('text-btn');
   if (tb) {
