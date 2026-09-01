@@ -868,6 +868,12 @@
           <button onclick="smsTaskAdd()" style="padding:8px 20px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">+ 등록</button>
         </div>
       </div>
+      <!-- 검색 -->
+      <div style="margin-bottom:10px;">
+        <input id="sms-search-input" type="text" placeholder="🔍 문자 내용 검색..."
+          oninput="smsTaskRender()"
+          style="width:100%;padding:9px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--ink);outline:none;">
+      </div>
       <!-- 필터 -->
       <div class="sms-task-filter">
         <button class="sms-ftab active" data-sf="전체" onclick="smsFilterSet(this)">전체</button>
@@ -2567,9 +2573,11 @@ function smsFilterSet(btn) {
 function smsTaskRender() {
   const list = document.getElementById('sms-task-list');
   if (!list) return;
+  const q = (document.getElementById('sms-search-input')?.value || '').trim().toLowerCase();
   let items = smsTaskList;
   if (smsFilter === '미완료') items = items.filter(e => !e.완료);
   if (smsFilter === '완료')   items = items.filter(e => e.완료);
+  if (q) items = items.filter(e => (e.내용||'').toLowerCase().includes(q) || (e.등록자||'').toLowerCase().includes(q));
   if (!items.length) {
     list.innerHTML = '<div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">해당하는 문자 업무가 없습니다.</div>';
     return;
