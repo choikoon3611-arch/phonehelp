@@ -197,23 +197,32 @@ function resetFormImage() {
   location.reload();
 }
 
-// ── 좌표 내보내기 ─────────────────────────────
+// ── 좌표 내보내기 (.field + .textbox 모두) ────
 function exportCoords() {
   var wrap = document.getElementById('wrap1');
-  var boxes = wrap.querySelectorAll('.textbox');
-  if (!boxes.length) { alert('T 텍스트 모드로 칸을 먼저 드래그해 주세요.'); return; }
   var lines = [];
-  boxes.forEach(function(b, i) {
+  // 기존 .field 입력 필드 좌표
+  wrap.querySelectorAll('.field').forEach(function(b) {
+    var id = b.id || '(id없음)';
+    var ph = b.placeholder || '';
+    var l = parseFloat(b.style.left).toFixed(2);
+    var t = parseFloat(b.style.top).toFixed(2);
+    var w = parseFloat(b.style.width).toFixed(2);
+    lines.push('#'+id+' ('+ph+'): left:'+l+'%, top:'+t+'%, width:'+w+'%');
+  });
+  // 새로 그린 .textbox 좌표
+  wrap.querySelectorAll('.textbox').forEach(function(b, i) {
     var l = parseFloat(b.style.left).toFixed(2);
     var t = parseFloat(b.style.top).toFixed(2);
     var w = parseFloat(b.style.width).toFixed(2);
     var h = parseFloat(b.style.minHeight).toFixed(2);
-    lines.push('필드 '+(i+1)+': left:'+l+'%, top:'+t+'%, width:'+w+'%, height:'+h+'%');
+    lines.push('새박스'+(i+1)+': left:'+l+'%, top:'+t+'%, width:'+w+'%, height:'+h+'%');
   });
-  var result = '📋 텍스트박스 좌표\n' + lines.join('\n');
+  if (!lines.length) { alert('필드가 없습니다.'); return; }
+  var result = '📋 필드 좌표\n' + lines.join('\n');
   var ta = document.createElement('textarea');
   ta.value = result;
-  ta.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);width:600px;max-width:95vw;height:200px;z-index:9999;font-family:monospace;font-size:13px;padding:10px;border:2px solid #0078d4;border-radius:8px;resize:vertical;';
+  ta.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);width:640px;max-width:95vw;height:220px;z-index:9999;font-family:monospace;font-size:12px;padding:10px;border:2px solid #0078d4;border-radius:8px;resize:vertical;';
   document.body.appendChild(ta); ta.select(); document.execCommand('copy');
   ta.addEventListener('blur', function(){ ta.remove(); });
   ta.addEventListener('keydown', function(e){ if (e.key==='Escape') ta.remove(); });
@@ -226,6 +235,7 @@ function exportCoords() {
   var undoBtn = document.getElementById('undo-btn');
   if (!textBtn || !undoBtn) return;
   var textOn = false, textBoxes = [], dragStart = null, selRect = null, undoStack = [];
+  var movingField = null, moveOffset = {x:0, y:0}, moveOrigPos = null;
 
   textBtn.addEventListener('click', function(){
     textOn = !textOn;
@@ -234,11 +244,31 @@ function exportCoords() {
     var wrap = document.getElementById('wrap1');
     wrap.style.cursor = textOn ? 'crosshair' : '';
     wrap.style.userSelect = textOn ? 'none' : '';
+    // 필드에 드래그 커서 표시
+    wrap.querySelectorAll('.field').forEach(function(f){
+      f.style.cursor = textOn ? 'move' : '';
+    });
   });
 
+  // ── 기존 .field 드래그 이동 ──
   var wrap = document.getElementById('wrap1');
   wrap.addEventListener('mousedown', function(e){
-    if (!textOn || e.target.closest('.textbox')) return;
+    var field = e.target.closest('.field');
+    if (textOn && field) {
+      e.preventDefault();
+      var img = wrap.querySelector('img');
+      var r = wrap.getBoundingClientRect();
+      var iw = wrap.offsetWidth, ih = img.offsetHeight;
+      var fx = parseFloat(field.style.left)/100 * iw;
+      var fy = parseFloat(field.style.top)/100 * ih;
+      moveOffset = { x: e.clientX - r.left - fx, y: e.clientY - r.top - fy };
+      moveOrigPos = { left: field.style.left, top: field.style.top };
+      movingField = field;
+      field.style.opacity = '0.7';
+      return;
+    }
+    // ── 빈 영역 드래그 → 새 텍스트박스 ──
+    if (!textOn || e.target.closest('.textbox') || e.target.closest('.field')) return;
     e.preventDefault();
     var r = wrap.getBoundingClientRect();
     dragStart = { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -248,6 +278,17 @@ function exportCoords() {
   });
 
   window.addEventListener('mousemove', function(e){
+    // 기존 필드 이동
+    if (movingField) {
+      var img = wrap.querySelector('img');
+      var r = wrap.getBoundingClientRect();
+      var iw = wrap.offsetWidth, ih = img.offsetHeight;
+      var nx = e.clientX - r.left - moveOffset.x;
+      var ny = e.clientY - r.top  - moveOffset.y;
+      movingField.style.left = (nx/iw*100).toFixed(2)+'%';
+      movingField.style.top  = (ny/ih*100).toFixed(2)+'%';
+      return;
+    }
     if (!textOn || !dragStart) return;
     var r = wrap.getBoundingClientRect();
     var cx = e.clientX - r.left, cy = e.clientY - r.top;
@@ -258,6 +299,13 @@ function exportCoords() {
   });
 
   window.addEventListener('mouseup', function(e){
+    // 기존 필드 이동 완료
+    if (movingField) {
+      movingField.style.opacity = '';
+      undoStack.push({ type:'move', el:movingField, orig:moveOrigPos });
+      movingField = null; moveOrigPos = null;
+      return;
+    }
     if (!textOn || !dragStart) return;
     var img = wrap.querySelector('img');
     var r = wrap.getBoundingClientRect();
@@ -286,6 +334,9 @@ function exportCoords() {
     if (last.type === 'textbox') {
       last.el.remove();
       textBoxes = textBoxes.filter(function(b){ return b !== last.el; });
+    } else if (last.type === 'move') {
+      last.el.style.left = last.orig.left;
+      last.el.style.top  = last.orig.top;
     }
   }
   undoBtn.addEventListener('click', undo);
