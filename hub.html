@@ -369,8 +369,8 @@
   .pr-radio-row { display:flex; gap:16px; flex-wrap:wrap; }
 
   /* ── 공유업무 서브탭 ── */
-  .consult-sub-tabs { display:flex; gap:6px; margin-bottom:16px; border-bottom:2px solid var(--line); padding-bottom:0; }
-  .csub-btn { padding:8px 18px; font-size:13px; font-weight:700; border:none; border-radius:8px 8px 0 0; background:transparent; color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; }
+  .consult-sub-tabs { display:flex; gap:6px; margin-bottom:16px; border-bottom:2px solid var(--line); padding-bottom:0; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .csub-btn { padding:10px 20px; font-size:13px; font-weight:700; border:none; border-radius:8px 8px 0 0; background:transparent; color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; white-space:nowrap; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
   .csub-btn.active { color:#7c3aed; border-bottom:3px solid #7c3aed; background:rgba(124,58,237,0.07); }
   .csub-panel { display:none; }
   .csub-panel.active { display:block; }
