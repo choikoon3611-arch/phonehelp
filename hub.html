@@ -423,7 +423,16 @@
   .consult-table td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
   .consult-table tr:last-child td { border-bottom: none; }
   .consult-table tr:hover td { background: #f8fafc; }
-  .consult-content { max-width: 220px; white-space: pre-wrap; word-break: break-all; font-size: 12px; color: #374151; }
+  .consult-content { max-width: 220px; white-space: pre-wrap; word-break: break-all; font-size: 12px; color: #374151; max-height: 72px; overflow: hidden; cursor: pointer; position: relative; }
+  .consult-content::after { content:''; position:absolute; bottom:0; left:0; right:0; height:20px; background:linear-gradient(transparent, #fff); pointer-events:none; }
+  .consult-content:hover { opacity:0.8; }
+  /* 상담내용 뷰어 모달 */
+  #consult-view-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9000; align-items:center; justify-content:center; padding:20px; }
+  #consult-view-modal.open { display:flex; }
+  #consult-view-box { background:var(--panel); border-radius:16px; width:100%; max-width:600px; max-height:80vh; display:flex; flex-direction:column; box-shadow:0 8px 40px rgba(0,0,0,0.25); }
+  #consult-view-box .vhd { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--line); }
+  #consult-view-box .vhd h3 { font-size:15px; font-weight:800; margin:0; }
+  #consult-view-body { padding:20px; overflow-y:auto; font-size:14px; line-height:1.8; white-space:pre-wrap; word-break:break-all; color:var(--ink); }
   .consult-empty { padding: 36px; text-align: center; color: var(--ink-soft); font-size: 14px; }
 
   /* ── 거래처 업로드 카드 ── */
@@ -2098,6 +2107,17 @@
       oninput="this.style.borderColor=this.value.trim()?'#7c3aed':'#e2e7ec'"
       onkeydown="if(event.key==='Enter')confirmStoreName()">
     <button onclick="confirmStoreName()" style="width:100%;padding:12px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">시작하기</button>
+  </div>
+</div>
+
+<!-- 상담내용 뷰어 -->
+<div id="consult-view-modal" onclick="if(event.target===this)consultViewClose()">
+  <div id="consult-view-box">
+    <div class="vhd">
+      <h3 id="consult-view-name">상담내용</h3>
+      <button onclick="consultViewClose()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--ink-soft);">✕</button>
+    </div>
+    <div id="consult-view-body"></div>
   </div>
 </div>
 
@@ -4449,7 +4469,7 @@ function consultRender() {
       <td><span class="cbadge ${carrierCls[e.carrier]||''}">${e.carrier||'-'}</span></td>
       <td>${e.ssn||'-'}</td>
       <td style="font-size:12px;">${e.penalty||'-'}</td>
-      <td><div class="consult-content">${(e.content||'-').replace(/</g,'&lt;')}</div></td>
+      <td><div class="consult-content" onclick="consultViewOpen('${(e.name||'').replace(/'/g,"\\'")}','${(e.content||'').replace(/\n/g,'\\n').replace(/'/g,"\\'")}',this)">${(e.content||'-').replace(/</g,'&lt;')}</div></td>
       <td style="font-size:12px;color:var(--ink-soft);">${e.agent||'-'}</td>
       <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
         ${!done ? `<button class="cbtn" style="background:#16a34a;color:#fff;border-color:#16a34a;" onclick="consultDone('${e.id}')">✅ 완료</button>` : `<button class="cbtn" onclick="consultUndone('${e.id}')">↩ 되돌리기</button>`}
@@ -4459,6 +4479,16 @@ function consultRender() {
     </tr>`;
   }).join('');
 }
+
+function consultViewOpen(name, content, el) {
+  document.getElementById('consult-view-name').textContent = name ? name + ' — 상담내용' : '상담내용';
+  document.getElementById('consult-view-body').textContent = content;
+  document.getElementById('consult-view-modal').classList.add('open');
+}
+function consultViewClose() {
+  document.getElementById('consult-view-modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') consultViewClose(); });
 
 function consultDone(id) {
   db.ref(HUB + '/consultations/' + id + '/done').set(true);
