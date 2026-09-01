@@ -75,7 +75,6 @@
 
 <div class="toolbar">
   <a href="hub.html">← 허브로 돌아가기</a>
-  <button class="hdr-btn" id="text-btn">T 텍스트</button>
   <button class="hdr-btn" onclick="exportCoords()">📋 좌표 내보내기</button>
   <button class="hdr-btn" id="undo-btn">↩ 되돌리기</button>
   <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="새 서류 이미지로 교체">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this)"></label>
@@ -229,124 +228,70 @@ function exportCoords() {
   alert('좌표가 클립보드에 복사됐습니다!\nClaude에게 붙여넣기 하세요.\n(ESC 또는 바깥 클릭으로 닫힙니다)');
 }
 
-// ── T 텍스트 / 되돌리기 ───────────────────────
+// ── 필드 드래그 이동 (항상 활성) ────────────────
 (function(){
-  var textBtn = document.getElementById('text-btn');
-  var undoBtn = document.getElementById('undo-btn');
-  if (!textBtn || !undoBtn) return;
-  var textOn = false, textBoxes = [], dragStart = null, selRect = null, undoStack = [];
-  var movingField = null, moveOffset = {x:0, y:0}, moveOrigPos = null;
-
-  textBtn.addEventListener('click', function(){
-    textOn = !textOn;
-    textBtn.classList.toggle('active-text', textOn);
-    textBtn.textContent = textOn ? 'T 끄기' : 'T 텍스트';
-    var wrap = document.getElementById('wrap1');
-    wrap.style.cursor = textOn ? 'crosshair' : '';
-    wrap.style.userSelect = textOn ? 'none' : '';
-    // 필드에 드래그 커서 표시
-    wrap.querySelectorAll('.field').forEach(function(f){
-      f.style.cursor = textOn ? 'move' : '';
-    });
-  });
-
-  // ── 기존 .field 드래그 이동 ──
   var wrap = document.getElementById('wrap1');
-  wrap.addEventListener('mousedown', function(e){
-    var field = e.target.closest('.field');
-    if (textOn && field) {
-      e.preventDefault();
-      var img = wrap.querySelector('img');
-      var r = wrap.getBoundingClientRect();
-      var iw = wrap.offsetWidth, ih = img.offsetHeight;
-      var fx = parseFloat(field.style.left)/100 * iw;
-      var fy = parseFloat(field.style.top)/100 * ih;
-      moveOffset = { x: e.clientX - r.left - fx, y: e.clientY - r.top - fy };
-      moveOrigPos = { left: field.style.left, top: field.style.top };
-      movingField = field;
-      field.style.opacity = '0.7';
-      return;
-    }
-    // ── 빈 영역 드래그 → 새 텍스트박스 ──
-    if (!textOn || e.target.closest('.textbox') || e.target.closest('.field')) return;
+  var img  = wrap.querySelector('img');
+  var movingField = null, moveOffset = {x:0,y:0}, moveOrigPos = null, undoStack = [];
+  var undoBtn = document.getElementById('undo-btn');
+
+  // 모든 .field에 move 커서 + mousedown
+  function initFields() {
+    wrap.querySelectorAll('.field').forEach(function(f){
+      f.style.cursor = 'move';
+      f.addEventListener('mousedown', onFieldDown);
+    });
+  }
+  function onFieldDown(e) {
+    // 입력 중(포커스)일 때는 드래그 대신 타이핑 허용 — Shift 누르면 이동
+    if (document.activeElement === e.currentTarget && !e.shiftKey) return;
     e.preventDefault();
+    var f = e.currentTarget;
     var r = wrap.getBoundingClientRect();
-    dragStart = { x: e.clientX - r.left, y: e.clientY - r.top };
-    selRect = document.createElement('div'); selRect.className = 'sel-rect';
-    selRect.style.left = dragStart.x + 'px'; selRect.style.top = dragStart.y + 'px';
-    wrap.appendChild(selRect);
-  });
+    var iw = wrap.offsetWidth, ih = img.offsetHeight;
+    var fx = parseFloat(f.style.left)/100 * iw;
+    var fy = parseFloat(f.style.top) /100 * ih;
+    moveOffset = { x: e.clientX - r.left - fx, y: e.clientY - r.top - fy };
+    moveOrigPos = { left: f.style.left, top: f.style.top };
+    movingField = f;
+    f.style.opacity = '0.6';
+    f.style.outline = '2px solid #be185d';
+  }
 
   window.addEventListener('mousemove', function(e){
-    // 기존 필드 이동
-    if (movingField) {
-      var img = wrap.querySelector('img');
-      var r = wrap.getBoundingClientRect();
-      var iw = wrap.offsetWidth, ih = img.offsetHeight;
-      var nx = e.clientX - r.left - moveOffset.x;
-      var ny = e.clientY - r.top  - moveOffset.y;
-      movingField.style.left = (nx/iw*100).toFixed(2)+'%';
-      movingField.style.top  = (ny/ih*100).toFixed(2)+'%';
-      return;
-    }
-    if (!textOn || !dragStart) return;
+    if (!movingField) return;
     var r = wrap.getBoundingClientRect();
-    var cx = e.clientX - r.left, cy = e.clientY - r.top;
-    var x = Math.min(dragStart.x, cx), y = Math.min(dragStart.y, cy);
-    selRect.style.left = x+'px'; selRect.style.top = y+'px';
-    selRect.style.width = Math.abs(cx-dragStart.x)+'px';
-    selRect.style.height = Math.abs(cy-dragStart.y)+'px';
-  });
-
-  window.addEventListener('mouseup', function(e){
-    // 기존 필드 이동 완료
-    if (movingField) {
-      movingField.style.opacity = '';
-      undoStack.push({ type:'move', el:movingField, orig:moveOrigPos });
-      movingField = null; moveOrigPos = null;
-      return;
-    }
-    if (!textOn || !dragStart) return;
-    var img = wrap.querySelector('img');
-    var r = wrap.getBoundingClientRect();
-    var cx = e.clientX - r.left, cy = e.clientY - r.top;
-    var x = Math.min(dragStart.x, cx), y = Math.min(dragStart.y, cy);
-    var ww = Math.abs(cx-dragStart.x), h = Math.abs(cy-dragStart.y);
-    selRect.remove(); selRect = null; dragStart = null;
-    if (ww < 10 || h < 6) return;
     var iw = wrap.offsetWidth, ih = img.offsetHeight;
-    var box = document.createElement('div');
-    box.className = 'textbox'; box.contentEditable = 'true';
-    box.style.left = (x/iw*100)+'%'; box.style.top = (y/ih*100)+'%';
-    box.style.width = (ww/iw*100)+'%'; box.style.minHeight = (h/ih*100)+'%';
-    box.addEventListener('keydown', function(ev){
-      if ((ev.key==='Delete'||ev.key==='Backspace') && box.textContent==='') {
-        ev.preventDefault(); box.remove();
-        textBoxes = textBoxes.filter(function(b){ return b !== box; });
-      }
-    });
-    wrap.appendChild(box); textBoxes.push(box); box.focus();
-    undoStack.push({ type:'textbox', el:box });
+    var nx = e.clientX - r.left - moveOffset.x;
+    var ny = e.clientY - r.top  - moveOffset.y;
+    movingField.style.left = (nx/iw*100).toFixed(2)+'%';
+    movingField.style.top  = (ny/ih*100).toFixed(2)+'%';
   });
 
+  window.addEventListener('mouseup', function(){
+    if (!movingField) return;
+    movingField.style.opacity = '';
+    movingField.style.outline = '';
+    undoStack.push({ el: movingField, orig: moveOrigPos });
+    movingField = null;
+  });
+
+  // 되돌리기
   function undo() {
     var last = undoStack.pop(); if (!last) return;
-    if (last.type === 'textbox') {
-      last.el.remove();
-      textBoxes = textBoxes.filter(function(b){ return b !== last.el; });
-    } else if (last.type === 'move') {
-      last.el.style.left = last.orig.left;
-      last.el.style.top  = last.orig.top;
-    }
+    last.el.style.left = last.orig.left;
+    last.el.style.top  = last.orig.top;
   }
-  undoBtn.addEventListener('click', undo);
+  if (undoBtn) undoBtn.addEventListener('click', undo);
   document.addEventListener('keydown', function(e){
     if (e.ctrlKey && e.key==='z') {
       var a = document.activeElement;
-      if (a && (a.tagName==='INPUT' || a.contentEditable==='true')) return;
+      if (a && a.tagName==='INPUT') return;
       e.preventDefault(); undo();
     }
   });
+
+  initFields();
 })();
 
 // ── 고객 정보 자동 입력 ───────────────────────
