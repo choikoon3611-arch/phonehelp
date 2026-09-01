@@ -82,23 +82,37 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
   <div class="sb-sec">
     <div class="sb-ttl">📡 인터넷 요금제</div>
     <div class="plan-btns">
-      <button class="plan-btn" data-g="inet" data-k="p1" onclick="sel(this)">요금제1</button>
-      <button class="plan-btn" data-g="inet" data-k="p2" onclick="sel(this)">요금제2</button>
-      <button class="plan-btn" data-g="inet" data-k="p3" onclick="sel(this)">요금제3</button>
+      <button class="plan-btn" data-g="inet" data-k="slim" onclick="sel(this)">인터넷 슬림</button>
+      <button class="plan-btn" data-g="inet" data-k="ess" onclick="sel(this)">에센스</button>
+      <button class="plan-btn" data-g="inet" data-k="giga" onclick="sel(this)">기가인터넷</button>
+      <button class="plan-btn" data-g="inet" data-k="prem" onclick="sel(this)">기가 프리미엄</button>
+      <button class="plan-btn" data-g="inet" data-k="10g" onclick="sel(this)">10기가</button>
     </div>
-    <div class="sb-sub">📋 정기계약</div>
+    <div class="sb-sub">📋 약정기간</div>
     <div class="plan-btns">
       <button class="plan-btn" data-g="term" data-k="3y" onclick="sel(this)">3년</button>
       <button class="plan-btn" data-g="term" data-k="2y" onclick="sel(this)">2년</button>
       <button class="plan-btn" data-g="term" data-k="1y" onclick="sel(this)">1년</button>
       <button class="plan-btn" data-g="term" data-k="free" onclick="sel(this)">무약정</button>
     </div>
+    <div class="sb-sub">📶 WiFi 공유기</div>
+    <div class="plan-btns">
+      <button class="plan-btn" data-g="wifi" data-k="y" onclick="sel(this)">포함</button>
+      <button class="plan-btn" data-g="wifi" data-k="n" onclick="sel(this)">미포함</button>
+    </div>
   </div>
   <div class="sb-sec">
-    <div class="sb-ttl">📺 IPTV (olleh TV)</div>
+    <div class="sb-ttl">📺 olleh TV 요금제</div>
     <div class="plan-btns">
-      <button class="plan-btn" data-g="tv" data-k="t1" onclick="sel(this)">TV요금제1</button>
-      <button class="plan-btn" data-g="tv" data-k="t2" onclick="sel(this)">TV요금제2</button>
+      <button class="plan-btn" data-g="tv" data-k="basic" onclick="sel(this)">베이직</button>
+      <button class="plan-btn" data-g="tv" data-k="ess" onclick="sel(this)">에센스</button>
+      <button class="plan-btn" data-g="tv" data-k="prem" onclick="sel(this)">프리미엄</button>
+      <button class="plan-btn" data-g="tv" data-k="slim" onclick="sel(this)">슬림</button>
+    </div>
+    <div class="sb-sub">📡 셋톱박스</div>
+    <div class="plan-btns">
+      <button class="plan-btn" data-g="stb" data-k="uhd" onclick="sel(this)">UHD</button>
+      <button class="plan-btn" data-g="stb" data-k="hd" onclick="sel(this)">HD</button>
     </div>
   </div>
   <div class="sb-sec">
@@ -152,8 +166,14 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
 </div>
 <div id="dinfo"></div>
 <script>
-var POS={inet:{p1:{x:20,y:30},p2:{x:35,y:30},p3:{x:50,y:30}},term:{'3y':{x:70,y:40},'2y':{x:78,y:40},'1y':{x:85,y:40},free:{x:91,y:40}},tv:{t1:{x:25,y:25},t2:{x:40,y:25}}};
-var GWRAP={inet:'iw',term:'iw',tv:'bw'};
+var POS={
+  inet:{slim:{x:20,y:30},ess:{x:32,y:30},giga:{x:44,y:30},prem:{x:56,y:30},'10g':{x:68,y:30}},
+  term:{'3y':{x:70,y:40},'2y':{x:78,y:40},'1y':{x:86,y:40},free:{x:94,y:40}},
+  wifi:{y:{x:20,y:50},n:{x:35,y:50}},
+  tv:{basic:{x:20,y:25},ess:{x:35,y:25},prem:{x:50,y:25},slim:{x:65,y:25}},
+  stb:{uhd:{x:20,y:35},hd:{x:35,y:35}}
+};
+var GWRAP={inet:'iw',term:'iw',wifi:'iw',tv:'bw',stb:'bw'};
 var marks={};
 function sel(btn){var g=btn.dataset.g,k=btn.dataset.k,uid=g+':'+k;if(btn.classList.contains('on')){btn.classList.remove('on');if(marks[uid]){marks[uid].remove();delete marks[uid];}return;}var pos=POS[g]&&POS[g][k];if(!pos)return;btn.classList.add('on');var wrap=document.getElementById(GWRAP[g]);if(!wrap||!wrap.querySelector('img'))return;var m=document.createElement('div');m.className='dm';m.textContent='✔';m.dataset.lbl=btn.textContent.trim();m.style.left=pos.x+'%';m.style.top=pos.y+'%';wrap.appendChild(m);marks[uid]=m;makeDrag(m);}
 var dinfo=document.getElementById('dinfo');
