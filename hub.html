@@ -2511,7 +2511,7 @@ function smsTaskAdd() {
   db.ref(HUB + '/sms_tasks/' + id).set(entry);
   document.getElementById('sms-task-text').value = '';
   // 텔레그램 알림
-  const hubUrl = 'https://dreamy-scone-25c7bc.netlify.app/hub.html#consult';
+  const hubUrl = 'https://choikoon3611-arch.github.io/phonehelp/hub.html#consult';
   const msg = `📨 <b>문자업무 등록</b>\n\n👤 ${store} | 🕐 ${now}\n\n${text.slice(0,300)}${text.length>300?'...':''}\n\n🔗 <a href="${hubUrl}">바로가기</a>`;
   sendSmsTgNotify(msg);
 }
@@ -4540,7 +4540,7 @@ function checkDailyReminder() {
     `${i+1}. <b>${e.name}</b> (${e.carrier}) — ${e.agent||'담당자미상'}\n   ${(e.content||'').slice(0,60)}${(e.content||'').length>60?'...':''}`
   ).join('\n\n');
 
-  const hubUrl = 'https://dreamy-scone-25c7bc.netlify.app/hub.html#consult';
+  const hubUrl = 'https://choikoon3611-arch.github.io/phonehelp/hub.html#consult';
   const msg = `⏰ <b>미처리 공유업무 알림</b> (${todayKey})\n\n총 <b>${pending.length}건</b> 처리 대기 중입니다.\n\n${lines}\n\n🔗 <a href="${hubUrl}">공유업무 바로가기</a>`;
   sendTelegramNotify(msg);
 
@@ -4573,7 +4573,7 @@ function consultSaveEntry() {
 
   // 새 등록일 때만 텔레그램 알림 전송
   if (!consultEditId) {
-    const hubUrl = 'https://dreamy-scone-25c7bc.netlify.app/hub.html#consult';
+    const hubUrl = 'https://choikoon3611-arch.github.io/phonehelp/hub.html#consult';
     const msg = `📋 <b>공유업무 새 등록</b>\n\n` +
       `👤 고객명: ${entry.name}\n` +
       `📱 전화번호: ${entry.phone || '-'}\n` +
