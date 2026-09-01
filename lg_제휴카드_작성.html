@@ -117,6 +117,7 @@
   <input class="field field-sm" id="f-cnum1" style="left:28.74%; top:32.90%; width:12%; height:2%;" placeholder="0000">
   <input class="field field-sm" id="f-cnum2" style="left:41.05%; top:33.11%; width:12%; height:2%;" placeholder="0000">
   <input class="field field-sm" id="f-cnum3" style="left:50.25%; top:33.11%; width:12%; height:2%;" placeholder="0000">
+  <input class="field field-sm" id="f-cnum4" style="left:63.00%; top:33.11%; width:12%; height:2%;" placeholder="0000">
   <input class="field field-sm" id="f-exp"   style="left:86.14%; top:33.43%; width:14%; height:2%;" placeholder="MM/YY">
 
   <!-- 구간할부 체크 -->
@@ -316,10 +317,29 @@ function exportCoords() {
     if (c.카드번호) {
       var parts = c.카드번호.replace(/\s/g,'').split('-');
       set('f-cnum1', parts[0]||''); set('f-cnum2', parts[1]||'');
-      set('f-cnum3', parts[2]||'');
+      set('f-cnum3', parts[2]||''); set('f-cnum4', parts[3]||'');
     }
     set('f-exp', c.유효기간 || '');
     set('f-amount', c.결제금액 || '');
+
+    // 개월수 → 할부 체크박스 자동 선택
+    if (c.개월수) {
+      var monthMap = { '18': 'ck-18', '24': 'ck-24', '36': 'ck-36' };
+      Object.keys(monthMap).forEach(function(m) {
+        if (c.개월수.indexOf(m) !== -1) {
+          var el = document.getElementById(monthMap[m]);
+          if (el) el.textContent = '✓';
+        }
+      });
+    }
+
+    // 자동이체 → 자동이체 등록 체크박스 자동 선택
+    if (c.자동이체) {
+      var autoY = document.getElementById('ck-auto-y');
+      var autoN = document.getElementById('ck-auto-n');
+      if (c.자동이체.indexOf('요망') !== -1 && autoY) autoY.textContent = '✓';
+      else if (c.자동이체.indexOf('안함') !== -1 && autoN) autoN.textContent = '✓';
+    }
 
     var bar = document.getElementById('cust-bar');
     if (bar) {
