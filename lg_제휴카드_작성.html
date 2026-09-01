@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LG U+ 제휴카드 장기할부 결제 신청서</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    background: #ececec;
+    margin: 0;
+    padding: 20px;
+  }
+  .cust-bar {
+    display: none; max-width: 707px; margin: 0 auto 10px;
+    background: #dbeafe; border: 1.5px solid #93c5fd; border-radius: 10px;
+    padding: 10px 14px; font-size: 12px; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .cust-bar.show { display: flex; }
+  .cust-bar .cb-title { font-weight: 800; color: #1e3a8a; font-size: 13px; flex-shrink:0; }
+  .cust-bar .cb-item { display: flex; align-items: center; gap: 5px; color: #1e3a8a; }
+  .cust-bar .cb-label { font-weight: 700; white-space: nowrap; }
+  .cb-copy { padding:2px 7px; font-size:11px; font-weight:700; border-radius:5px; border:1px solid #93c5fd; background:#fff; cursor:pointer; color:#1e3a8a; }
+  .cb-copy:hover { background:#eff6ff; }
+
+  .toolbar {
+    max-width: 707px; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  }
+  .toolbar a { font-size: 13px; color: #2f6feb; text-decoration: none; }
+  .hdr-btn {
+    padding: 7px 13px; font-size: 12px; font-weight: 700;
+    border: 1.5px solid #ccc; border-radius: 7px; background: #f8f8f8; color: #333; cursor: pointer;
+  }
+  .hdr-btn:hover { background: #e8f0fe; border-color: #4285f4; }
+  #print-btn { padding:9px 18px; font-size:13px; font-weight:700; border:none; border-radius:8px; background:#be185d; color:#fff; cursor:pointer; }
+
+  .doc-wrap {
+    position: relative; max-width: 707px; margin: 0 auto;
+    background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .doc-wrap img { display: block; width: 100%; height: auto; }
+
+  .field {
+    position: absolute;
+    border: none;
+    background: rgba(255, 235, 59, 0.28);
+    border-radius: 2px;
+    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a8c;
+    padding: 0 2px;
+    outline: none;
+    border-bottom: 1px dashed rgba(26,26,140,0.4);
+    overflow: visible;
+    white-space: nowrap;
+    transform: translateY(-50%);
+    line-height: 1;
+  }
+  .field:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid #1a1a8c;
+    box-shadow: 0 0 0 1px #be185d, 0 2px 6px rgba(0,0,0,0.25);
+    z-index: 50;
+  }
+  .field::placeholder { color: #aaa; font-size: 0.82em; font-weight: 400; }
+
+  /* 작은 필드 */
+  .field-sm { font-size: 10px; }
+  .field-xs { font-size: 9px; letter-spacing: -0.2px; }
+
+  /* 체크박스 오버레이 */
+  .ck {
+    position: absolute;
+    width: 14px; height: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #be185d; font-weight: 900;
+    cursor: pointer; transform: translate(-50%, -50%);
+    user-select: none;
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .toolbar, .cust-bar { display: none !important; }
+    .doc-wrap { box-shadow: none; max-width: 707px; width: 707px; }
+    .field {
+      background: transparent;
+      border-bottom: none;
+      box-shadow: none;
+      font-size: 11pt;
+    }
+    .field-sm { font-size: 9pt; }
+    .field-xs { font-size: 8pt; }
+    .field::placeholder { color: transparent; }
+    .ck { color: #000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cust-bar" id="cust-bar">
+  <span class="cb-title">📋 고객 정보</span>
+</div>
+
+<div class="toolbar">
+  <a href="hub.html">← 허브로 돌아가기</a>
+  <button id="print-btn">🖨 인쇄 / PDF 저장</button>
+</div>
+
+<div class="doc-wrap" id="wrap1">
+  <img src="lg_제휴카드_p1.png" alt="LG 제휴카드 장기할부 결제 신청서" id="doc-img">
+
+  <!-- ══════════════════════════════════
+       가입자 정보
+  ══════════════════════════════════ -->
+  <!-- 가입자명 -->
+  <input class="field" id="f-name"
+    style="left:17%; top:11.2%; width:24%; height:2%;"
+    placeholder="가입자명">
+
+  <!-- 생년월일 -->
+  <input class="field" id="f-birth"
+    style="left:63%; top:11.2%; width:22%; height:2%;"
+    placeholder="생년월일(주민앞6자리)">
+
+  <!-- 유대폰번호 -->
+  <input class="field" id="f-phone"
+    style="left:17%; top:14.5%; width:24%; height:2%;"
+    placeholder="010-0000-0000">
+
+  <!-- 개통일 -->
+  <input class="field" id="f-open-date"
+    style="left:63%; top:14.5%; width:22%; height:2%;"
+    placeholder="개통일 (YYYY.MM.DD)">
+
+  <!-- ══════════════════════════════════
+       제휴카드 정보
+  ══════════════════════════════════ -->
+  <!-- 카드 종류 체크박스 (신한/국민/현대/하나/우리/롯데/삼성/NH) -->
+  <span class="ck" id="ck-shin"  style="left:21.5%; top:20.3%;" onclick="toggleCk(this)"></span>
+  <span class="ck" id="ck-kook"  style="left:29%;   top:20.3%;" onclick="toggleCk(this)"></span>
+  <span class="ck" id="ck-hyun"  style="left:36.5%; top:20.3%;" onclick="toggleCk(this)"></span>
+  <span class="ck" id="ck-hana"  style="left:44%;   top:20.3%;" onclick="toggleCk(this)"></span>
+  <span class="ck" id="ck-wuri"  style="left:51.5%; top:20.3%;" onclick="toggleCk(this)"></span>
+  <span class="ck" id="ck-lott"  style="left:59%;   top:20.3%;" onclick="toggleCk(this)"></span>
+  <span class="ck" id="ck-sam"   style="left:66.5%; top:20.3%;" onclick="toggleCk(this)"></span>
+  <span class="ck" id="ck-nh"    style="left:74%;   top:20.3%;" onclick="toggleCk(this)"></span>
+
+  <!-- 카드 명의자 성명 -->
+  <input class="field" id="f-card-holder"
+    style="left:17%; top:23.7%; width:26%; height:2%;"
+    placeholder="카드 명의자">
+
+  <!-- 카드 명의자 생년월일 -->
+  <input class="field field-sm" id="f-card-birth"
+    style="left:60%; top:23.7%; width:25%; height:2%;"
+    placeholder="생년월일">
+
+  <!-- 결제 금액 -->
+  <input class="field" id="f-amount"
+    style="left:17%; top:27.3%; width:38%; height:2%;"
+    placeholder="결제금액">
+
+  <!-- 할부 개월 체크 (18/24/36) -->
+  <span class="ck" id="ck-18" style="left:60.5%; top:27.3%;" onclick="toggleCkGroup(this, 'inst-month')"></span>
+  <span class="ck" id="ck-24" style="left:70%;   top:27.3%;" onclick="toggleCkGroup(this, 'inst-month')"></span>
+  <span class="ck" id="ck-36" style="left:80%;   top:27.3%;" onclick="toggleCkGroup(this, 'inst-month')"></span>
+
+  <!-- 카드번호 4파트 -->
+  <input class="field field-sm" id="f-cnum1"
+    style="left:17%; top:31%; width:12%; height:2%;"
+    placeholder="0000">
+  <input class="field field-sm" id="f-cnum2"
+    style="left:32%; top:31%; width:12%; height:2%;"
+    placeholder="0000">
+  <input class="field field-sm" id="f-cnum3"
+    style="left:47%; top:31%; width:12%; height:2%;"
+    placeholder="0000">
+
+  <!-- 유효기간 -->
+  <input class="field field-sm" id="f-exp"
+    style="left:72%; top:31%; width:14%; height:2%;"
+    placeholder="MM/YY">
+
+  <!-- 구간할부 체크 (1구간/2구간/완납/부분납) -->
+  <span class="ck" id="ck-g1"   style="left:21%;   top:34.7%;" onclick="toggleCkGroup(this, 'guan')"></span>
+  <span class="ck" id="ck-g2"   style="left:33%;   top:34.7%;" onclick="toggleCkGroup(this, 'guan')"></span>
+  <span class="ck" id="ck-wan"  style="left:51%;   top:34.7%;" onclick="toggleCkGroup(this, 'guan')"></span>
+  <span class="ck" id="ck-bun"  style="left:65%;   top:34.7%;" onclick="toggleCkGroup(this, 'guan')"></span>
+
+  <!-- 부분납 개월수 -->
+  <input class="field field-sm" id="f-bun-month"
+    style="left:75%; top:34.7%; width:10%; height:2%;"
+    placeholder="">
+
+  <!-- ══════════════════════════════════
+       LGU+ 전산
+  ══════════════════════════════════ -->
+  <!-- U+할부 체크 -->
+  <span class="ck" id="ck-uplus" style="left:4.5%; top:41%;" onclick="toggleCkGroup(this, 'lgutype')"></span>
+  <!-- 잔여할부금 -->
+  <input class="field" id="f-remain"
+    style="left:30%; top:41%; width:28%; height:2%;"
+    placeholder="잔여할부금(원)">
+  <!-- 할부 개월 -->
+  <input class="field field-sm" id="f-uplus-month"
+    style="left:72%; top:41%; width:12%; height:2%;"
+    placeholder="개월">
+
+  <!-- 일반카드 체크 -->
+  <span class="ck" id="ck-gencard" style="left:4.5%; top:47.5%;" onclick="toggleCkGroup(this, 'lgutype')"></span>
+  <!-- 카드주 성명 -->
+  <input class="field field-sm" id="f-gen-name"
+    style="left:25%; top:45.5%; width:22%; height:2%;"
+    placeholder="카드주 성명">
+  <!-- 생년월일 -->
+  <input class="field field-sm" id="f-gen-birth"
+    style="left:66%; top:45.5%; width:20%; height:2%;"
+    placeholder="생년월일">
+  <!-- 카드번호 -->
+  <input class="field field-sm" id="f-gen-card"
+    style="left:25%; top:48.8%; width:33%; height:2%;"
+    placeholder="카드번호">
+  <!-- 유효기간 -->
+  <input class="field field-sm" id="f-gen-exp"
+    style="left:71%; top:48.8%; width:14%; height:2%;"
+    placeholder="MM/YY">
+  <!-- 결제금액 -->
+  <input class="field field-sm" id="f-gen-amount"
+    style="left:25%; top:52%; width:28%; height:2%;"
+    placeholder="결제금액">
+  <!-- 할부개월 -->
+  <input class="field field-sm" id="f-gen-month"
+    style="left:70%; top:52%; width:16%; height:2%;"
+    placeholder="개월">
+
+  <!-- 현금 체크 -->
+  <span class="ck" id="ck-cash" style="left:4.5%; top:56%;" onclick="toggleCkGroup(this, 'lgutype')"></span>
+  <!-- 현금 결제금액 -->
+  <input class="field" id="f-cash-amount"
+    style="left:25%; top:56%; width:33%; height:2%;"
+    placeholder="결제금액(원)">
+  <!-- 명의자 주민번호 -->
+  <input class="field field-sm" id="f-cash-ssn"
+    style="left:25%; top:59%; width:55%; height:2%;"
+    placeholder="명의자 주민번호 전체">
+
+  <!-- ══════════════════════════════════
+       제휴카드 자동이체 등록
+  ══════════════════════════════════ -->
+  <span class="ck" id="ck-auto-y" style="left:21.5%; top:63.5%;" onclick="toggleCkGroup(this, 'auto')"></span>
+  <span class="ck" id="ck-auto-n" style="left:33%;   top:63.5%;" onclick="toggleCkGroup(this, 'auto')"></span>
+
+  <!-- ══════════════════════════════════
+       하단: 매장명 / 연락처 / 날짜 / 영수증
+  ══════════════════════════════════ -->
+  <!-- 매장명 -->
+  <input class="field" id="f-store"
+    style="left:15%; top:87.5%; width:42%; height:2%;"
+    placeholder="매장명">
+
+  <!-- 매장연락처 날짜 (년 월 일) -->
+  <input class="field field-sm" id="f-year"
+    style="left:15%; top:91.2%; width:7%; height:2%;"
+    placeholder="년">
+  <input class="field field-sm" id="f-month"
+    style="left:26%; top:91.2%; width:5%; height:2%;"
+    placeholder="월">
+  <input class="field field-sm" id="f-day"
+    style="left:34%; top:91.2%; width:5%; height:2%;"
+    placeholder="일">
+
+  <!-- 영수증 발송 여부 -->
+  <span class="ck" id="ck-rcpt-y" style="left:12.5%; top:95.5%;" onclick="toggleCkGroup(this, 'rcpt')"></span>
+  <span class="ck" id="ck-rcpt-n" style="left:21%;   top:95.5%;" onclick="toggleCkGroup(this, 'rcpt')"></span>
+
+  <!-- FAX 번호 -->
+  <input class="field field-sm" id="f-fax"
+    style="left:50%; top:95.5%; width:35%; height:2%;"
+    placeholder="FAX 번호">
+
+</div>
+
+<script>
+// ── 체크박스 토글 ──────────────────────────
+function toggleCk(el) {
+  el.textContent = el.textContent === '✓' ? '' : '✓';
+}
+function toggleCkGroup(el, group) {
+  document.querySelectorAll('.ck[id^="ck-"]').forEach(c => {
+    // 같은 group에 속하는 것만 해제
+    if (c.dataset.group === group) c.textContent = '';
+  });
+  el.dataset.group = group;
+  el.textContent = el.textContent === '✓' ? '' : '✓';
+}
+// 그룹 초기화 (group 속성 세팅)
+(function(){
+  const groups = {
+    'inst-month': ['ck-18','ck-24','ck-36'],
+    'guan': ['ck-g1','ck-g2','ck-wan','ck-bun'],
+    'lgutype': ['ck-uplus','ck-gencard','ck-cash'],
+    'auto': ['ck-auto-y','ck-auto-n'],
+    'rcpt': ['ck-rcpt-y','ck-rcpt-n'],
+  };
+  Object.entries(groups).forEach(([g, ids]) => {
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.dataset.group = g;
+    });
+  });
+})();
+
+// ── 고객 정보 자동 입력 ──────────────────────
+const _params = new URLSearchParams(window.location.search);
+const _custId = _params.get('id');
+if (_custId) {
+  try {
+    const _list = JSON.parse(localStorage.getItem('issuance_list') || '[]');
+    const _c = _list.find(e => String(e.id) === _custId);
+    if (_c) {
+      const bar = document.getElementById('cust-bar');
+      bar.classList.add('show');
+      bar.innerHTML = `<span class="cb-title">📋 고객 정보</span>
+        <span class="cb-item"><span class="cb-label">이름:</span><span class="cb-val">${_c.name||''}</span></span>
+        <span class="cb-item"><span class="cb-label">생년월일:</span><span class="cb-val">${_c.birth||''}</span></span>
+        <span class="cb-item"><span class="cb-label">전화:</span><span class="cb-val">${_c.phone||''}</span></span>`;
+      const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+      set('f-name',  _c.name);
+      set('f-birth', _c.birth);
+      set('f-phone', _c.phone);
+    }
+  } catch(e) {}
+}
+
+// ── 오늘 날짜 자동 입력 ─────────────────────
+(function(){
+  const t = new Date();
+  const y = t.getFullYear(), m = t.getMonth()+1, d = t.getDate();
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
+  set('f-year',  y);
+  set('f-month', String(m).padStart(2,'0'));
+  set('f-day',   String(d).padStart(2,'0'));
+})();
+
+// ── 인쇄 버튼 ──────────────────────────────
+document.getElementById('print-btn').addEventListener('click', function(){ window.print(); });
+</script>
+</body>
+</html>
