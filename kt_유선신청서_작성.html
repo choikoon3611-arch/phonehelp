@@ -46,6 +46,7 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
 .dm{position:absolute;transform:translate(-50%,-50%);font-size:20px;font-weight:900;color:#dc2626;cursor:grab;z-index:50;user-select:none;line-height:1;text-shadow:0 0 3px rgba(255,255,255,.9);}
 .dm:active{cursor:grabbing;}
 #dinfo{position:fixed;bottom:14px;right:14px;background:rgba(15,23,42,.92);color:#60a5fa;font-size:13px;font-family:monospace;font-weight:700;padding:8px 16px;border-radius:10px;z-index:999;display:none;max-width:380px;}
+.sidebar.hidden { display:none !important; }
 @media print {
   .sidebar { display:none !important; }
   .toolbar { display:none !important; }
@@ -63,6 +64,7 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
 <body>
 <div class="toolbar">
   <a href="hub.html">← 허브</a>
+  <button id="sb-toggle" onclick="toggleSidebar()" style="background:#334155;margin-right:4px;">☰ 입력</button>
   <span class="title">KT 유선 서식지</span>
   <button onclick="window.print()">🖨️ 인쇄</button>
 </div>
@@ -202,6 +204,7 @@ function sync(inp){(FM[inp.id]||[]).forEach(function(id){var el=document.getElem
 function copyAll(){var lines=[],mKeys=Object.keys(marks);if(mKeys.length){lines.push('=== ✔ 요금제 마크 좌표 ===');mKeys.forEach(function(uid){var m=marks[uid];lines.push(m.dataset.lbl+': x:'+parseFloat(m.style.left).toFixed(1)+'% y:'+parseFloat(m.style.top).toFixed(1)+'%');});}lines.push('\n=== 텍스트 위치 ===');document.querySelectorAll('.ft').forEach(function(ft){lines.push((ft.dataset.fid||ft.id)+': x:'+parseFloat(ft.style.left).toFixed(1)+'% y:'+parseFloat(ft.style.top).toFixed(1)+'%');});var txt=lines.join('\n');if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){showN('✅ 복사 완료!');});}else{prompt('복사하세요:',txt);}}
 function showN(msg){var n=document.getElementById('notice');n.textContent=msg;n.style.opacity='1';setTimeout(function(){n.style.opacity='0';},3000);}
 function resetAll(){document.querySelectorAll('.plan-btn').forEach(function(b){b.classList.remove('on');});Object.keys(marks).forEach(function(u){marks[u].remove();});marks={};document.querySelectorAll('.sb-field input').forEach(function(i){i.value='';});document.querySelectorAll('.ft').forEach(function(s){s.textContent='';});dinfo.style.display='none';}
+function toggleSidebar(){var sb=document.querySelector('.sidebar'),btn=document.getElementById('sb-toggle');if(sb.classList.toggle('hidden')){btn.textContent='☰ 입력';}else{btn.textContent='✕ 닫기';}}
 </script>
 <style>
 #print-footer { max-width:900px; margin:0 auto; padding:7px 16px; background:#f1f5f9; border-top:1px solid #e2e7ec; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:12px; color:#334155; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
