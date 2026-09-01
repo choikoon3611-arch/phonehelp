@@ -34,7 +34,7 @@
     position:absolute; border:none;
     background:transparent; border-radius:2px;
     font-family:"Malgun Gothic","맑은 고딕",sans-serif;
-    font-size:13px; font-weight:700; color:#1a1a8c;
+    font-size:15px; font-weight:700; color:#1a1a8c;
     padding:0 2px; outline:none;
     border-bottom:1px dashed rgba(26,26,140,0.4);
     overflow:visible; white-space:nowrap;
@@ -42,8 +42,8 @@
   }
   .field:focus { background:rgba(255,255,255,0.95); border-bottom:1px solid #1a1a8c; box-shadow:0 0 0 1px #be185d,0 2px 6px rgba(0,0,0,0.25); z-index:50; }
   .field::placeholder { color:#aaa; font-size:0.82em; font-weight:400; }
-  .field-sm { font-size:10px; }
-  .field-xs { font-size:9px; letter-spacing:-0.2px; }
+  .field-sm { font-size:13px; }
+  .field-xs { font-size:11px; letter-spacing:-0.2px; }
 
   /* ─── 체크박스 오버레이 ─── */
   .ck { position:absolute; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#be185d; font-weight:900; cursor:pointer; transform:translate(-50%,-50%); user-select:none; }
@@ -86,75 +86,75 @@
   <img src="lg_제휴카드_p1.png" alt="LG U+ 제휴카드 장기할부 결제 신청서" id="doc-img">
 
   <!-- ══ 가입자 정보 ══ -->
-  <input class="field" id="f-name"      style="left:17%;   top:11.2%; width:24%;  height:2%;" placeholder="가입자명">
-  <input class="field" id="f-birth"     style="left:63%;   top:11.2%; width:22%;  height:2%;" placeholder="생년월일">
-  <input class="field" id="f-phone"     style="left:17%;   top:14.5%; width:24%;  height:2%;" placeholder="010-0000-0000">
-  <input class="field" id="f-open-date" style="left:63%;   top:14.5%; width:22%;  height:2%;" placeholder="개통일">
+  <input class="field" id="f-name"      style="left:23.23%; top:14.69%; width:24%;  height:2%;" placeholder="가입자명">
+  <input class="field" id="f-birth"     style="left:69.51%; top:14.79%; width:22%;  height:2%;" placeholder="생년월일">
+  <input class="field" id="f-phone"     style="left:23.08%; top:18.61%; width:24%;  height:2%;" placeholder="010-0000-0000">
+  <input class="field" id="f-open-date" style="left:63.42%; top:18.72%; width:22%;  height:2%;" placeholder="개통일">
 
   <!-- ══ 제휴카드 정보: 카드 종류 체크 ══ -->
-  <span class="ck" id="ck-shin" data-group="cardtype" style="left:21.5%; top:20.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-kook" data-group="cardtype" style="left:29%;   top:20.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-hyun" data-group="cardtype" style="left:36.5%; top:20.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-hana" data-group="cardtype" style="left:44%;   top:20.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-wuri" data-group="cardtype" style="left:51.5%; top:20.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-lott" data-group="cardtype" style="left:59%;   top:20.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-sam"  data-group="cardtype" style="left:66.5%; top:20.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-nh"   data-group="cardtype" style="left:74%;   top:20.3%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-shin" data-group="cardtype" style="left:21.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-kook" data-group="cardtype" style="left:29%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-hyun" data-group="cardtype" style="left:36.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-hana" data-group="cardtype" style="left:44%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-wuri" data-group="cardtype" style="left:51.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-lott" data-group="cardtype" style="left:59%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-sam"  data-group="cardtype" style="left:66.5%; top:22.8%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-nh"   data-group="cardtype" style="left:74%;   top:22.8%;" onclick="toggleCkGroup(this)"></span>
 
   <!-- 카드 명의자 성명 / 생년월일 -->
-  <input class="field" id="f-card-holder" style="left:17%;  top:23.7%; width:26%; height:2%;" placeholder="카드 명의자 성명">
-  <input class="field field-sm" id="f-card-birth" style="left:60%; top:23.7%; width:25%; height:2%;" placeholder="생년월일">
+  <input class="field" id="f-card-holder" style="left:31.71%; top:26.23%; width:26%; height:2%;" placeholder="카드 명의자 성명">
+  <input class="field field-sm" id="f-card-birth" style="left:72.02%; top:26.55%; width:25%; height:2%;" placeholder="생년월일">
 
   <!-- 결제금액 -->
-  <input class="field" id="f-amount" style="left:17%; top:27.3%; width:38%; height:2%;" placeholder="결제금액">
+  <input class="field" id="f-amount" style="left:31.99%; top:29.94%; width:38%; height:2%;" placeholder="결제금액">
 
   <!-- 할부 개월 체크 (18/24/36) -->
-  <span class="ck" id="ck-18" data-group="inst" style="left:60.5%; top:27.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-24" data-group="inst" style="left:70%;   top:27.3%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-36" data-group="inst" style="left:80%;   top:27.3%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-18" data-group="inst" style="left:60.5%; top:29.94%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-24" data-group="inst" style="left:70%;   top:29.94%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-36" data-group="inst" style="left:80%;   top:29.94%;" onclick="toggleCkGroup(this)"></span>
 
   <!-- 카드번호 + 유효기간 -->
-  <input class="field field-sm" id="f-cnum1" style="left:17%; top:31%; width:12%; height:2%;" placeholder="0000">
-  <input class="field field-sm" id="f-cnum2" style="left:32%; top:31%; width:12%; height:2%;" placeholder="0000">
-  <input class="field field-sm" id="f-cnum3" style="left:47%; top:31%; width:12%; height:2%;" placeholder="0000">
-  <input class="field field-sm" id="f-exp"   style="left:72%; top:31%; width:14%; height:2%;" placeholder="MM/YY">
+  <input class="field field-sm" id="f-cnum1" style="left:28.74%; top:32.90%; width:12%; height:2%;" placeholder="0000">
+  <input class="field field-sm" id="f-cnum2" style="left:41.05%; top:33.11%; width:12%; height:2%;" placeholder="0000">
+  <input class="field field-sm" id="f-cnum3" style="left:50.25%; top:33.11%; width:12%; height:2%;" placeholder="0000">
+  <input class="field field-sm" id="f-exp"   style="left:86.14%; top:33.43%; width:14%; height:2%;" placeholder="MM/YY">
 
   <!-- 구간할부 체크 -->
-  <span class="ck" id="ck-g1"  data-group="guan" style="left:21%;   top:34.7%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-g2"  data-group="guan" style="left:33%;   top:34.7%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-wan" data-group="guan" style="left:51%;   top:34.7%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-bun" data-group="guan" style="left:65%;   top:34.7%;" onclick="toggleCkGroup(this)"></span>
-  <input class="field field-sm" id="f-bun-month" style="left:75%; top:34.7%; width:10%; height:2%;" placeholder="">
+  <span class="ck" id="ck-g1"  data-group="guan" style="left:21%;   top:36.7%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-g2"  data-group="guan" style="left:33%;   top:36.7%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-wan" data-group="guan" style="left:51%;   top:36.7%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-bun" data-group="guan" style="left:65%;   top:36.7%;" onclick="toggleCkGroup(this)"></span>
+  <input class="field field-sm" id="f-bun-month" style="left:59.87%; top:32.80%; width:10%; height:2%;" placeholder="">
 
   <!-- ══ LGU+ 전산 ══ -->
-  <span class="ck" id="ck-uplus"   data-group="lgutype" style="left:4.5%; top:41%;"   onclick="toggleCkGroup(this)"></span>
-  <input class="field" id="f-remain"      style="left:30%; top:41%;   width:28%; height:2%;" placeholder="잔여할부금(원)">
-  <input class="field field-sm" id="f-uplus-month" style="left:72%; top:41%;   width:12%; height:2%;" placeholder="개월">
+  <span class="ck" id="ck-uplus"   data-group="lgutype" style="left:4.5%; top:42%;"   onclick="toggleCkGroup(this)"></span>
+  <input class="field" id="f-remain"      style="left:39.33%; top:41.63%; width:28%; height:2%;" placeholder="잔여할부금(원)">
+  <input class="field field-sm" id="f-uplus-month" style="left:85.30%; top:41.73%; width:12%; height:2%;" placeholder="개월">
 
-  <span class="ck" id="ck-gencard" data-group="lgutype" style="left:4.5%; top:47.5%;" onclick="toggleCkGroup(this)"></span>
-  <input class="field field-sm" id="f-gen-name"   style="left:25%; top:45.5%; width:22%; height:2%;" placeholder="카드주 성명">
-  <input class="field field-sm" id="f-gen-birth"  style="left:66%; top:45.5%; width:20%; height:2%;" placeholder="생년월일">
-  <input class="field field-sm" id="f-gen-card"   style="left:25%; top:48.8%; width:33%; height:2%;" placeholder="카드번호">
-  <input class="field field-sm" id="f-gen-exp"    style="left:71%; top:48.8%; width:14%; height:2%;" placeholder="MM/YY">
-  <input class="field field-sm" id="f-gen-amount" style="left:25%; top:52%;   width:28%; height:2%;" placeholder="결제금액">
-  <input class="field field-sm" id="f-gen-month"  style="left:70%; top:52%;   width:16%; height:2%;" placeholder="개월">
+  <span class="ck" id="ck-gencard" data-group="lgutype" style="left:4.5%; top:48%;" onclick="toggleCkGroup(this)"></span>
+  <input class="field field-sm" id="f-gen-name"   style="left:39.43%; top:45.08%; width:22%; height:2%;" placeholder="카드주 성명">
+  <input class="field field-sm" id="f-gen-birth"  style="left:66.00%; top:45.50%; width:20%; height:2%;" placeholder="생년월일">
+  <input class="field field-sm" id="f-gen-card"   style="left:39.00%; top:48.17%; width:33%; height:2%;" placeholder="카드번호">
+  <input class="field field-sm" id="f-gen-exp"    style="left:88.54%; top:47.85%; width:14%; height:2%;" placeholder="MM/YY">
+  <input class="field field-sm" id="f-gen-amount" style="left:38.86%; top:51.47%; width:28%; height:2%;" placeholder="결제금액">
+  <input class="field field-sm" id="f-gen-month"  style="left:70.00%; top:52.00%; width:16%; height:2%;" placeholder="개월">
 
-  <span class="ck" id="ck-cash" data-group="lgutype" style="left:4.5%; top:56%;" onclick="toggleCkGroup(this)"></span>
-  <input class="field" id="f-cash-amount" style="left:25%; top:56%; width:33%; height:2%;" placeholder="결제금액(원)">
-  <input class="field field-sm" id="f-cash-ssn" style="left:25%; top:59%; width:55%; height:2%;" placeholder="명의자 주민번호 전체">
+  <span class="ck" id="ck-cash" data-group="lgutype" style="left:4.5%; top:55%;" onclick="toggleCkGroup(this)"></span>
+  <input class="field" id="f-cash-amount" style="left:38.86%; top:54.52%; width:33%; height:2%;" placeholder="결제금액(원)">
+  <input class="field field-sm" id="f-cash-ssn" style="left:38.44%; top:58.05%; width:55%; height:2%;" placeholder="명의자 주민번호 전체">
 
   <!-- ══ 자동이체 등록 ══ -->
   <span class="ck" id="ck-auto-y" data-group="auto" style="left:21.5%; top:63.5%;" onclick="toggleCkGroup(this)"></span>
   <span class="ck" id="ck-auto-n" data-group="auto" style="left:33%;   top:63.5%;" onclick="toggleCkGroup(this)"></span>
 
   <!-- ══ 하단 ══ -->
-  <input class="field" id="f-store" style="left:15%; top:87.5%; width:42%; height:2%;" placeholder="매장명">
-  <input class="field field-sm" id="f-year"  style="left:15%; top:91.2%; width:7%;  height:2%;" placeholder="년">
-  <input class="field field-sm" id="f-month" style="left:26%; top:91.2%; width:5%;  height:2%;" placeholder="월">
-  <input class="field field-sm" id="f-day"   style="left:34%; top:91.2%; width:5%;  height:2%;" placeholder="일">
-  <span class="ck" id="ck-rcpt-y" data-group="rcpt" style="left:12.5%; top:95.5%;" onclick="toggleCkGroup(this)"></span>
-  <span class="ck" id="ck-rcpt-n" data-group="rcpt" style="left:21%;   top:95.5%;" onclick="toggleCkGroup(this)"></span>
-  <input class="field field-sm" id="f-fax" style="left:50%; top:95.5%; width:35%; height:2%;" placeholder="FAX 번호">
+  <input class="field" id="f-store" style="left:14.86%; top:86.44%; width:42%; height:2%;" placeholder="매장명">
+  <input class="field field-sm" id="f-year"  style="left:41.59%; top:89.83%; width:7%;  height:2%;" placeholder="년">
+  <input class="field field-sm" id="f-month" style="left:51.46%; top:89.62%; width:5%;  height:2%;" placeholder="월">
+  <input class="field field-sm" id="f-day"   style="left:57.76%; top:89.72%; width:5%;  height:2%;" placeholder="일">
+  <span class="ck" id="ck-rcpt-y" data-group="rcpt" style="left:12.5%; top:93.5%;" onclick="toggleCkGroup(this)"></span>
+  <span class="ck" id="ck-rcpt-n" data-group="rcpt" style="left:21%;   top:93.5%;" onclick="toggleCkGroup(this)"></span>
+  <input class="field field-sm" id="f-fax" style="left:67.68%; top:93.28%; width:35%; height:2%;" placeholder="FAX 번호">
 
 </div>
 
