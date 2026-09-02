@@ -714,6 +714,8 @@
   <button class="tab-btn" data-tab="excel">📊 엑셀분석</button>
   <button class="tab-btn" data-tab="solapi">📱 문자발송</button>
   <button class="tab-btn" data-tab="library">📚 자료실</button>
+  <button id="store-badge" onclick="changeStoreName()" title="클릭해서 매장코드 변경" style="margin-left:auto;padding:5px 12px;background:rgba(126,184,247,0.15);color:#7eb8f7;border:1px solid rgba(126,184,247,0.3);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
+  <button onclick="copyStoreUrl(this)" title="초대 링크 복사" style="padding:5px 10px;background:rgba(13,148,136,0.15);color:#0d9488;border:1px solid rgba(13,148,136,0.35);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🔗 초대링크</button>
   <button id="logout-btn" style="padding:5px 13px;background:rgba(255,255,255,0.12);color:#cdd9e4;border:1px solid rgba(255,255,255,0.2);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" onclick="doLogout()">로그아웃</button>
 </nav>
 
@@ -2094,6 +2096,19 @@
 .excel-exp-btn.active { background:#6366f1;color:#fff;border-color:#6366f1; }
 </style>
 
+<!-- 매장코드 설정 모달 -->
+<div id="store-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:18px;padding:36px 32px;width:340px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.35);text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">🏪</div>
+    <div style="font-size:18px;font-weight:900;color:#16283f;margin-bottom:8px;">매장 코드 설정</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:24px;line-height:1.6;">매장마다 데이터가 분리됩니다.<br>같은 코드를 입력하면 같은 데이터를 공유해요.</div>
+    <input id="store-name-input" type="text" placeholder="예: 이쁜핸드폰집" maxlength="20"
+      style="width:100%;padding:12px 14px;border:2px solid #e2e7ec;border-radius:10px;font-size:15px;font-weight:700;text-align:center;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px;"
+      oninput="this.style.borderColor=this.value.trim()?'#7c3aed':'#e2e7ec'"
+      onkeydown="if(event.key==='Enter')confirmStoreName()">
+    <button onclick="confirmStoreName()" style="width:100%;padding:12px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">시작하기</button>
+  </div>
+</div>
 
 <!-- 상담내용 뷰어 -->
 <div id="consult-view-modal" onclick="if(event.target===this)consultViewClose()">
@@ -2227,7 +2242,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.database();
-let HUB    = 'hub_hub';
+let HUB    = 'hub';
 
 // ?store= 파라미터를 로그인 리다이렉트 전에 세션에 보존
 (function() {
@@ -2254,8 +2269,64 @@ auth.onAuthStateChanged(user => {
   initStore();
 });
 
+function storeNameToHUB(name) {
+  // '__hub__' 는 원래 경로(hub/) 유지용 예약어
+  return name === '__hub__' ? 'hub' : 'hub_' + name;
+}
+
 function initStore() {
+  // URL 파라미터 또는 로그인 리다이렉트 전에 보존해둔 세션값 적용
+  const urlStore = new URLSearchParams(location.search).get('store')
+                || sessionStorage.getItem('hub_pending_store');
+  if (urlStore) {
+    localStorage.setItem('hub_store_name', urlStore);
+    sessionStorage.removeItem('hub_pending_store');
+  }
+  const saved = localStorage.getItem('hub_store_name');
+  if (saved) {
+    HUB = storeNameToHUB(saved);
+    updateStoreBadge(saved === '__hub__' ? '내 매장' : saved);
+    setupFirebaseSync();
+  } else {
+    document.getElementById('store-modal-bg').style.display = 'flex';
+    setTimeout(() => document.getElementById('store-name-input')?.focus(), 100);
+  }
+}
+
+function confirmStoreName() {
+  const val = document.getElementById('store-name-input').value.trim();
+  if (!val) { document.getElementById('store-name-input').style.borderColor='#dc2626'; return; }
+  localStorage.setItem('hub_store_name', val);
+  HUB = storeNameToHUB(val);
+  document.getElementById('store-modal-bg').style.display = 'none';
+  updateStoreBadge(val === '__hub__' ? '내 매장' : val);
   setupFirebaseSync();
+}
+
+function updateStoreBadge(name) {
+  const btn = document.getElementById('store-badge');
+  if (btn) btn.textContent = '🏪 ' + name;
+}
+
+function copyStoreUrl(btn) {
+  const code = localStorage.getItem('hub_store_name') || '';
+  if (!code) return;
+  const url = location.origin + location.pathname + '?store=' + encodeURIComponent(code);
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ 복사됨';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function changeStoreName() {
+  const cur = localStorage.getItem('hub_store_name') || '';
+  const display = cur === '__hub__' ? '내 매장' : cur;
+  const newName = prompt('매장 코드를 변경하세요.\n현재: ' + display, display);
+  if (newName === null) return;
+  if (!newName.trim()) return;
+  localStorage.setItem('hub_store_name', newName.trim());
+  location.reload();
 }
 
 function doLogout() {
