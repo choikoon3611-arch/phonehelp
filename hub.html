@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -815,6 +815,8 @@
       </div>
       <button onclick="consultTgSave()"
         style="padding:7px 14px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">저장</button>
+      <button onclick="tgAutoDetect()"
+        style="padding:7px 14px;border:none;border-radius:8px;background:#0088cc;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🔍 ID 자동감지</button>
       <button onclick="consultTgTest()"
         style="padding:7px 14px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">📨 테스트 전송</button>
     </div>
@@ -1246,6 +1248,7 @@
       <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
         <button class="lib-tab-btn active" data-lib="iphone" style="padding:8px 18px;border-radius:20px;border:2px solid #1d4ed8;background:#1d4ed8;color:#fff;font-size:13px;font-weight:800;cursor:pointer;">📱 아이폰 마이그레이션</button>
         <button class="lib-tab-btn" data-lib="smartswitch" style="padding:8px 18px;border-radius:20px;border:2px solid #d1d5db;background:#fff;color:#374151;font-size:13px;font-weight:700;cursor:pointer;">🔄 스마트스위치</button>
+        <button class="lib-tab-btn" data-lib="card" style="padding:8px 18px;border-radius:20px;border:2px solid #d1d5db;background:#fff;color:#374151;font-size:13px;font-weight:700;cursor:pointer;">💳 제휴카드 안내</button>
       </div>
 
       <!-- 인쇄 버튼 (화면에서만 보임) -->
@@ -1255,6 +1258,25 @@
 
       <!-- ===== 아이폰 마이그레이션 ===== -->
       <div class="lib-panel" id="lib-panel-iphone">
+      <style>
+      @media print {
+        #lib-panel-iphone svg { display: none !important; }
+        #lib-panel-iphone #lib-guide { border: none !important; }
+        #lib-panel-iphone #lib-guide > div:first-child { padding: 8px 14px !important; }
+        #lib-panel-iphone #lib-guide > div:first-child > div:first-child { font-size: 20px !important; margin-bottom: 3px !important; }
+        #lib-panel-iphone #lib-guide > div:first-child > div:nth-child(2) { font-size: 14px !important; margin-bottom: 2px !important; }
+        #lib-panel-iphone #lib-guide > div:nth-child(2) { padding: 6px !important; gap: 4px !important; }
+        #lib-panel-iphone [style*="border-radius:14px"] > div:first-child { padding: 4px 10px !important; }
+        #lib-panel-iphone [style*="border-radius:14px"] > div:nth-child(2) { padding: 5px 10px !important; }
+        #lib-panel-iphone [style*="line-height:2"] { line-height: 1.3 !important; font-size: 11px !important; }
+        #lib-panel-iphone [style*="line-height:1.9"] { line-height: 1.3 !important; font-size: 11px !important; }
+        #lib-panel-iphone [style*="background:#fff7ed"] { padding: 5px 8px !important; margin: 0 5px 3px !important; }
+        #lib-panel-iphone [style*="background:#fff7ed"] > div:first-child { font-size: 10px !important; margin-bottom: 3px !important; }
+        #lib-panel-iphone [style*="background:#f0fdf4"][style*="border:2px solid #bbf7d0"] { padding: 8px 12px !important; }
+        #lib-panel-iphone [style*="background:#f0fdf4"][style*="border:2px solid #bbf7d0"] > span { font-size: 24px !important; }
+        #lib-panel-iphone [style*="background:#f0fdf4"][style*="border:2px solid #bbf7d0"] div:first-child > div:first-child { font-size: 13px !important; margin-bottom: 2px !important; }
+      }
+      </style>
       <div id="lib-guide" style="background:#fff;color:#111;border-radius:14px;overflow:hidden;border:1px solid #d1d5db;font-family:'Malgun Gothic','맑은 고딕',sans-serif;">
 
         <!-- 제목 헤더 -->
@@ -1522,6 +1544,22 @@
 
       <!-- ===== 스마트스위치 ===== -->
       <div class="lib-panel" id="lib-panel-smartswitch" style="display:none;">
+      <style>
+      @media print {
+        #lib-panel-smartswitch svg { display: none !important; }
+        #lib-panel-smartswitch > div { border: none !important; }
+        #lib-panel-smartswitch > div > div:first-child { padding: 8px 14px !important; }
+        #lib-panel-smartswitch > div > div:first-child > div:first-child { font-size: 20px !important; margin-bottom: 3px !important; }
+        #lib-panel-smartswitch > div > div:nth-child(2) { padding: 6px !important; gap: 4px !important; }
+        #lib-panel-smartswitch [style*="border-radius:14px"] > div:first-child { padding: 4px 10px !important; }
+        #lib-panel-smartswitch [style*="border-radius:14px"] > div:nth-child(2) { padding: 5px 10px !important; }
+        #lib-panel-smartswitch [style*="line-height:2"] { line-height: 1.3 !important; font-size: 11px !important; }
+        #lib-panel-smartswitch [style*="line-height:1.9"] { line-height: 1.3 !important; font-size: 11px !important; }
+        #lib-panel-smartswitch [style*="background:#ecfdf5"] { padding: 5px 10px !important; }
+        #lib-panel-smartswitch [style*="background:#f0fdf4"] { padding: 8px 12px !important; }
+        #lib-panel-smartswitch [style*="background:#f0fdf4"] > span { font-size: 24px !important; }
+      }
+      </style>
         <div style="background:#fff;color:#111;border-radius:14px;overflow:hidden;border:1px solid #d1d5db;font-family:'Malgun Gothic','맑은 고딕',sans-serif;">
 
           <!-- 헤더 -->
@@ -1741,6 +1779,149 @@
           </div>
         </div>
       </div><!-- lib-panel-smartswitch 끝 -->
+
+      <!-- ===== 제휴카드 안내 ===== -->
+      <div class="lib-panel" id="lib-panel-card" style="display:none;">
+        <style>
+        @media print { @page { size: A4 portrait; margin: 5mm 6mm; } }
+        @media print { #lib-panel-card .cs-page { width: 100% !important; margin: 0 !important; border: none !important; box-shadow: none !important; } }
+        #lib-panel-card .cs-page{width:182mm;margin:0 auto;background:#fff;border:1px solid #bbb;box-shadow:0 2px 12px rgba(0,0,0,.15);display:flex;flex-direction:column;font-family:'Noto Sans KR','Malgun Gothic',Arial,sans-serif;font-size:14px;color:#222;}
+        #lib-panel-card .cs-top-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #ddd;}
+        #lib-panel-card .cs-logo-text{font-size:20px;font-weight:700;color:#1565C0;letter-spacing:-0.5px;}
+        #lib-panel-card .cs-top-nav{display:flex;gap:14px;font-size:13px;color:#555;}
+        #lib-panel-card .cs-date-section{display:flex;align-items:flex-start;padding:14px 16px 12px;gap:0;}
+        #lib-panel-card .cs-date-left{min-width:100px;}
+        #lib-panel-card .cs-date-year{font-size:16px;font-weight:500;color:#999;line-height:1;}
+        #lib-panel-card .cs-date-month{font-size:54px;font-weight:700;color:#bbb;line-height:1;margin-top:-2px;}
+        #lib-panel-card .cs-date-divider{width:90px;height:2px;background:#1565C0;margin-top:6px;}
+        #lib-panel-card .cs-date-right{flex:1;padding-top:4px;}
+        #lib-panel-card .cs-date-row{display:flex;gap:8px;margin-bottom:5px;font-size:14px;}
+        #lib-panel-card .cs-date-label{color:#666;min-width:70px;}
+        #lib-panel-card .cs-date-value{color:#1565C0;font-weight:500;}
+        #lib-panel-card .cs-total-section{margin-left:auto;text-align:right;padding-top:2px;}
+        #lib-panel-card .cs-total-label{font-size:13px;color:#555;margin-bottom:2px;}
+        #lib-panel-card .cs-total-amount{font-size:26px;font-weight:700;color:#222;font-variant-numeric:tabular-nums;}
+        #lib-panel-card .cs-total-amount span{font-size:15px;font-weight:400;}
+        #lib-panel-card .cs-statement-note{font-size:13px;color:#1565C0;font-weight:600;margin-top:4px;}
+        #lib-panel-card .cs-tabs{display:flex;border-top:1px solid #ddd;border-bottom:1px solid #ddd;}
+        #lib-panel-card .cs-tab{flex:1;text-align:center;padding:10px;font-size:14px;color:#777;border-right:1px solid #ddd;}
+        #lib-panel-card .cs-tab:last-child{border-right:none;}
+        #lib-panel-card .cs-tab.active{font-weight:700;color:#222;}
+        #lib-panel-card .cs-detail-section{padding:10px 16px 6px;}
+        #lib-panel-card .cs-detail-title{font-size:16px;font-weight:700;margin-bottom:8px;}
+        #lib-panel-card .cs-stmt-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;}
+        #lib-panel-card .cs-stmt-table thead tr{background:#f5f5f5;}
+        #lib-panel-card .cs-stmt-table th{border:1px solid #ddd;padding:5px 5px;text-align:center;font-weight:600;color:#444;vertical-align:middle;line-height:1.3;}
+        #lib-panel-card .cs-stmt-table td{border:1px solid #ddd;padding:5px 7px;vertical-align:middle;}
+        #lib-panel-card .cs-stmt-table td.date{text-align:center;white-space:nowrap;}
+        #lib-panel-card .cs-stmt-table td.num{text-align:right;color:#222;}
+        #lib-panel-card .cs-stmt-table td.blue-num{text-align:right;color:#1565C0;font-weight:600;}
+        #lib-panel-card .cs-th-group{border-bottom:none!important;background:#e8e8e8!important;}
+        #lib-panel-card .cs-key-row td{background:#FFF8E1;font-weight:700;}
+        #lib-panel-card .cs-key-row td.blue-num{color:#E53935;font-weight:900;}
+        #lib-panel-card .cs-discount-row td{background:#E8F5E9;color:#2E7D32;font-weight:700;}
+        #lib-panel-card .cs-discount-row td.blue-num{color:#2E7D32;}
+        #lib-panel-card .cs-total-row td{background:#f5f5f5;font-weight:700;}
+        #lib-panel-card .cs-total-row td.blue-num{color:#1565C0;font-weight:900;}
+        #lib-panel-card .cs-footer-note{padding:6px 16px 8px;font-size:12px;text-align:center;border-top:1px solid #eee;font-weight:700;color:#555;}
+        </style>
+
+        <div class="cs-page">
+          <div class="cs-top-bar">
+            <div class="cs-logo-text">통신사 제휴카드</div>
+            <div class="cs-top-nav"><span>🏠 홈페이지</span><span>🖨️ 인쇄하기</span><span>📱 모바일보기</span></div>
+          </div>
+          <div class="cs-date-section">
+            <div class="cs-date-left">
+              <div class="cs-date-year">2025</div>
+              <div class="cs-date-month">10</div>
+              <div class="cs-date-divider"></div>
+            </div>
+            <div class="cs-date-right">
+              <div class="cs-date-row"><span class="cs-date-label">결제일</span><span class="cs-date-value">2025년 10월 10일</span></div>
+              <div class="cs-date-row"><span class="cs-date-label">출금예정일</span><span class="cs-date-value">2025년 10월 10일</span></div>
+              <div class="cs-date-row"><span class="cs-date-label">결제계좌</span><span class="cs-date-value">국민은행 ***-****-****</span></div>
+            </div>
+            <div class="cs-total-section">
+              <div class="cs-total-label">총 결제금액</div>
+              <div class="cs-total-amount">300,000<span>원</span></div>
+              <div class="cs-statement-note">10월 이용대금명세서입니다.</div>
+            </div>
+          </div>
+          <div class="cs-tabs">
+            <div class="cs-tab active">이용대금명세서</div>
+            <div class="cs-tab">카드이용내역</div>
+            <div class="cs-tab">카드이용안내</div>
+          </div>
+          <div class="cs-detail-section">
+            <div class="cs-detail-title">상세내역</div>
+            <table class="cs-stmt-table">
+              <thead>
+                <tr>
+                  <th rowspan="2">이용<br>일자</th>
+                  <th rowspan="2" style="min-width:120px;">이용가맹점</th>
+                  <th rowspan="2">이용금액</th>
+                  <th colspan="4" class="cs-th-group">당월 결제하실 금액</th>
+                </tr>
+                <tr>
+                  <th>기간·회차</th>
+                  <th>청구금액</th>
+                  <th>이용혜택</th>
+                  <th>납부하실금액</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="date">09/03</td><td>GS25 편의점</td><td class="num">23,400</td><td class="num" style="color:#999;font-size:9px;">일시불</td><td class="num">23,400</td><td class="num">-</td><td class="blue-num">23,400</td></tr>
+                <tr><td class="date">09/08</td><td>SKT 통신요금</td><td class="num">45,200</td><td class="num" style="color:#999;font-size:9px;">일시불</td><td class="num">45,200</td><td class="num">-</td><td class="blue-num">45,200</td></tr>
+                <tr><td class="date">09/12</td><td>SK주유소</td><td class="num">68,000</td><td class="num" style="color:#999;font-size:9px;">일시불</td><td class="num">68,000</td><td class="num">-</td><td class="blue-num">68,000</td></tr>
+                <tr><td class="date">09/18</td><td>한국관 (식당)</td><td class="num">38,500</td><td class="num" style="color:#999;font-size:9px;">일시불</td><td class="num">38,500</td><td class="num">-</td><td class="blue-num">38,500</td></tr>
+                <tr><td class="date">09/22</td><td>쿠팡</td><td class="num">124,900</td><td class="num" style="color:#999;font-size:9px;">일시불</td><td class="num">124,900</td><td class="num">-</td><td class="blue-num">124,900</td></tr>
+                <tr class="cs-key-row">
+                  <td class="date">09/01</td>
+                  <td style="color:#E53935;font-weight:700;">단말기할부금</td>
+                  <td class="num">480,000</td>
+                  <td class="num" style="font-size:9px;">24개월 / 10회차</td>
+                  <td class="num">20,000</td>
+                  <td class="num">-</td>
+                  <td class="blue-num">20,000</td>
+                </tr>
+                <tr class="cs-total-row">
+                  <td colspan="4" style="text-align:right;color:#555;">소계</td>
+                  <td class="num">320,000</td><td class="num">-</td><td class="blue-num">320,000</td>
+                </tr>
+                <tr class="cs-discount-row">
+                  <td class="date">-</td>
+                  <td colspan="3">🎁 전월 실적 달성 할인 (일반 사용 300,000원 달성 · 단말기할부금 제외)</td>
+                  <td class="num" colspan="2">-</td>
+                  <td class="blue-num" style="color:#2E7D32;">-20,000</td>
+                </tr>
+                <tr class="cs-total-row">
+                  <td colspan="4" style="text-align:right;color:#444;font-size:11px;">최종 청구금액</td>
+                  <td class="num" style="font-size:11px;">320,000</td>
+                  <td class="num">-</td>
+                  <td class="blue-num" style="font-size:12px;color:#1565C0;">300,000</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="font-size:9px;color:#888;margin-top:4px;">※ 단말기할부금(20,000원)은 전월실적에 포함되지 않습니다. 일반 사용액 300,000원으로 실적 달성 → 할인 적용. 실제 출금액: <strong style="color:#1565C0;">300,000원</strong></div>
+          </div>
+
+          <div style="margin:0 16px 4px;border:1px solid #FFCDD2;border-radius:4px;overflow:hidden;">
+            <div style="background:#B71C1C;color:#fff;font-size:16px;font-weight:700;padding:7px 16px;letter-spacing:0.5px;">⚠️ 반드시 확인하세요</div>
+            <div style="padding:10px 16px;font-size:14px;color:#333;line-height:1.5;background:#FFF8F8;">
+              <table style="width:100%;border-collapse:collapse;">
+                <tr style="vertical-align:top;"><td style="white-space:nowrap;font-weight:700;color:#B71C1C;padding-right:10px;padding-bottom:5px;">① 연회비</td><td style="padding-bottom:5px;">제휴카드 발급 시 연회비가 부과됩니다. 카드사 및 카드 종류에 따라 금액이 다르며, 카드 발급 전 반드시 확인하시기 바랍니다.</td></tr>
+                <tr style="vertical-align:top;"><td style="white-space:nowrap;font-weight:700;color:#B71C1C;padding-right:10px;padding-bottom:5px;">② 할부이자</td><td style="padding-bottom:5px;">카드로 단말기 대금을 할부 결제하면 <strong style="color:#B71C1C;">카드사에서 할부이자가 별도로 부과됩니다.</strong> 예시의 20,000원은 원금만이며, 실제 청구금액은 이자 포함 시 더 높아질 수 있습니다.</td></tr>
+                <tr style="vertical-align:top;"><td style="white-space:nowrap;font-weight:700;color:#B71C1C;padding-right:10px;padding-bottom:5px;">③ 실적 미포함</td><td style="padding-bottom:5px;">사용실적에 포함되지 않는 금액도 있으니 (예: 국세, 지방세, 할부결제금액 등) 자세한 내용은 카드 고객센터 연결 후 문의 부탁드립니다.</td></tr>
+                <tr style="vertical-align:top;"><td style="white-space:nowrap;font-weight:700;color:#B71C1C;padding-right:10px;padding-bottom:5px;">④ 캐쉬백 안내</td><td style="padding-bottom:5px;">일부 카드는 할인금액을 <strong>캐쉬백으로 지급</strong>하오니 참고 부탁드립니다.</td></tr>
+                <tr style="vertical-align:top;"><td style="white-space:nowrap;font-weight:700;color:#B71C1C;padding-right:10px;">⑤ 카드 등록</td><td>실물 카드 수령 후 <strong>14일 이내</strong> 카드번호 및 유효기간을 매장에 알려주셔야 등록 가능합니다.<br>문자로 보내주시는 경우 전송 후 <strong>별도로 전화 주셔야 누락이 발생하지 않으니</strong> 참고 부탁드립니다.<br><span style="color:#1565C0;font-weight:700;">☎ 043)216-0550 &nbsp;·&nbsp; 010-5835-7010</span></td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="cs-footer-note">※ 본 명세서는 제휴카드 혜택 설명을 위한 예시 자료입니다. 실제 청구금액과 다를 수 있습니다.</div>
+        </div>
+      </div><!-- lib-panel-card 끝 -->
 
     </div>
   </div>
@@ -2231,13 +2412,13 @@
 <script>
 /* ===== Firebase 초기화 ===== */
 const firebaseConfig = {
-  apiKey: "AIzaSyBKoaJ5JnMFg3ioIoj-BGzicBrDMg8C5bI",
-  authDomain: "assist-9109b.firebaseapp.com",
-  databaseURL: "https://assist-9109b-default-rtdb.firebaseio.com",
-  projectId: "assist-9109b",
-  storageBucket: "assist-9109b.firebasestorage.app",
-  messagingSenderId: "830833125281",
-  appId: "1:830833125281:web:fe539ba512048bd8754de0"
+  apiKey: "AIzaSyD7A_wYacfMHuW4aKNHbYvy6lcgMxk3qkU",
+  authDomain: "assist-new-4e02a.firebaseapp.com",
+  databaseURL: "https://assist-new-4e02a-default-rtdb.firebaseio.com",
+  projectId: "assist-new-4e02a",
+  storageBucket: "assist-new-4e02a.firebasestorage.app",
+  messagingSenderId: "785535773227",
+  appId: "1:785535773227:web:3b999adcff550a6b47586e"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -2379,45 +2560,58 @@ function setupFirebaseSync() {
       try { localStorage.setItem('fimg_' + decodeURIComponent(key), dataUrl); } catch(e) {}
     });
   });
+  // 텔레그램 설정
+  db.ref(HUB + '/tgSettings').on('value', snap => {
+    const d = snap.val() || {};
+    tgCfg.token        = d.token        || '';
+    tgCfg.chatId       = d.chatId       || '';
+    tgCfg.consultTopic = d.consultTopic || '';
+    tgCfg.smsTopic     = d.smsTopic     || '';
+    uploadLoadSettings();
+    const ct = document.getElementById('tg-consult-topic');
+    if (ct) ct.value = tgCfg.consultTopic;
+    const st = document.getElementById('tg-sms-topic');
+    if (st) st.value = tgCfg.smsTopic;
+  });
 }
 
 /* ===== 서류 데이터 ===== */
 const DOCS = {
   change: {
     lg: [
-      { title: 'LG 서비스 변경 신청서', url: 'lg_서비스변경신청서_작성.html' },
-      { title: 'LG U+ 고객정보 변경신청서', url: 'lg_고객정보변경서류_작성.html' },
+      { title: 'LG 서비스 변경 신청서', url: 'LG/lg_서비스변경신청서_작성.html' },
+      { title: 'LG U+ 고객정보 변경신청서', url: 'LG/lg_고객정보변경서류_작성.html' },
     ],
     kt: [
-      { title: 'KT 변경 서류',     url: 'kt_변경신청서_작성.html' },
-      { title: 'KT 유심변경 서류', url: 'kt_유심변경서류_작성.html' },
-      { title: 'KT 재약정 신청서', url: 'kt_재약정신청서_작성.html' },
-      { title: '해지신청서',        url: 'kt_해지신청서_작성.html' },
+      { title: 'KT 변경 서류',     url: 'KT/kt_변경신청서_작성.html' },
+      { title: 'KT 유심변경 서류', url: 'KT/kt_유심변경서류_작성.html' },
+      { title: 'KT 재약정 신청서', url: 'KT/kt_재약정신청서_작성.html' },
+      { title: '해지신청서',        url: 'KT/kt_해지신청서_작성.html' },
     ],
     ktm: [
-      { title: 'KT M모바일 서비스변경 신청서', url: 'ktm_서비스변경신청서_작성.html' },
-      { title: 'SK텔링크 변경신청서',           url: 'sktellink_변경신청서_작성.html' },
-      { title: 'SK텔링크 해지신청서',           url: '텔링크_해지신청서_작성.html' },
-      { title: 'M모바일 해지신청서',            url: 'm모바일_해지신청서_작성.html' },
+      { title: 'KT M모바일 서비스변경 신청서', url: 'KT/ktm_서비스변경신청서_작성.html' },
+      { title: 'SK텔링크 변경신청서',           url: 'SK/sktellink_변경신청서_작성.html' },
+      { title: 'SK텔링크 해지신청서',           url: '기타/텔링크_해지신청서_작성.html' },
+      { title: 'M모바일 해지신청서',            url: '기타/m모바일_해지신청서_작성.html' },
     ],
     sk: [
-      { title: 'SKT 변경 서류',        url: 'sk_변경신청서_작성.html' },
-      { title: 'SKT 자동이체 변경서류', url: 'sk_자동이체_변경서류_작성.html' },
-      { title: '단말기/USIM 변경 신청서', url: '단말기_USIM_변경신청서_작성.html' },
-      { title: 'SKT 재약정 서류',       url: 'sk_재약정서류_작성.html' },
+      { title: 'SKT 변경 서류',        url: 'SK/sk_변경신청서_작성.html' },
+      { title: 'SKT 자동이체 변경서류', url: 'SK/sk_자동이체_변경서류_작성.html' },
+      { title: '단말기/USIM 변경 신청서', url: '기타/단말기_USIM_변경신청서_작성.html' },
+      { title: 'SKT 재약정 서류',       url: 'SK/sk_재약정서류_작성.html' },
 
-      { title: '해지신청서',             url: '해지신청서_작성.html' },
+      { title: '해지신청서',             url: '기타/해지신청서_작성.html' },
     ],
     etc: [
-      { title: '제한기간이내 번호이동 신청서', url: '기타_중립기관_작성.html' },
+      { title: '제한기간이내 번호이동 신청서', url: '기타/기타_중립기관_작성.html' },
       { type: 'info', label: '번호이동 관리기관 문의', lines: ['📠 FAX : 02-541-4370', '✉️ rnp@ktoa.or.kr', '📞 1588-0413 (월~금 09:00~18:00, 공휴일 휴무)'] },
     ],
   },
   bundle: {
-    lg:  [ { title: 'LG U+ 결합 서류', url: '#' }, { title: 'LG U+ 유선 신청서', url: 'lg_유선신청서_작성.html' } ],
-    kt:  [ { title: 'KT 결합 서류',    url: 'kt_결합서류_작성.html' }, { title: 'KT 유선 신청서', url: 'kt_유선신청서_작성.html' } ],
+    lg:  [ { title: 'LG U+ 결합 서류', url: '#' }, { title: 'LG U+ 유선 신청서', url: 'LG/lg_유선신청서_작성.html' } ],
+    kt:  [ { title: 'KT 결합 서류',    url: 'KT/kt_결합서류_작성.html' }, { title: 'KT 유선 신청서', url: 'KT/kt_유선신청서_작성.html' } ],
     ktm: [],
-    sk:  [ { title: 'SKT 결합 서류',   url: 'sk_결합서류_작성.html' }, { title: 'SK 유선 신청서', url: 'sk_유선신청서_작성.html' } ],
+    sk:  [ { title: 'SKT 결합 서류',   url: 'SK/sk_결합서류_작성.html' }, { title: 'SK 유선 신청서', url: 'SK/sk_유선신청서_작성.html' } ],
   },
 };
 
@@ -2631,7 +2825,7 @@ function escHtml(s) {
 
 /* ===== 제휴카드 발급현황 ===== */
 const CARD_KEY  = 'card_issuance_list'; // 레거시 키 (더 이상 사용 안 함)
-const CARD_URLS = { SKT:'sk_변경신청서_카드_작성.html', KT:'kt_변경신청서_카드_작성.html', KTM:'ktm_서비스변경신청서_작성.html', LG:'lg_제휴카드_작성.html' };
+const CARD_URLS = { SKT:'SK/sk_변경신청서_카드_작성.html', KT:'KT/kt_변경신청서_카드_작성.html', KTM:'KT/ktm_서비스변경신청서_작성.html', LG:'LG/lg_제휴카드_작성.html' };
 const CARD_CLS  = { SKT:'csk', KT:'ckt', KTM:'cktm', LG:'clg' };
 
 let cardList        = [];
@@ -4073,19 +4267,6 @@ db.ref(HUB + '/uploadDealers').on('value', snap => {
 // 텔레그램 설정 — Firebase 공유 저장
 var tgCfg = { token:'', chatId:'', consultTopic:'', smsTopic:'' };
 
-db.ref(HUB + '/tgSettings').on('value', snap => {
-  const d = snap.val() || {};
-  tgCfg.token        = d.token        || '';
-  tgCfg.chatId       = d.chatId       || '';
-  tgCfg.consultTopic = d.consultTopic || '';
-  tgCfg.smsTopic     = d.smsTopic     || '';
-  uploadLoadSettings();
-  const ct = document.getElementById('tg-consult-topic');
-  if (ct) ct.value = tgCfg.consultTopic;
-  const st = document.getElementById('tg-sms-topic');
-  if (st) st.value = tgCfg.smsTopic;
-});
-
 function uploadTgSaveSettings() {
   const tok = document.getElementById('tg-token')?.value.trim();
   const cid = document.getElementById('tg-chatid')?.value.trim();
@@ -4528,15 +4709,52 @@ function consultOpenModal(id = null) {
 function consultCloseModal() {
   document.getElementById('consult-modal-bg').classList.remove('open'); consultEditId = null;
 }
+/* ── 텔레그램 ID 자동감지 ── */
+function tgAutoDetect() {
+  if (!tgCfg.token) { alert('먼저 정책 탭에서 Bot Token을 저장하세요.'); return; }
+  fetch('https://api.telegram.org/bot' + tgCfg.token + '/getUpdates?limit=50&offset=-50')
+    .then(r => r.json())
+    .then(j => {
+      if (!j.ok) { alert('❌ 토큰 오류: ' + j.description); return; }
+      if (!j.result || !j.result.length) { alert('수신된 메시지가 없습니다.\n그룹 토픽에 아무 메시지나 보내고 다시 시도해주세요.'); return; }
+      const msgs = j.result.filter(u => u.message && u.message.chat);
+      if (!msgs.length) { alert('메시지를 찾을 수 없습니다.'); return; }
+      // 가장 최근 메시지 기준으로 목록 표시
+      let info = '수신된 메시지 목록:\n\n';
+      msgs.slice(-5).forEach((u, i) => {
+        const m = u.message;
+        info += `[${i+1}] ${m.chat.title || '개인채팅'} (${m.chat.type})\n  Chat ID: ${m.chat.id}\n  Topic ID: ${m.message_thread_id || '없음'}\n\n`;
+      });
+      const last = msgs[msgs.length - 1].message;
+      info += `가장 최근 메시지 값을 사용할까요?\nChat ID: ${last.chat.id}\nTopic ID: ${last.message_thread_id || '없음'}`;
+      if (confirm(info)) {
+        const chatId = String(last.chat.id);
+        const threadId = String(last.message_thread_id || '');
+        db.ref(HUB + '/tgSettings').update({ chatId, consultTopic: threadId });
+        const ce = document.getElementById('tg-chatid');
+        if (ce) ce.value = chatId;
+        const ct = document.getElementById('tg-consult-topic');
+        if (ct) ct.value = threadId;
+        alert('저장 완료! 테스트 전송을 눌러보세요.');
+      }
+    })
+    .catch(e => alert('오류: ' + e));
+}
+
 /* ── 텔레그램 알림 설정 ── */
 function consultTgTest() {
-  console.log('[TG 테스트] tgCfg:', JSON.stringify(tgCfg));
   if (!tgCfg.token || !tgCfg.chatId) {
     alert('Bot Token 또는 Chat ID가 없습니다.\n정책 업로드 탭에서 먼저 저장하세요.');
     return;
   }
-  sendTelegramNotify('✅ 공유업무 텔레그램 알림 테스트 메시지입니다.');
-  alert('전송 시도했습니다. 텔레그램을 확인하세요.');
+  const body = { chat_id: tgCfg.chatId, text: '✅ 공유업무 텔레그램 알림 테스트 메시지입니다.', parse_mode: 'HTML' };
+  if (tgCfg.consultTopic) body.message_thread_id = parseInt(tgCfg.consultTopic);
+  fetch('https://api.telegram.org/bot' + tgCfg.token + '/sendMessage', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+  }).then(r=>r.json()).then(j=>{
+    if (j.ok) alert('✅ 전송 성공! 텔레그램을 확인하세요.');
+    else alert('❌ 전송 실패\n\n오류: ' + j.description + '\n\nchat_id: ' + tgCfg.chatId);
+  }).catch(e=>alert('❌ 네트워크 오류\n' + e));
 }
 
 function consultTgSave() {
