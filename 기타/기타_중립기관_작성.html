@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SK텔링크 변경신청서</title>
+<title>제한기간이내 번호이동 신청서</title>
 <style>
   * { box-sizing: border-box; }
   body { font-family: "Malgun Gothic","맑은 고딕",sans-serif; background:#ececec; margin:0; padding:0 0 40px; }
@@ -23,7 +23,7 @@
     background:#1e3252; flex-shrink:0;
   }
   .hdr-btn.active-check { background:#d0021b; border-color:#d0021b; }
-  .hdr-btn.active-input { background:#7c3aed; border-color:#7c3aed; }
+  .hdr-btn.active-input { background:#475569; border-color:#475569; }
   .hdr-btn.active-text  { background:#0060df; border-color:#0060df; }
   .btn-print { background:#475569 !important; border-color:#475569 !important; }
 
@@ -40,18 +40,18 @@
     font-size: min(2.2vw, 15px); font-weight: 700; color:#1a1a1a;
     padding:0; outline:none; border-bottom:1px dashed transparent;
   }
-  .overlay-input:focus { border-bottom:1px dashed #7c3aed; background:rgba(237,233,254,0.5); }
+  .overlay-input:focus { border-bottom:1px dashed #475569; background:rgba(241,245,249,0.5); }
   .overlay-input::placeholder { color:#bbb; font-size:0.85em; }
 
   .click-wrap {
     position:absolute; min-width:50px; min-height:22px;
-    border:1px solid rgba(124,58,237,0.55); border-left:7px solid rgba(124,58,237,0.75);
-    background:rgba(237,233,254,0.72); border-radius:4px; cursor:move; resize:both; overflow:hidden; z-index:10;
+    border:1px solid rgba(71,85,105,0.55); border-left:7px solid rgba(71,85,105,0.75);
+    background:rgba(241,245,249,0.72); border-radius:4px; cursor:move; resize:both; overflow:hidden; z-index:10;
   }
-  .click-wrap:focus-within { border-color:rgba(124,58,237,0.9); box-shadow:0 0 0 2px rgba(124,58,237,0.22); z-index:20; }
+  .click-wrap:focus-within { border-color:rgba(71,85,105,0.9); box-shadow:0 0 0 2px rgba(71,85,105,0.22); z-index:20; }
   .click-wrap input {
     display:block; width:100%; height:100%; border:none; background:transparent;
-    font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:13px; font-weight:700; color:#3b1a8c;
+    font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:13px; font-weight:700; color:#1a1a1a;
     padding:2px 4px; outline:none; cursor:text;
   }
   .checkmark { position:absolute; transform:translate(-50%,-50%); font-size:1.6%; font-weight:900; color:#d0021b; pointer-events:none; line-height:1; }
@@ -80,8 +80,8 @@
 <body>
 
 <header>
-  <a class="back" href="hub.html">← 허브로</a>
-  <h1>SK텔링크 변경신청서</h1>
+  <a class="back" href="../hub.html">← 허브로</a>
+  <h1>제한기간이내 번호이동 신청서</h1>
   <button class="hdr-btn" id="check-btn">✓ 체크</button>
   <button class="hdr-btn" id="input-btn">✏️ 입력</button>
   <button class="hdr-btn" id="text-btn">T 텍스트</button>
@@ -90,10 +90,7 @@
 </header>
 
 <div class="doc-wrap" id="doc-wrap">
-  <img src="sktellink_변경신청서_p1.jpg" alt="SK텔링크 변경신청서" id="doc-img">
-  <input class="overlay-input" id="f-1" style="left:34.33%; top:12.96%; width:22%;">
-  <input class="overlay-input" id="f-2" style="left:34.23%; top:14.73%; width:22%;">
-  <input class="overlay-input" id="f-3" style="left:76.52%; top:12.82%; width:20%;">
+  <img src="기타_중립기관_p1.jpg" alt="제한기간이내 번호이동 신청서" id="doc-img">
 </div>
 
 <script>

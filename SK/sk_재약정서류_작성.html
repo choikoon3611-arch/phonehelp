@@ -1,217 +1,141 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KT 변경신청서 작성</title>
+<title>SK 재약정 서류 작성</title>
 <style>
   * { box-sizing: border-box; }
   body {
     font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
     background: #ececec;
     margin: 0;
-    padding: 20px;
+    padding: 0 0 40px;
   }
-  .cust-bar {
-    display: none; max-width: 700px; margin: 0 auto 10px;
-    background: #dbeafe; border: 1.5px solid #93c5fd; border-radius: 10px;
-    padding: 10px 14px; font-size: 12px; gap: 10px; flex-wrap: wrap; align-items: center;
-  }
-  .cust-bar.show { display: flex; }
-  .cust-bar .cb-title { font-weight: 800; color: #1e3a8a; font-size: 13px; flex-shrink:0; }
-  .cust-bar .cb-item { display: flex; align-items: center; gap: 5px; color: #1e3a8a; }
-  .cust-bar .cb-label { font-weight: 700; white-space: nowrap; }
-  .cust-bar .cb-val { font-weight: 400; }
-  .cb-copy {
-    padding: 2px 7px; font-size: 11px; font-weight: 700; border-radius: 5px;
-    border: 1px solid #93c5fd; background: #fff; cursor: pointer; color: #1e3a8a;
-  }
-  .cb-copy:hover { background: #eff6ff; }
-    .textbox {
-    position:absolute; border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55);
-    outline:none; font-family:"Malgun Gothic","맑은 고딕",sans-serif;
-    font-size:13px; font-weight:700; color:#111;
-    padding:0 3px; overflow:visible; white-space:nowrap; line-height:1.3; cursor:text;
-  }
-  .textbox:focus { background:rgba(255,255,200,0.9); border-color:#0078ff; }
-  .sel-rect { position:absolute; border:2px dashed #0078ff; background:rgba(0,120,255,0.08); pointer-events:none; }
-  @media print { .cust-bar { display: none !important; } }
-
-  .toolbar {
-    max-width: 700px;
-    margin: 0 auto 14px;
+  header {
+    background: #16283f;
+    color: #fff;
+    padding: 14px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 50;
   }
-  .toolbar a { font-size: 13px; color: #2f6feb; text-decoration: none; }
-  .toolbar button {
-    padding: 9px 16px; font-size: 13px; font-weight: 700;
-    border: none; border-radius: 8px; background: #16283f; color: #fff; cursor: pointer;
+  header a.back {
+    color: #cdd9e4;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
   }
+  header a.back:hover { color: #fff; }
+  header h1 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    flex: 1;
+    text-align: center;
+  }
+  header button, header label.btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    background: #e6002d;
+    color: #fff;
+    cursor: pointer;
+  }
+  header label.btn { background: #2c4460; }
   .doc-wrap {
     position: relative;
-    max-width: 700px;
-    margin: 0 auto;
+    max-width: 900px;
+    margin: 20px auto;
     background: #fff;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   }
-  .doc-wrap img { display: block; width: 100%; height: auto; }
-  .overlay-input {
+  .doc-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+  }
+  .field {
     position: absolute;
-    transform: translate(0, -50%);
-    border: none;
-    background: rgba(255, 235, 59, 0.28);
-    border-radius: 2px;
+    transform: translateY(-50%);
+    border: 1px solid rgba(230,0,45,0.5);
+    background: rgba(255, 236, 179, 0.55);
+    border-radius: 4px;
     font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
-    font-size: 15px;
+    color: #16283f;
     font-weight: 700;
-    line-height: 1;
-    color: #1a1a8c;
-    padding: 0 1px;
+    text-align: left;
+    padding: 0 4px;
     outline: none;
-    border-bottom: 1px dashed rgba(26,26,140,0.4);
-    overflow: visible;
-    white-space: nowrap;
-  }
-  .overlay-input:focus {
-    background: #fff;
-    border-bottom: 1px solid #1a1a8c;
-    box-shadow: 0 0 0 1px #1a1a8c, 0 2px 6px rgba(0,0,0,0.35);
-    z-index: 50;
-  }
-  .overlay-input::placeholder { color: #bbb; font-size: 0.85em; }
-
-  /* 세로로 촘촘하게 붙어있는 필드용 - 줄 간격이 좁아 글씨가 서로 겹치는 것 방지 */
-  .overlay-input-tight {
-    font-size: 9px;
-    transform: translate(0, -50%) scale(1);
-  }
-  .overlay-input-tight:focus {
     font-size: 15px;
-    padding: 1px 2px;
   }
-
-  .overlay-textarea {
-    position: absolute;
-    border: none;
-    background: transparent;
-    font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
-    font-size: 22px;
-    line-height: 1.4;
-    color: #1a1a8c;
-    padding: 2px 0;
-    outline: none;
-    resize: none;
-    overflow: hidden;
+  .field:focus {
+    background: rgba(255, 236, 179, 0.95);
+    border-color: #e6002d;
+    box-shadow: 0 0 0 2px rgba(230,0,45,0.3);
+    z-index: 20;
   }
-  .overlay-textarea:focus {
-    border-bottom: 1px dashed #1a1a8c;
-    z-index: 10;
-  }
-  .overlay-textarea::placeholder { color: #bbb; font-size: 0.7em; }
 
     .textbox {
     position:absolute; border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55);
     outline:none; font-family:"Malgun Gothic","맑은 고딕",sans-serif;
     font-size:13px; font-weight:700; color:#111;
-    padding:0 3px; overflow:visible; white-space:nowrap; line-height:1.3; cursor:text;
+    padding:0 3px; overflow:hidden; line-height:1.3; cursor:text;
   }
   .textbox:focus { background:rgba(255,255,200,0.9); border-color:#0078ff; }
   .sel-rect { position:absolute; border:2px dashed #0078ff; background:rgba(0,120,255,0.08); pointer-events:none; }
-  /* 전화번호 필드 - 11자리 반드시 표시 */
-  #f-phone { font-size: 10px !important; letter-spacing: -0.3px !important; }
-  #f-extra6, #f-extra7, #f-extra8, #f-extra9, #f-extra10,
-  #f-extra12, #f-extra13, #f-extra14, #f-extra15, #f-extra16 {
-    font-size: 8px !important; letter-spacing: -0.2px !important;
-  }
   @media print {
-    #f-phone { font-size: 10px !important; letter-spacing: -0.3px !important; }
-    #f-extra6, #f-extra7, #f-extra8, #f-extra9, #f-extra10,
-    #f-extra12, #f-extra13, #f-extra14, #f-extra15, #f-extra16 {
-      font-size: 8px !important; letter-spacing: -0.2px !important;
-    }
-  }
-
-  @media print {
+    header { display: none; }
     body { background: #fff; padding: 0; }
-    .toolbar { display: none; }
-    .doc-wrap {
-      box-shadow: none;
-      width: 700px;
-      max-width: 700px;
-    }
-    .overlay-input {
-      font-size: 11pt; font-weight: 700;
-    font-weight: 700;
-      background: transparent;
-      border-bottom: none;
-      box-shadow: none;
-    }
-    .overlay-input-tight { font-size: 9px; }
-    .overlay-input::placeholder { color: transparent; }
-    .textbox { border:none; background:transparent; }
-    .overlay-textarea { font-size: 22px; }
-    .overlay-textarea::placeholder { color: transparent; }
+    .doc-wrap { box-shadow: none; margin: 0; max-width: 100%; }
+    .field { border: none; background: transparent; }
   }
-  .field { position:absolute; border:1px solid rgba(0,100,200,0.45); background:rgba(255,236,179,0.55); border-radius:3px; font-family:"Malgun Gothic","맑은 고딕",sans-serif; color:#16283f; font-weight:700; padding:0 4px; outline:none; font-size:13px; transform:translateY(-50%); }
-  .field:focus { background:rgba(255,236,179,0.95); border-color:#0078d4; z-index:20; }
 </style>
 </head>
 <body>
 
-<div class="cust-bar" id="cust-bar">
-  <span class="cb-title">📋 고객 정보</span>
-</div>
-
-<div class="toolbar">
-  <a href="hub.html">&larr; 허브로 돌아가기</a>
+<header>
+  <a class="back" href="../hub.html">← 허브로</a>
+  <h1>SK 선택약정할인 재약정 서류 작성</h1>
+  <label class="btn">
+    📂 이미지 불러오기
+    <input type="file" id="img-input" accept="image/*" style="display:none;">
+  </label>
   <button class="hdr-btn" id="text-btn">T 텍스트</button>
-  <button class="hdr-btn" onclick="exportCoords()">📋 좌표 내보내기</button>
   <button class="hdr-btn" id="undo-btn">↩ 되돌리기</button>
-  <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="새 서류 이미지로 교체">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this)"></label> <button class="hdr-btn" id="img-reset-btn" onclick="resetFormImage()" style="display:none;" title="원본 이미지로 복원">↺ 복원</button> <button id="print-btn">인쇄 / PDF 저장</button>
-</div>
+  <button class="hdr-btn" onclick="exportCoords()">📋 좌표 내보내기</button>
+  <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="새 서류 이미지로 교체">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this)"></label> <button class="hdr-btn" id="img-reset-btn" onclick="resetFormImage()" style="display:none;" title="원본 이미지로 복원">↺ 복원</button> <button onclick="window.print()">인쇄 / PDF저장</button>
+</header>
 
 <div class="doc-wrap" id="wrap1">
-  <img src="kt_변경신청서_p1.jpg" alt="KT 변경신청서" id="doc-img">
+  <img src="sk_jaeyakjeong_form.jpg" alt="SK 선택약정할인제도 가입 신청서">
 
-  <!-- 상단: 판매자 / 신청·가입자(본인) / 신청·가입자(대리인) 서명 -->
-
-
-<!-- 고객정보 -->
-
-
-<!-- 하단: 신청일 / 판매자 서명 -->
-
-  <!-- 입력 필드 -->
-  <input class="field" style="left:74.94%; top:9.88%;  width:14.43%; height:1.82%;" placeholder="">
-  <input class="field" style="left:74.94%; top:13.01%; width:14.43%; height:2.42%;" placeholder="">
-  <input class="field" style="left:75.09%; top:16.90%; width:14.29%; height:2.32%;" placeholder="서명/인">
-  <input class="field" id="f-name"  style="left:22.80%; top:49.33%; width:13.00%; height:2.93%;" placeholder="고객명">
-  <input class="field" id="f-birth" style="left:46.66%; top:48.47%; width:14.43%; height:1.82%;" placeholder="생년월일">
-  <input class="field" id="f-phone" style="left:80.37%; top:48.57%; width:14.14%; height:1.62%;" placeholder="핸드폰">
-  <input class="field" style="left:75.51%; top:93.62%; width:10.57%; height:2.02%;" placeholder="서명/인">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <input class="field" style="left:20.62%; top:12.75%; width:27.89%; height:1.65%;" placeholder="이동전화번호">
+  <input class="field" style="left:65.18%; top:12.75%; width:22.44%; height:1.96%;" placeholder="이름(법인명)">
+  <input class="field" style="left:33.51%; top:14.84%; width:16.44%; height:1.89%;" placeholder="법정생년월일">
+  <input class="field" style="left:69.40%; top:70.30%; width:17.78%; height:2.83%;" placeholder="서명/인">
+  <input class="field" style="left:67.84%; top:91.07%; width:17.89%; height:2.28%;" placeholder="서명/인">
 
 </div>
 
 <script>
-
+document.getElementById('img-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.querySelector('.doc-wrap img').src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
 
 const FORM_IMG_KEY = 'fimg_' + encodeURIComponent(document.title);
 (function(){
@@ -243,7 +167,7 @@ function resetFormImage(){
   location.reload();
 }
 
-// ── 좌표 내보내기 (전역) ──
+// ── 좌표 내보내기 ──
 function exportCoords(){
   var wrap=document.getElementById('wrap1');
   var boxes=wrap.querySelectorAll('.textbox');
@@ -259,7 +183,7 @@ function exportCoords(){
   var result='📋 텍스트박스 좌표\n'+lines.join('\n');
   var ta=document.createElement('textarea');
   ta.value=result;
-  ta.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);width:600px;max-width:95vw;height:200px;z-index:9999;font-family:monospace;font-size:13px;padding:10px;border:2px solid #0078d4;border-radius:8px;resize:vertical;';
+  ta.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);width:600px;max-width:95vw;height:200px;z-index:9999;font-family:monospace;font-size:13px;padding:10px;border:2px solid #e6002d;border-radius:8px;resize:vertical;';
   document.body.appendChild(ta);ta.select();document.execCommand('copy');
   ta.addEventListener('blur',function(){ta.remove();});
   ta.addEventListener('keydown',function(e){if(e.key==='Escape')ta.remove();});
@@ -268,7 +192,7 @@ function exportCoords(){
 
 // ── T 텍스트 / 되돌리기 ──
 (function(){
-var textBtn=document.getElementById('text-btn');
+  var textBtn=document.getElementById('text-btn');
   var undoBtn=document.getElementById('undo-btn');
   if(!textBtn||!undoBtn)return;
   var textOn=false,textBoxes=[],dragStart=null,selRect=null,undoStack=[];
@@ -323,9 +247,7 @@ var textBtn=document.getElementById('text-btn');
   document.addEventListener('keydown',function(e){
     if(e.ctrlKey&&e.key==='z'){var a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.contentEditable==='true'))return;e.preventDefault();undo();}
   });
-  var _pb=document.getElementById('print-btn'); if(_pb) _pb.addEventListener('click', function(){ window.print(); });
 })();</script>
-
 <style>
 #print-footer { max-width:900px; margin:0 auto; padding:7px 16px; background:#f1f5f9; border-top:1px solid #e2e7ec; font-family:"Malgun Gothic","맑은 고딕",sans-serif; font-size:12px; color:#334155; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
 #print-footer span { white-space:nowrap; }

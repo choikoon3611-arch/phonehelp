@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LG 서비스 변경 신청서</title>
+<title>KT 재약정 신청서</title>
 <style>
   * { box-sizing: border-box; }
   body { font-family: "Malgun Gothic","맑은 고딕",sans-serif; background:#ececec; margin:0; padding:0 0 40px; }
@@ -23,12 +23,12 @@
     background:#1e3252; flex-shrink:0;
   }
   .hdr-btn.active-check { background:#d0021b; border-color:#d0021b; }
-  .hdr-btn.active-input { background:#7b00b8; border-color:#7b00b8; }
+  .hdr-btn.active-input { background:#ff5f1a; border-color:#ff5f1a; }
   .hdr-btn.active-text  { background:#0060df; border-color:#0060df; }
-  .btn-print { background:#e6007e !important; border-color:#e6007e !important; }
+  .btn-print { background:#ff5f1a !important; border-color:#ff5f1a !important; }
 
   .cust-bar {
-    display:none; max-width:700px; margin:12px auto 0;
+    display:none; max-width:900px; margin:12px auto 0;
     background:#dbeafe; border:1.5px solid #93c5fd; border-radius:10px;
     padding:10px 14px; font-size:12px; gap:10px; flex-wrap:wrap; align-items:center;
   }
@@ -36,60 +36,51 @@
   .cust-bar .cb-title { font-weight:800; color:#1e3a8a; font-size:13px; flex-shrink:0; }
   .cust-bar .cb-item { display:flex; align-items:center; gap:5px; color:#1e3a8a; }
   .cust-bar .cb-label { font-weight:700; white-space:nowrap; }
-  .cust-bar .cb-val { font-weight:400; }
   .cb-copy {
     padding:2px 7px; font-size:11px; font-weight:700; border-radius:5px;
     border:1px solid #93c5fd; background:#fff; cursor:pointer; color:#1e3a8a;
   }
   .cb-copy:hover { background:#eff6ff; }
 
-  .page-label {
-    max-width:700px; margin:16px auto 6px;
-    font-size:11px; font-weight:700; color:#888; letter-spacing:0.5px;
-  }
-
   .doc-wrap {
-    position:relative; max-width:700px; margin:0 auto;
+    position:relative; max-width:900px; margin:20px auto;
     background:#fff; box-shadow:0 4px 20px rgba(0,0,0,0.15);
+    cursor:default;
   }
   .doc-wrap img { display:block; width:100%; height:auto; user-select:none; }
 
-  /* 고정 입력필드 */
   .overlay-input {
     position:absolute; transform:translate(0,-50%);
     border:none; background:transparent;
     font-family:"Malgun Gothic","맑은 고딕",sans-serif;
-    font-size: min(2.2vw, 15px); font-weight: 700; color:#1a1a8c;
+    font-size: min(2.2vw, 15px); font-weight: 700; color:#1a1a1a;
     padding:0; outline:none;
     border-bottom:1px dashed transparent;
   }
-  .overlay-input:focus { border-bottom:1px dashed #e6007e; background:rgba(255,230,245,0.3); }
+  .overlay-input:focus { border-bottom:1px dashed #ff5f1a; background:rgba(255,240,230,0.4); }
   .overlay-input::placeholder { color:#bbb; font-size:0.85em; }
 
-  /* 클릭 입력 칸 */
   .click-wrap {
     position:absolute; min-width:50px; min-height:22px;
-    border:1px solid rgba(123,0,184,0.55);
-    border-left:7px solid rgba(123,0,184,0.75);
-    background:rgba(240,218,255,0.72);
+    border:1px solid rgba(255,95,26,0.55);
+    border-left:7px solid rgba(255,95,26,0.75);
+    background:rgba(255,237,213,0.72);
     border-radius:4px; cursor:move; resize:both; overflow:hidden; z-index:10;
   }
-  .click-wrap:focus-within { border-color:rgba(123,0,184,0.9); box-shadow:0 0 0 2px rgba(123,0,184,0.22); z-index:20; }
+  .click-wrap:focus-within { border-color:rgba(255,95,26,0.9); box-shadow:0 0 0 2px rgba(255,95,26,0.22); z-index:20; }
   .click-wrap input {
     display:block; width:100%; height:100%; border:none; background:transparent;
     font-family:"Malgun Gothic","맑은 고딕",sans-serif;
-    font-size:13px; font-weight:700; color:#16283f;
+    font-size:13px; font-weight:700; color:#1a1a1a;
     padding:2px 4px; outline:none; cursor:text;
   }
 
-  /* 체크마크 */
   .checkmark {
     position:absolute; transform:translate(-50%,-50%);
     font-size:1.6%; font-weight:900; color:#d0021b;
     pointer-events:none; line-height:1;
   }
 
-  /* 드래그 텍스트박스 */
   .textbox {
     position:absolute;
     border:1px dashed rgba(0,120,255,0.7); background:rgba(255,255,200,0.55);
@@ -104,9 +95,8 @@
     header { display:none; }
     body { background:#fff; padding:0; }
     .cust-bar { display:none !important; }
-    .page-label { display:none; }
-    .doc-wrap { box-shadow:none; max-width:100%; page-break-after:always; }
-    .overlay-input { color:#000;   font-size: 11pt;
+    .doc-wrap { box-shadow:none; margin:0; max-width:100%; }
+    .overlay-input { color:#000; border-bottom:none; background:transparent;   font-size: 11pt;
       font-weight: 700;
     }
     .click-wrap { border:none; background:transparent; resize:none; overflow:visible; cursor:default; }
@@ -119,57 +109,35 @@
 <body>
 
 <header>
-  <a class="back" href="hub.html">← 허브로</a>
-  <h1>LG 서비스 변경 신청서</h1>
+  <a class="back" href="../hub.html">← 허브로</a>
+  <h1>KT 재약정 신청서</h1>
   <button class="hdr-btn" id="check-btn">✓ 체크</button>
   <button class="hdr-btn" id="input-btn">✏️ 입력</button>
   <button class="hdr-btn" id="text-btn">T 텍스트</button>
   <button class="hdr-btn" id="undo-btn">↩ 되돌리기</button>
-  <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="1페이지 이미지 교체">🔄 1P 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this,'img1','')"></label> <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="2페이지 이미지 교체">🔄 2P 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this,'img2','_p2')"></label> <button class="hdr-btn" id="img-reset-btn" onclick="resetFormImage()" style="display:none;" title="원본 이미지로 복원">↺ 복원</button> <button class="hdr-btn btn-print" id="print-btn">인쇄 / PDF저장</button>
+  <label class="hdr-btn" style="cursor:pointer;display:inline-flex;align-items:center;" title="새 서류 이미지로 교체">🔄 이미지 교체<input type="file" accept="image/*" style="display:none;" onchange="replaceFormImage(this)"></label> <button class="hdr-btn" id="img-reset-btn" onclick="resetFormImage()" style="display:none;" title="원본 이미지로 복원">↺ 복원</button> <button class="hdr-btn btn-print" id="print-btn">인쇄 / PDF저장</button>
 </header>
 
 <div class="cust-bar" id="cust-bar">
   <span class="cb-title">📋 고객 정보</span>
 </div>
 
-<!-- ========== 1/2 페이지 ========== -->
-<div class="page-label">■ 1 / 2 페이지</div>
-<div class="doc-wrap" id="wrap1">
-  <img src="lg_서비스변경신청서_p1.jpg" alt="LG 서비스 변경 신청서 1/2" id="img1">
+<div class="doc-wrap" id="doc-wrap">
+  <img src="kt무선재약정신청서.jpg" alt="KT 재약정 신청서" id="doc-img">
 
-  <input class="overlay-input" id="f-name"  style="left:19.50%; top:14.04%; width:22.19%;">
-  <input class="overlay-input" id="f-birth" style="left:51.38%; top:14.14%; width:19.17%;">
-  <input class="overlay-input" id="f-phone" style="left:77.82%; top:14.06%; width:18.54%;">
-</div>
-
-<!-- ========== 2/2 페이지 ========== -->
-<div class="page-label">■ 2 / 2 페이지</div>
-<div class="doc-wrap" id="wrap2">
-  <img src="lg_서비스변경신청서_p2.jpg" alt="LG 서비스 변경 신청서 2/2" id="img2">
-
-  <input class="overlay-input" id="f-city"       placeholder="시/도"     style="left:4%;  top:21%;   width:8%;">
-  <input class="overlay-input" id="f-district"   placeholder="구/군"     style="left:4%;  top:24%;   width:8%;">
-  <input class="overlay-input" id="f-town"       placeholder="동/읍/면"  style="left:4%;  top:27%;   width:8%;">
-  <input class="overlay-input" id="f-rel"        placeholder="관계"      style="left:4%;  top:68%;   width:8%;">
-  <input class="overlay-input" id="f-rep-birth"  placeholder="생년월일"  style="left:19%; top:68%;   width:15%;">
-  <input class="overlay-input" id="f-rep-phone"  placeholder="휴대폰"    style="left:40%; top:68%;   width:20%;">
-  <input class="overlay-input" id="f-rep-name"   placeholder="성명"      style="left:69%; top:68%;   width:14%;">
-  <input class="overlay-input" id="f-rep-sign"   placeholder="서명/인"   style="left:87%; top:68%;   width:9%;">
-  <input class="overlay-input" id="f-year"       placeholder="년"        style="left:7%;  top:88.5%; width:5%;">
-  <input class="overlay-input" id="f-month"      placeholder="월"        style="left:17%; top:88.5%; width:3%;">
-  <input class="overlay-input" id="f-day"        placeholder="일"        style="left:24%; top:88.5%; width:3%;">
-  <input class="overlay-input" id="f-sign"       placeholder="서명/인"   style="left:72%; top:88.5%; width:21%;">
-  <input class="overlay-input" id="f-store"      placeholder="매장명"    style="left:8%;  top:93.5%; width:22%;">
-  <input class="overlay-input" id="f-store-phone" placeholder="매장 연락처" style="left:37%; top:93.5%; width:26%;">
-  <input class="overlay-input" id="f-staff"      placeholder="직원 이름" style="left:76%; top:93.5%; width:16%;">
+  <input class="overlay-input" id="f-name"  style="left:24.29%; top:14.43%; width:16.67%;">
+  <input class="overlay-input" id="f-birth" style="left:49.60%; top:14.43%; width:13.02%;">
+  <input class="overlay-input" id="f-phone" style="left:77.73%; top:14.50%; width:13.02%;">
+  <input class="overlay-input" id="f-period" style="left:53.66%; top:24.08%; width:12.92%;">
 </div>
 
 <script>
-// 오늘 날짜
-const today = new Date();
-document.getElementById('f-year').value  = today.getFullYear();
-document.getElementById('f-month').value = today.getMonth() + 1;
-document.getElementById('f-day').value   = today.getDate();
+const wrap     = document.getElementById('doc-wrap');
+const img      = document.getElementById('doc-img');
+const checkBtn = document.getElementById('check-btn');
+const inputBtn = document.getElementById('input-btn');
+const textBtn  = document.getElementById('text-btn');
+const undoBtn  = document.getElementById('undo-btn');
 
 // 발급현황 자동 입력
 const _issuanceId = new URLSearchParams(window.location.search).get('id');
@@ -178,13 +146,6 @@ if (_issuanceId) {
     const _lst = JSON.parse(localStorage.getItem('card_issuance_list') || '[]');
     const _c = _lst.find(e => e.id === _issuanceId);
     if (_c) {
-      const n = document.getElementById('f-name');
-      const p = document.getElementById('f-phone');
-      const b = document.getElementById('f-birth');
-      if (n && _c.고객명)   n.value = _c.고객명;
-      if (p && _c.전화번호) p.value = _c.전화번호;
-      if (b && _c.주민번호) b.value = _c.주민번호;
-
       const bar = document.getElementById('cust-bar');
       if (bar) {
         const items = [
@@ -201,7 +162,7 @@ if (_issuanceId) {
           const sp = document.createElement('span');
           sp.className = 'cb-item';
           const safeVal = i.val.replace(/'/g, "\\'");
-          sp.innerHTML = `<span class="cb-label">${i.label}:</span><span class="cb-val">${i.val}</span><button class="cb-copy" onclick="navigator.clipboard.writeText('${safeVal}');this.textContent='✓';setTimeout(()=>this.textContent='복사',1000)">복사</button>`;
+          sp.innerHTML = `<span class="cb-label">${i.label}:</span><span class="cb-val"> ${i.val}</span><button class="cb-copy" onclick="navigator.clipboard.writeText('${safeVal}');this.textContent='✓';setTimeout(()=>this.textContent='복사',1000)">복사</button>`;
           bar.appendChild(sp);
         });
         bar.classList.add('show');
@@ -226,12 +187,7 @@ document.getElementById('print-btn').addEventListener('click', () => {
   window.print();
 });
 
-// ── 체크 / 입력 / 텍스트 모드 ──
-const checkBtn = document.getElementById('check-btn');
-const inputBtn = document.getElementById('input-btn');
-const textBtn  = document.getElementById('text-btn');
-const undoBtn  = document.getElementById('undo-btn');
-
+// ── 모드 ──
 let checkOn = false, inputOn = false, textOn = false;
 let checks = [], clickFields = [], textBoxes = [];
 let dragStart = null, selRect = null;
@@ -245,10 +201,8 @@ function setMode(mode) {
   checkBtn.textContent = checkOn ? '✓ 체크 끄기' : '✓ 체크';
   inputBtn.textContent = inputOn ? '✏️ 입력 끄기' : '✏️ 입력';
   textBtn.textContent  = textOn  ? 'T 끄기'       : 'T 텍스트';
-  document.querySelectorAll('.doc-wrap').forEach(w => {
-    w.style.cursor = (checkOn || inputOn || textOn) ? 'crosshair' : '';
-    w.style.userSelect = textOn ? 'none' : '';
-  });
+  wrap.style.cursor    = (checkOn || inputOn || textOn) ? 'crosshair' : '';
+  wrap.style.userSelect = textOn ? 'none' : '';
 }
 checkBtn.addEventListener('click', () => setMode(checkOn ? '' : 'check'));
 inputBtn.addEventListener('click', () => setMode(inputOn ? '' : 'input'));
@@ -260,23 +214,18 @@ function renderChecks() {
     const el = document.createElement('div');
     el.className = 'checkmark';
     el.style.left = c.x + '%'; el.style.top = c.y + '%';
-    el.textContent = '✓';
-    document.getElementById(c.wrap).appendChild(el);
+    el.textContent = '✓'; wrap.appendChild(el);
   });
 }
 
-function getImgRect(wrapEl) {
-  return wrapEl.querySelector('img').getBoundingClientRect();
-}
-
-function createClickField(wrapEl, x, y) {
+function createClickField(x, y) {
   const wrapper = document.createElement('div');
   wrapper.className = 'click-wrap';
   wrapper.style.left = x + '%'; wrapper.style.top = y + '%';
   wrapper.style.width = '18%'; wrapper.style.height = '28px';
   wrapper.style.transform = 'translate(-50%,-50%)';
   const inp = document.createElement('input'); inp.type = 'text';
-  wrapper.appendChild(inp); wrapEl.appendChild(wrapper);
+  wrapper.appendChild(inp); wrap.appendChild(wrapper);
 
   let xformed = false;
   wrapper.addEventListener('mousedown', e => {
@@ -285,18 +234,16 @@ function createClickField(wrapEl, x, y) {
     if (e.clientX > r.right - 20 && e.clientY > r.bottom - 20) return;
     e.preventDefault(); e.stopPropagation();
     if (!xformed) {
-      const ir = getImgRect(wrapEl);
+      const ir = img.getBoundingClientRect();
       wrapper.style.left = ((r.left - ir.left) / ir.width  * 100).toFixed(2) + '%';
-      wrapper.style.top  = ((r.top  - ir.top)  / wrapEl.querySelector('img').offsetHeight * 100).toFixed(2) + '%';
+      wrapper.style.top  = ((r.top  - ir.top)  / img.offsetHeight * 100).toFixed(2) + '%';
       wrapper.style.transform = ''; xformed = true;
     }
     const sx = e.clientX, sy = e.clientY;
     const sl = parseFloat(wrapper.style.left), st = parseFloat(wrapper.style.top);
     const mv = ev => {
-      const iw = wrapEl.querySelector('img').offsetWidth;
-      const ih = wrapEl.querySelector('img').offsetHeight;
-      wrapper.style.left = (sl + (ev.clientX - sx) / iw * 100).toFixed(2) + '%';
-      wrapper.style.top  = (st + (ev.clientY - sy) / ih * 100).toFixed(2) + '%';
+      wrapper.style.left = (sl + (ev.clientX - sx) / img.offsetWidth  * 100).toFixed(2) + '%';
+      wrapper.style.top  = (st + (ev.clientY - sy) / img.offsetHeight * 100).toFixed(2) + '%';
     };
     const up = () => { window.removeEventListener('mousemove', mv); window.removeEventListener('mouseup', up); };
     window.addEventListener('mousemove', mv); window.addEventListener('mouseup', up);
@@ -309,50 +256,41 @@ function createClickField(wrapEl, x, y) {
   clickFields.push(wrapper); undoStack.push({type:'field', el:wrapper}); inp.focus();
 }
 
-document.querySelectorAll('.doc-wrap').forEach(wrapEl => {
-  wrapEl.addEventListener('click', e => {
-    if (e.target.closest('.click-wrap') || e.target.classList.contains('checkmark') || e.target.classList.contains('textbox')) return;
-    const iRect = getImgRect(wrapEl);
-    const x = Math.round(((e.clientX - iRect.left) / iRect.width)  * 10000) / 100;
-    const y = Math.round(((e.clientY - iRect.top)  / iRect.height) * 10000) / 100;
-    if (checkOn) {
-      checks.push({x, y, wrap: wrapEl.id}); renderChecks();
-      undoStack.push({type:'check'});
-    } else if (inputOn) {
-      createClickField(wrapEl, x, y);
-    }
-  });
-
-  wrapEl.addEventListener('mousedown', e => {
-    if (!textOn || e.target.closest('.click-wrap') || e.target.classList.contains('textbox')) return;
-    e.preventDefault();
-    const r = wrapEl.getBoundingClientRect();
-    dragStart = {x: e.clientX - r.left, y: e.clientY - r.top, wrap: wrapEl};
-    selRect = document.createElement('div'); selRect.className = 'sel-rect';
-    selRect.style.left = dragStart.x + 'px'; selRect.style.top = dragStart.y + 'px';
-    wrapEl.appendChild(selRect);
-  });
+wrap.addEventListener('click', e => {
+  if (e.target.closest('.click-wrap') || e.target.classList.contains('checkmark') || e.target.classList.contains('textbox')) return;
+  const rect = img.getBoundingClientRect();
+  const x = Math.round(((e.clientX - rect.left) / rect.width)  * 10000) / 100;
+  const y = Math.round(((e.clientY - rect.top)  / rect.height) * 10000) / 100;
+  if (checkOn) { checks.push({x, y}); renderChecks(); undoStack.push({type:'check'}); }
+  else if (inputOn) { createClickField(x, y); }
 });
 
+wrap.addEventListener('mousedown', e => {
+  if (!textOn || e.target.closest('.click-wrap') || e.target.classList.contains('textbox')) return;
+  e.preventDefault();
+  const r = wrap.getBoundingClientRect();
+  dragStart = {x: e.clientX - r.left, y: e.clientY - r.top};
+  selRect = document.createElement('div'); selRect.className = 'sel-rect';
+  selRect.style.left = dragStart.x + 'px'; selRect.style.top = dragStart.y + 'px';
+  wrap.appendChild(selRect);
+});
 window.addEventListener('mousemove', e => {
   if (!textOn || !dragStart) return;
-  const r = dragStart.wrap.getBoundingClientRect();
+  const r = wrap.getBoundingClientRect();
   const cx = e.clientX - r.left, cy = e.clientY - r.top;
   const x = Math.min(dragStart.x, cx), y = Math.min(dragStart.y, cy);
   selRect.style.left = x + 'px'; selRect.style.top = y + 'px';
   selRect.style.width = Math.abs(cx - dragStart.x) + 'px'; selRect.style.height = Math.abs(cy - dragStart.y) + 'px';
 });
-
 window.addEventListener('mouseup', e => {
   if (!textOn || !dragStart) return;
-  const wrapEl = dragStart.wrap;
-  const r = wrapEl.getBoundingClientRect();
+  const r = wrap.getBoundingClientRect();
   const cx = e.clientX - r.left, cy = e.clientY - r.top;
   const x = Math.min(dragStart.x, cx), y = Math.min(dragStart.y, cy);
   const w = Math.abs(cx - dragStart.x), h = Math.abs(cy - dragStart.y);
   selRect.remove(); selRect = null; dragStart = null;
   if (w < 10 || h < 6) return;
-  const iw = wrapEl.offsetWidth, ih = wrapEl.querySelector('img').offsetHeight;
+  const iw = wrap.offsetWidth, ih = img.offsetHeight;
   const box = document.createElement('div');
   box.className = 'textbox'; box.contentEditable = 'true';
   box.style.left = (x / iw * 100) + '%'; box.style.top = (y / ih * 100) + '%';
@@ -362,7 +300,7 @@ window.addEventListener('mouseup', e => {
       ev.preventDefault(); box.remove(); textBoxes = textBoxes.filter(b => b !== box);
     }
   });
-  wrapEl.appendChild(box); textBoxes.push(box); box.focus();
+  wrap.appendChild(box); textBoxes.push(box); box.focus();
   undoStack.push({type:'textbox', el:box});
 });
 
