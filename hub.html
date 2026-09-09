@@ -1007,6 +1007,14 @@
             <input type="text" class="pr-tag-input" id="pr-color-input" placeholder="+ 색상 추가">
           </div>
         </div>
+        <div class="pr-setup-row">
+          <span class="pr-setup-label">예약기간</span>
+          <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap;">
+            <input type="date" id="pr-period-start" style="padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);">
+            <span style="color:var(--ink-soft);font-size:13px;">~</span>
+            <input type="date" id="pr-period-end" style="padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);">
+          </div>
+        </div>
         <div style="display:flex;justify-content:flex-end;">
           <button class="pr-save-btn" onclick="prSaveCampaign()">💾 설정 저장</button>
         </div>
@@ -2577,9 +2585,11 @@ function setupFirebaseSync() {
     const d = snap.val();
     if (d) {
       prCampaign = {
-        name:   d.name   || '',
-        models: d.models ? Object.values(d.models) : [],
-        colors: d.colors ? Object.values(d.colors) : [],
+        name:        d.name        || '',
+        models:      d.models ? Object.values(d.models) : [],
+        colors:      d.colors ? Object.values(d.colors) : [],
+        periodStart: d.periodStart || '',
+        periodEnd:   d.periodEnd   || '',
       };
       prRenderSetup();
     }
@@ -4060,7 +4070,7 @@ var prList = [];
 var prFilter = '전체';
 var prSearch = '';
 var prEditId = null;
-var prCampaign = { name: '', models: [], colors: [] };
+var prCampaign = { name: '', models: [], colors: [], periodStart: '', periodEnd: '' };
 
 function prCampaignSave() { db.ref(HUB + '/campaign').set(prCampaign); }
 function prSave() { /* Firebase 실시간 동기화로 대체 */ }
@@ -4068,6 +4078,8 @@ function prSave() { /* Firebase 실시간 동기화로 대체 */ }
 /* 설정 렌더 */
 function prRenderSetup() {
   document.getElementById('pr-campaign-name').value = prCampaign.name || '';
+  document.getElementById('pr-period-start').value  = prCampaign.periodStart || '';
+  document.getElementById('pr-period-end').value    = prCampaign.periodEnd   || '';
   prRenderModelTags();
   prRenderColorTags();
 }
@@ -4113,7 +4125,9 @@ function prRemoveModel(i) { prCampaign.models.splice(i, 1); prRenderModelTags();
 function prRemoveColor(i) { prCampaign.colors.splice(i, 1); prRenderColorTags(); }
 
 function prSaveCampaign() {
-  prCampaign.name = document.getElementById('pr-campaign-name').value.trim();
+  prCampaign.name        = document.getElementById('pr-campaign-name').value.trim();
+  prCampaign.periodStart = document.getElementById('pr-period-start').value || '';
+  prCampaign.periodEnd   = document.getElementById('pr-period-end').value   || '';
   const mv = document.getElementById('pr-model-input').value.trim();
   if (mv) { prCampaign.models.push(mv); document.getElementById('pr-model-input').value = ''; prRenderModelTags(); }
   const cv = document.getElementById('pr-color-input').value.trim();
