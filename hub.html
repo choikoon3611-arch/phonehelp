@@ -615,6 +615,20 @@
     border:none; background:none; color:#ef4444; cursor:pointer;
     font-size:16px; padding:0 3px; line-height:1; flex-shrink:0;
   }
+  /* ===== 문자발송 ===== */
+  .smslog-carrier { padding:4px 12px; border:1.5px solid var(--line); border-radius:16px; background:var(--panel); color:var(--ink-soft); font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; transition:.1s; }
+  .smslog-carrier.on { border-color:var(--sk); background:var(--sk); color:#fff; }
+  .smslog-cat { padding:4px 11px; border:1.5px solid var(--line); border-radius:16px; background:var(--panel); color:var(--ink-soft); font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; transition:.1s; }
+  .smslog-cat.on { border-color:#6366f1; background:#6366f1; color:#fff; }
+  .smslog-plan { padding:4px 10px; border:1.5px solid var(--line); border-radius:16px; background:var(--panel); color:var(--ink); font-size:11px; font-weight:600; cursor:pointer; font-family:inherit; transition:.1s; white-space:nowrap; }
+  .smslog-plan:hover { border-color:#6366f1; color:#6366f1; }
+  .smslog-plan.on { border-color:var(--sk); background:var(--sk); color:#fff; }
+  .smslog-type { padding:5px 13px; border:1.5px solid var(--line); border-radius:20px; background:var(--panel); color:var(--ink-soft); font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; transition:.1s; }
+  .smslog-type.on { border-color:#0d9488; background:#0d9488; color:#fff; }
+  .smslog-filter { padding:4px 12px; border:1.5px solid var(--line); border-radius:16px; background:var(--panel); color:var(--ink-soft); font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; transition:.1s; }
+  .smslog-filter.on { border-color:#e65100; background:#e65100; color:#fff; }
+  .smslog-item { border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--bg); margin-bottom:8px; }
+  .smslog-item.done { opacity:.65; }
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -799,6 +813,7 @@
     <div class="consult-sub-tabs">
       <button class="csub-btn active" data-csub="csub-consult">📋 상담업무</button>
       <button class="csub-btn" data-csub="csub-sms">💬 문자업무공유</button>
+      <button class="csub-btn" data-csub="csub-activation">📱 개통확인</button>
       <button class="csub-btn" data-csub="csub-calendar">📅 달력</button>
     </div>
 
@@ -858,6 +873,114 @@
       </div>
     </div>
     </div><!-- /csub-consult -->
+
+    <!-- ── 개통확인 ── -->
+    <div class="csub-panel" id="csub-activation">
+
+      <!-- 텔레그램 Topic 설정 -->
+      <div style="background:var(--panel);border:1px solid #ddd6fe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:11px;font-weight:800;color:#7c3aed;">🔔 개통확인 Topic ID</span>
+        <input id="tg-activation-topic" placeholder="텔레그램 주제 ID"
+          style="width:140px;padding:6px 10px;border:1.5px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;"
+          onchange="actSaveTopic()">
+        <span id="act-alarm-status" style="font-size:11px;color:#dc2626;font-weight:700;"></span>
+      </div>
+
+      <!-- 개통 입력 폼 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:12px;">📱 개통 정보 입력</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">거래처</label>
+            <select id="act-dealer"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--panel);color:var(--ink);box-sizing:border-box;">
+              <option value="">선택</option>
+              <option value="블루">블루</option>
+              <option value="이도">이도</option>
+              <option value="텔나라">텔나라</option>
+              <option value="에이스">에이스</option>
+            </select></div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">고객명</label>
+            <input id="act-customer" type="text" placeholder="홍길동"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">번호</label>
+            <input id="act-phone" type="tel" placeholder="010-0000-0000"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">요금제</label>
+            <input id="act-plan" type="text" placeholder="수기 작성"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">부가서비스</label>
+            <input id="act-addon" type="text" placeholder="수기 작성 (없으면 없음)"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">할부원금</label>
+            <input id="act-principal" type="text" placeholder="예: 800,000"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">지원금 유형</label>
+            <div style="display:flex;gap:5px;margin-top:5px;">
+              <button id="act-disc-pub" onclick="actDisc('공시지원금')"
+                style="flex:1;padding:6px 4px;border:1.5px solid #6366f1;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">공시지원금</button>
+              <button id="act-disc-sel" onclick="actDisc('선택약정')"
+                style="flex:1;padding:6px 4px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">선택약정</button>
+            </div>
+          </div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">추가지원금</label>
+            <input id="act-extra" type="text" placeholder="예: 50,000"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">할부개월수</label>
+            <select id="act-installment"
+              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--panel);color:var(--ink);box-sizing:border-box;">
+              <option value="24">24개월</option>
+              <option value="30">30개월</option>
+              <option value="36">36개월</option>
+              <option value="48">48개월</option>
+            </select>
+          </div>
+
+          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">약정기간</label>
+            <div style="display:flex;gap:5px;margin-top:5px;">
+              <button id="act-contract-12" onclick="actContract('12')"
+                style="flex:1;padding:6px 4px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">12개월</button>
+              <button id="act-contract-24" onclick="actContract('24')"
+                style="flex:1;padding:6px 4px;border:1.5px solid #6366f1;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">24개월</button>
+            </div>
+          </div>
+
+          <div style="grid-column:1/-1;"><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">복지할인</label>
+            <div style="display:flex;gap:5px;margin-top:5px;">
+              <button id="act-welfare-n" onclick="actWelfare(false)"
+                style="flex:1;padding:6px;border:1.5px solid #6366f1;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">없음</button>
+              <button id="act-welfare-y" onclick="actWelfare(true)"
+                style="flex:1;padding:6px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">있음</button>
+            </div>
+          </div>
+
+        </div>
+        <button onclick="actSubmit()"
+          style="width:100%;margin-top:14px;padding:11px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">
+          📱 개통 알림 전송
+        </button>
+      </div>
+
+      <!-- 개통 목록 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span style="font-weight:800;font-size:14px;flex:1;">📋 개통 내역</span>
+          <button class="smslog-filter on" id="act-filter-all"     onclick="actFilter('all',this)">전체</button>
+          <button class="smslog-filter"    id="act-filter-pending" onclick="actFilter('pending',this)">⏳ 미확인</button>
+          <button class="smslog-filter"    id="act-filter-done"    onclick="actFilter('done',this)">✅ 완료</button>
+        </div>
+        <div id="act-list"><div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">내역이 없습니다.</div></div>
+      </div>
+
+    </div><!-- /csub-activation -->
 
     <!-- ── 달력 ── -->
     <div class="csub-panel" id="csub-calendar">
@@ -1060,21 +1183,94 @@
     </div>
   </div>
 
-  <!-- 문자 생성기 -->
+  <!-- 💬 문자발송 및 처리내역 -->
   <div class="tab-panel" id="panel-sms">
-    <div class="section-head">
-      <h2>💬 문자 생성기</h2>
-      <p>서류를 스캔해서 고객명·요금제를 자동 인식하고 문자를 완성합니다</p>
+    <div style="max-width:960px;margin:0 auto;">
+      <div class="section-head"><h2>💬 문자발송 및 처리내역</h2><p>요금제 클릭 → 문자 복사 → 발송완료 기록</p></div>
+
+      <!-- 작성 영역 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;">
+
+        <!-- 통신사 + 고객명 -->
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">통신사</span>
+          <div style="display:flex;gap:5px;">
+            <button class="smslog-carrier on" data-c="SK" onclick="smslogCarrier('SK',this)">SK</button>
+            <button class="smslog-carrier" data-c="KT" onclick="smslogCarrier('KT',this)">KT</button>
+            <button class="smslog-carrier" data-c="LG" onclick="smslogCarrier('LG',this)">LG</button>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-left:8px;">고객명</span>
+          <input id="smslog-name" type="text" placeholder="홍길동"
+            style="width:110px;height:30px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+            oninput="smslogPreview()">
+        </div>
+
+        <!-- 문자 유형 -->
+        <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">문자유형</span>
+          <button class="smslog-type on" id="smslog-tpl-plan" onclick="smslogTpl('plan')">요금제 변경</button>
+          <button class="smslog-type" id="smslog-tpl-both" onclick="smslogTpl('plan_addon')">요금제+부가서비스</button>
+          <button class="smslog-type" id="smslog-tpl-addon" onclick="smslogTpl('addon')">부가서비스만</button>
+        </div>
+
+        <!-- 유지기간 선택 (요금제 포함 유형) -->
+        <div id="smslog-retention-row" style="display:flex;align-items:center;gap:5px;margin-bottom:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">유지기간</span>
+          <button id="smslog-ret-m3" onclick="smslogRetention('M3')"
+            style="padding:5px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">M+3개월</button>
+          <button id="smslog-ret-d183" onclick="smslogRetention('D183')"
+            style="padding:5px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">D+183일</button>
+          <span id="smslog-plan-date" style="font-size:12px;font-weight:700;color:#0d9488;margin-left:2px;"></span>
+        </div>
+
+        <!-- 카테고리 탭 -->
+        <div id="smslog-cats" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;"></div>
+
+        <!-- 요금제 목록 -->
+        <div id="smslog-plans" style="margin-bottom:10px;">
+          <span style="color:var(--ink-soft);font-size:12px;padding:4px;">위에서 카테고리를 선택하세요</span>
+        </div>
+
+        <!-- 부가서비스 입력 -->
+        <div id="smslog-addon-row" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px;">
+          <div id="smslog-addon-btns" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input id="smslog-addon" type="text" placeholder="직접 입력"
+              style="flex:1;height:30px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+              oninput="smslogAddonInput()">
+            <span id="smslog-addon-date" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;"></span>
+          </div>
+        </div>
+
+        <!-- 미리보기 -->
+        <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);">
+          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:5px;">선택된 요금제: <strong id="smslog-sel-plan" style="color:var(--sk);">-</strong></div>
+          <div id="smslog-preview" style="font-size:14px;font-weight:600;color:var(--ink);line-height:1.8;word-break:keep-all;margin-bottom:5px;">이쁜핸드폰집입니다^^ -고객님 114연결 또는 매장내방하셔서 요금제(-) 변경 부탁드립니다</div>
+          <div id="smslog-date-preview" style="font-size:12px;font-weight:700;color:#0d9488;line-height:1.8;"></div>
+        </div>
+
+        <!-- 발송유형 + 버튼 -->
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">발송</span>
+          <button class="smslog-type on" id="smslog-type-cust" onclick="smslogType('customer')">📤 고객에게</button>
+          <button class="smslog-type" id="smslog-type-self" onclick="smslogType('self')">📥 나에게</button>
+          <div style="flex:1;min-width:10px;"></div>
+          <button onclick="smslogCopy()" style="padding:8px 16px;background:#0d9488;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;">📋 복사</button>
+          <button onclick="smslogRecord()" style="padding:8px 16px;background:var(--sk);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;">✅ 발송완료 기록</button>
+        </div>
+      </div>
+
+      <!-- 내역 -->
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+          <span style="font-weight:800;font-size:14px;flex:1;">📋 발송 / 처리 내역</span>
+          <button class="smslog-filter on" data-f="all" onclick="smslogFilter('all',this)">전체</button>
+          <button class="smslog-filter" data-f="pending" onclick="smslogFilter('pending',this)">⏳ 처리대기</button>
+          <button class="smslog-filter" data-f="done" onclick="smslogFilter('done',this)">✅ 완료</button>
+        </div>
+        <div id="smslog-list"><div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">내역이 없습니다.</div></div>
+      </div>
     </div>
-
-    <!-- 템플릿 목록 -->
-    <div id="sms-templates-wrap"></div>
-
-    <!-- 템플릿 추가 -->
-    <button onclick="smsAddTemplate()"
-      style="width:100%;padding:11px;border:2px dashed #6366f1;border-radius:12px;background:none;color:#6366f1;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;">
-      + 템플릿 추가
-    </button>
   </div>
 
   <!-- 즐겨찾기 -->
@@ -2614,12 +2810,29 @@ function setupFirebaseSync() {
     tgCfg.token        = d.token        || '';
     tgCfg.chatId       = d.chatId       || '';
     tgCfg.consultTopic = d.consultTopic || '';
-    tgCfg.smsTopic     = d.smsTopic     || '';
+    tgCfg.smsTopic        = d.smsTopic        || '';
+    tgCfg.activationTopic = d.activationTopic || '';
     uploadLoadSettings();
     const ct = document.getElementById('tg-consult-topic');
     if (ct) ct.value = tgCfg.consultTopic;
     const st = document.getElementById('tg-sms-topic');
     if (st) st.value = tgCfg.smsTopic;
+    const at = document.getElementById('tg-activation-topic');
+    if (at) at.value = tgCfg.activationTopic;
+  });
+  // 개통확인 내역
+  db.ref(HUB + '/activation').on('value', snap => {
+    const d = snap.val() || {};
+    actDataList = Object.entries(d).map(([id, v]) => ({ id, ...v }))
+      .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    actListRender();
+    if (actDataList.some(x => x.status !== 'done')) actStartAlarm();
+  });
+  // 문자발송 내역
+  db.ref(HUB + '/smsLog').on('value', snap => {
+    const d = snap.val() || {};
+    smslogList = Object.values(d).sort((a, b) => Number(a.id) - Number(b.id));
+    smslogListRender();
   });
 }
 
@@ -3591,8 +3804,479 @@ document.getElementById('card-search-input').addEventListener('input', function(
   cardRender();
 });
 
-/* ===== 문자 생성기 ===== */
-// httpSMS 설정 저장/로드 (localStorage — API Key는 Firebase에 올리지 않음)
+/* ===== 문자발송 및 처리내역 ===== */
+const SMS_PLANS = {
+  SK: {
+    '5G성인': [
+      '베스트 Max','베스트 Pro','베스트 109','베스트 99','베스트 89',
+      '라이트 79','라이트 69',
+      '라이트 59 75GB업','라이트 59 50GB업','라이트 59 30GB업','라이트 59 13GB업',
+      '라이트 59','라이트 55','라이트 49','라이트 45','라이트 39'
+    ],
+    '5G청년': [
+      '베스트 Max (청년)','베스트 Pro (청년)','베스트 109 (청년)','베스트 99 (청년)','베스트 89 (청년)',
+      '라이트 79 (청년)','라이트 69 (청년)',
+      '라이트 59 75GB업 (청년)','라이트 59 50GB업 (청년)','라이트 59 30GB업 (청년)','라이트 59 13GB업 (청년)',
+      '라이트 59 (청년)','라이트 55 (청년)','라이트 49 (청년)','라이트 45 (청년)','라이트 39 (청년)'
+    ],
+    '5G청소년': [
+      '베스트 Max (청소년)','베스트 Pro (청소년)','베스트 109 (청소년)','베스트 99 (청소년)','베스트 89 (청소년)',
+      '라이트 79 (청소년)','라이트 69 (청소년)',
+      '라이트 59 75GB업 (청소년)','라이트 59 50GB업 (청소년)','라이트 59 30GB업 (청소년)','라이트 59 13GB업 (청소년)',
+      '라이트 59 (청소년)','라이트 55 (청소년)','라이트 49 (청소년)','라이트 45 (청소년)','라이트 39 (청소년)'
+    ],
+    '5G어린이': [
+      'ZEM플랜 퍼펙트','ZEM플랜 베스트','ZEM플랜 스마트'
+    ],
+    '5G시니어': [
+      '라이트 45 (시니어)','라이트 39 (시니어)'
+    ],
+    'LTE표준': [], 'LTE키즈': [], 'LTE시니어': [], '5G복지': []
+  },
+  KT: {
+    '5G성인': [
+      '베이직100','베이직80',
+      '베이직110GB','베이직90GB','베이직70GB','베이직50GB','베이직30GB','베이직21GB','베이직14GB','베이직10GB','베이직7GB','베이직4GB','베이직1.4GB','베이직600MB',
+      '음성18.7','음성12.1',
+      '초이스130','초이스110','초이스90','초이스 더블'
+    ],
+    '5G청년(Y덤)': [
+      '베이직100','베이직80',
+      '베이직110GB','베이직90GB','베이직70GB','베이직50GB','베이직30GB','베이직21GB','베이직14GB','베이직10GB','베이직7GB','베이직4GB','베이직1.4GB',
+      '초이스130','초이스110','초이스90','초이스 더블'
+    ],
+    '5G청소년(스쿨덤)': [
+      '베이직100','베이직80',
+      '베이직110GB','베이직90GB','베이직70GB','베이직50GB','베이직30GB','베이직21GB','베이직14GB','베이직10GB','베이직7GB','베이직4GB','베이직1.4GB','베이직600MB',
+      '음성18.7',
+      '초이스130','초이스110','초이스90'
+    ],
+    '5G시니어(65+덤)': [
+      '베이직100','베이직80',
+      '베이직110GB','베이직90GB','베이직70GB','베이직50GB','베이직30GB','베이직21GB','베이직14GB','베이직10GB','베이직7GB','베이직4GB','베이직1.4GB','베이직600MB',
+      '음성18.7',
+      '초이스130','초이스110','초이스90','초이스 더블'
+    ],
+    '5G시니어(75+덤)': [
+      '베이직100','베이직80',
+      '베이직110GB','베이직90GB','베이직70GB','베이직50GB','베이직30GB','베이직21GB','베이직14GB','베이직10GB','베이직7GB','베이직4GB','베이직1.4GB','베이직600MB',
+      '음성18.7',
+      '초이스130','초이스110','초이스90','초이스 더블'
+    ],
+    '키즈': [
+      '키즈38','키즈28','키즈24','키즈20','키즈13'
+    ],
+    'LTE성인': [], 'LTE청년': [], 'LTE청소년': [], 'LTE시니어': []
+  },
+  LG: {
+    '5G성인': [
+      '플러스플랜130','플러스플랜115','플러스플랜105','플러스플랜95',
+      '데이터플랜MAX','데이터플랜150GB','데이터플랜125GB','데이터플랜95GB','데이터플랜80GB','데이터플랜50GB','데이터플랜31GB','데이터플랜24GB','데이터플랜14GB','데이터플랜9GB','데이터플랜5GB','데이터플랜1.5GB','데이터플랜750MB','데이터플랜300MB'
+    ],
+    '5G청년(유쓰)': [
+      '데이터플랜150GB(유쓰+60GB)','데이터플랜125GB(유쓰+60GB)','데이터플랜95GB(유쓰+40GB)','데이터플랜80GB(유쓰+30GB)','데이터플랜50GB(유쓰+20GB)','데이터플랜31GB(유쓰+10GB)','데이터플랜24GB(유쓰+60GB)','데이터플랜14GB(유쓰+12GB)','데이터플랜9GB(유쓰+6GB)','데이터플랜5GB(유쓰+4GB)','데이터플랜1.5GB(유쓰+0.5GB)'
+    ],
+    '5G청소년': [
+      '데이터플랜MAX(청소년)','데이터플랜150GB(키즈/청소년)','데이터플랜125GB(키즈/청소년)','데이터플랜95GB(키즈/청소년)','데이터플랜80GB(키즈/청소년)','데이터플랜50GB(키즈/청소년)','데이터플랜31GB(키즈/청소년)','데이터플랜24GB(키즈/청소년)',
+      '데이터플랜14GB(청소년+2GB)','데이터플랜9GB(청소년+2GB)','데이터플랜5GB(청소년+2GB)','데이터플랜1.5GB(청소년+1GB)','데이터플랜750MB(청소년+0.5GB)','데이터플랜300MB(청소년+0.7GB)'
+    ],
+    '5G어린이': [
+      '데이터플랜9GB(키즈+1GB)','데이터플랜5GB(키즈+1GB)','데이터플랜1.5GB(키즈+3.5GB)','데이터플랜750MB(키즈+2.5GB)','데이터플랜300MB(키즈+0.7GB)'
+    ],
+    '5G시니어': [
+      '데이터플랜9GB(시니어+3GB)','데이터플랜5GB(시니어+3GB)','데이터플랜1.5GB(시니어+1GB)','데이터플랜750MB(시니어+0.5GB)','데이터플랜300MB(시니어+0.7GB)'
+    ]
+  }
+};
+
+var smslogCarrierVal = 'SK';
+var smslogCatVal = '5G성인';
+var smslogPlanVal = '';
+var smslogTypeVal = 'customer';
+var smslogMsgType = 'plan';
+var smslogRetentionRule = '';
+var smslogAddonDateRule = '';
+var smslogList = [];
+var smslogFilterVal = 'all';
+
+function smslogCarrier(c, btn) {
+  smslogCarrierVal = c;
+  document.querySelectorAll('.smslog-carrier').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  smslogCatVal = Object.keys(SMS_PLANS[c] || {})[0] || '';
+  smslogPlanVal = '';
+  smslogAddonDateRule = '';
+  const addonEl = document.getElementById('smslog-addon');
+  if (addonEl) addonEl.value = '';
+  const addonDateEl = document.getElementById('smslog-addon-date');
+  if (addonDateEl) addonDateEl.textContent = '';
+  smslogOpenGroup = null;
+  smslogAddonBtnsRender();
+  smslogCatsRender();
+  smslogPlansRender();
+  smslogPreview();
+}
+
+function smslogCatsRender() {
+  const cats = Object.keys(SMS_PLANS[smslogCarrierVal] || {});
+  const wrap = document.getElementById('smslog-cats');
+  if (!wrap) return;
+  wrap.innerHTML = cats.map(cat =>
+    `<button class="smslog-cat${cat === smslogCatVal ? ' on' : ''}" onclick="smslogCat('${cat.replace(/'/g,"\\'")}',this)">${cat}</button>`
+  ).join('');
+}
+
+function smslogCat(cat, btn) {
+  smslogCatVal = cat;
+  smslogPlanVal = '';
+  smslogOpenGroup = null;
+  document.querySelectorAll('.smslog-cat').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  smslogPlansRender();
+  smslogPreview();
+}
+
+var smslogOpenGroup = null;
+
+function smslogGroupPlans(plans) {
+  const PREFIXES = [
+    // SK 5G
+    '베스트 Max','베스트 Pro','베스트 109','베스트 99','베스트 89','라이트','ZEM플랜',
+    // KT 5G
+    '초이스 더블','초이스130','초이스110','초이스90','베이직','키즈','음성',
+    // KT/LG LTE 데이터플랜
+    '데이터플랜',
+  ];
+  const CONTAINS = [
+    // LG 플러스플랜 — 구체적인 것 먼저
+    '플러스플랜130','플러스플랜115','플러스플랜105','플러스플랜95','플러스플랜',
+  ];
+  const groupMap = new Map();
+  plans.forEach(plan => {
+    let prefix = PREFIXES.find(p => plan.startsWith(p));
+    if (!prefix) prefix = CONTAINS.find(p => plan.includes(p));
+    prefix = prefix || '기타';
+    if (!groupMap.has(prefix)) groupMap.set(prefix, []);
+    const startsWithPrefix = plan.startsWith(prefix);
+    let opt = startsWithPrefix ? plan.slice(prefix.length).trim() : plan;
+    if (opt.startsWith('(') && opt.endsWith(')')) opt = opt.slice(1, -1).trim();
+    groupMap.get(prefix).push({ full: plan, label: opt || plan });
+  });
+  return [...groupMap.entries()].map(([name, items]) => ({ name, items }));
+}
+
+function smslogToggleGroup(name) {
+  smslogOpenGroup = smslogOpenGroup === name ? null : name;
+  smslogPlansRender();
+}
+
+function smslogPlansRender() {
+  const plans = (SMS_PLANS[smslogCarrierVal] || {})[smslogCatVal] || [];
+  const wrap = document.getElementById('smslog-plans');
+  if (!wrap) return;
+  if (!plans.length) {
+    wrap.innerHTML = '<span style="color:var(--ink-soft);font-size:12px;padding:4px;">해당 카테고리 요금제가 없습니다. (KT/LG는 추가 예정)</span>';
+    return;
+  }
+  const groups = smslogGroupPlans(plans);
+  wrap.innerHTML = groups.map(g => {
+    const isOpen = smslogOpenGroup === g.name;
+    const safeG = g.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:5px;">
+      <button onclick="smslogToggleGroup('${safeG}')"
+        style="width:100%;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;
+               background:${isOpen ? '#6366f1' : 'var(--panel)'};color:${isOpen ? '#fff' : 'var(--ink)'};
+               border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;">
+        <span>${g.name}</span>
+        <span style="font-size:11px;opacity:.7;">${isOpen ? '▲' : '▼'} ${g.items.length}개</span>
+      </button>
+      ${isOpen ? `<div style="padding:10px;display:flex;flex-wrap:wrap;gap:5px;background:var(--bg);">
+        ${g.items.map(item => `<button class="smslog-plan${item.full === smslogPlanVal ? ' on' : ''}" onclick="smslogSelectPlan(this)" data-full="${item.full.replace(/"/g,'&quot;')}">${item.label || item.full}</button>`).join('')}
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function smslogSelectPlan(btn) {
+  const p = btn.dataset.full || btn.textContent;
+  smslogPlanVal = p;
+  const el = document.getElementById('smslog-sel-plan');
+  if (el) el.textContent = p;
+  smslogPlansRender();
+  smslogPreview();
+}
+
+const ADDON_CONFIG = {
+  SK: [
+    { label: '우주패스',    rule: ''    },
+    { label: '마이스마트콜', rule: 'D30' },
+    { label: '휴대폰보험',  rule: 'M1'  },
+  ],
+  KT: [
+    { label: '필수팩',  rule: 'M3' },
+    { label: '캐치콜',  rule: 'M3' },
+    { label: '보험',    rule: 'M3' },
+  ],
+  LG: [],
+};
+
+function smslogAddonBtnsRender() {
+  const wrap = document.getElementById('smslog-addon-btns');
+  if (!wrap) return;
+  const list = ADDON_CONFIG[smslogCarrierVal] || [];
+  wrap.innerHTML = list.map(a =>
+    `<button onclick="smslogAddonQuick('${a.label}','${a.rule}')"
+      data-addon="${a.label}"
+      style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;"
+    >${a.label}</button>`
+  ).join('');
+}
+
+function smslogCalcDate(rule) {
+  const n = new Date();
+  if (rule === 'M3')   return new Date(n.getFullYear(), n.getMonth() + 3, 1);
+  if (rule === 'D183') return new Date(n.getTime() + 184 * 86400000);
+  if (rule === 'D30')  return new Date(n.getTime() + 30  * 86400000);
+  if (rule === 'M1')   return new Date(n.getFullYear(), n.getMonth() + 1, 1);
+  return null;
+}
+function smslogFmtDate(d) {
+  if (!d) return '';
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+
+function smslogAddonInput() {
+  smslogAddonDateRule = '';
+  const dateEl = document.getElementById('smslog-addon-date');
+  if (dateEl) dateEl.textContent = '';
+  document.querySelectorAll('#smslog-addon-btns button').forEach(b => {
+    b.style.background = 'var(--panel)'; b.style.color = 'var(--ink)'; b.style.borderColor = 'var(--line)';
+  });
+  smslogPreview();
+}
+
+function smslogAddonQuick(v, rule) {
+  smslogAddonDateRule = rule;
+  const el = document.getElementById('smslog-addon');
+  if (el) el.value = v;
+  document.querySelectorAll('#smslog-addon-btns button').forEach(b => {
+    const on = b.dataset.addon === v;
+    b.style.background   = on ? '#6366f1' : 'var(--panel)';
+    b.style.color        = on ? '#fff'    : 'var(--ink)';
+    b.style.borderColor  = on ? '#6366f1' : 'var(--line)';
+  });
+  const d = smslogCalcDate(rule);
+  const dateEl = document.getElementById('smslog-addon-date');
+  if (dateEl) dateEl.textContent = d ? `삭제가능: ${smslogFmtDate(d)}` : '';
+  smslogPreview();
+}
+
+function smslogTpl(t) {
+  smslogMsgType = t;
+  ['plan','plan_addon','addon'].forEach(k => {
+    const map = { plan:'smslog-tpl-plan', plan_addon:'smslog-tpl-both', addon:'smslog-tpl-addon' };
+    document.getElementById(map[k])?.classList.toggle('on', k === t);
+  });
+  const retRow  = document.getElementById('smslog-retention-row');
+  const addonRow= document.getElementById('smslog-addon-row');
+  const cats    = document.getElementById('smslog-cats');
+  const plans   = document.getElementById('smslog-plans');
+  if (retRow)   retRow.style.display   = t !== 'addon' ? 'flex'  : 'none';
+  if (addonRow) addonRow.style.display = t !== 'plan'  ? 'flex'  : 'none';
+  if (cats)     cats.style.display     = t !== 'addon' ? 'flex'  : 'none';
+  if (plans)    plans.style.display    = t !== 'addon' ? 'block' : 'none';
+  smslogPreview();
+}
+
+function smslogRetention(r) {
+  smslogRetentionRule = r;
+  const s = 'padding:5px 12px;border:1.5px solid;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+  const m3   = document.getElementById('smslog-ret-m3');
+  const d183 = document.getElementById('smslog-ret-d183');
+  if (m3)   m3.style.cssText   = s + (r==='M3'   ? 'background:#6366f1;color:#fff;border-color:#6366f1;' : 'background:var(--panel);color:var(--ink);border-color:var(--line);');
+  if (d183) d183.style.cssText = s + (r==='D183' ? 'background:#6366f1;color:#fff;border-color:#6366f1;' : 'background:var(--panel);color:var(--ink);border-color:var(--line);');
+  const d = smslogCalcDate(r);
+  const el = document.getElementById('smslog-plan-date');
+  if (el) el.textContent = d ? `→ ${smslogFmtDate(d)}` : '';
+  smslogPreview();
+}
+
+function smslogPreview() {
+  const name  = (document.getElementById('smslog-name')?.value.trim()) || '-';
+  const plan  = smslogPlanVal || '-';
+  const addon = (document.getElementById('smslog-addon')?.value.trim()) || '-';
+  const msgEl  = document.getElementById('smslog-preview');
+  const dateEl = document.getElementById('smslog-date-preview');
+  if (!msgEl) return;
+  let msg = '', dates = [];
+  if (smslogMsgType === 'plan_addon') {
+    msg = `이쁜핸드폰집입니다^^${name}고객님114고객센터연결또는매장내방하셔서요금제(${plan})변경및 부가서비스(${addon})삭제부탁드립니다`;
+    const pd = smslogCalcDate(smslogRetentionRule), ad = smslogCalcDate(smslogAddonDateRule);
+    if (pd) dates.push(`📅 요금제 변경가능일: ${smslogFmtDate(pd)}`);
+    if (ad) dates.push(`🗓 부가서비스 삭제가능일: ${smslogFmtDate(ad)}`);
+  } else if (smslogMsgType === 'addon') {
+    msg = `이쁜핸드폰집입니다^^${name}고객님114연결또는매장내방하셔서부가서비스(${addon})삭제부탁드립니다`;
+    const ad = smslogCalcDate(smslogAddonDateRule);
+    if (ad) dates.push(`🗓 삭제가능일: ${smslogFmtDate(ad)}`);
+  } else {
+    msg = `이쁜핸드폰집입니다^^ ${name}고객님 114연결 또는 매장내방하셔서 요금제(${plan}) 변경 부탁드립니다`;
+    const pd = smslogCalcDate(smslogRetentionRule);
+    if (pd) dates.push(`📅 변경가능일: ${smslogFmtDate(pd)}`);
+  }
+  msgEl.textContent = msg;
+  if (dateEl) dateEl.innerHTML = dates.map(d => `<span style="margin-right:12px;">${d}</span>`).join('');
+}
+
+function smslogType(t) {
+  smslogTypeVal = t;
+  document.getElementById('smslog-type-cust')?.classList.toggle('on', t === 'customer');
+  document.getElementById('smslog-type-self')?.classList.toggle('on', t === 'self');
+}
+
+function smslogCopy() {
+  const name  = (document.getElementById('smslog-name')?.value.trim()) || '';
+  const plan  = smslogPlanVal || '';
+  const addon = (document.getElementById('smslog-addon')?.value.trim()) || '';
+  if (!name) { alert('고객명을 입력하세요.'); return; }
+  let text;
+  if (smslogMsgType === 'addon') {
+    if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
+    text = `이쁜핸드폰집입니다^^${name}고객님114연결또는매장내방하셔서부가서비스(${addon})삭제부탁드립니다`;
+  } else if (smslogMsgType === 'plan_addon') {
+    if (!plan)  { alert('요금제를 선택하세요.'); return; }
+    if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
+    text = `이쁜핸드폰집입니다^^${name}고객님114고객센터연결또는매장내방하셔서요금제(${plan})변경및 부가서비스(${addon})삭제부탁드립니다`;
+  } else {
+    if (!plan) { alert('요금제를 선택하세요.'); return; }
+    text = `이쁜핸드폰집입니다^^ ${name}고객님 114연결 또는 매장내방하셔서 요금제(${plan}) 변경 부탁드립니다`;
+  }
+  const btn = document.querySelector('[onclick="smslogCopy()"]');
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) { btn.textContent = '✅ 복사됨!'; setTimeout(() => btn.textContent = '📋 복사', 1500); }
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    alert('복사되었습니다.');
+  });
+}
+
+function smslogRecord() {
+  const name  = (document.getElementById('smslog-name')?.value.trim()) || '';
+  const plan  = smslogPlanVal || '';
+  const addon = (document.getElementById('smslog-addon')?.value.trim()) || '';
+  if (!name) { alert('고객명을 입력하세요.'); return; }
+  let msg, planDate = '', addonDate = '';
+  if (smslogMsgType === 'addon') {
+    if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
+    msg = `이쁜핸드폰집입니다^^${name}고객님114연결또는매장내방하셔서부가서비스(${addon})삭제부탁드립니다`;
+    const ad = smslogCalcDate(smslogAddonDateRule);
+    if (ad) addonDate = smslogFmtDate(ad);
+  } else if (smslogMsgType === 'plan_addon') {
+    if (!plan)  { alert('요금제를 선택하세요.'); return; }
+    if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
+    msg = `이쁜핸드폰집입니다^^${name}고객님114고객센터연결또는매장내방하셔서요금제(${plan})변경및 부가서비스(${addon})삭제부탁드립니다`;
+    const pd = smslogCalcDate(smslogRetentionRule), ad = smslogCalcDate(smslogAddonDateRule);
+    if (pd) planDate  = smslogFmtDate(pd);
+    if (ad) addonDate = smslogFmtDate(ad);
+  } else {
+    if (!plan) { alert('요금제를 선택하세요.'); return; }
+    msg = `이쁜핸드폰집입니다^^ ${name}고객님 114연결 또는 매장내방하셔서 요금제(${plan}) 변경 부탁드립니다`;
+    const pd = smslogCalcDate(smslogRetentionRule);
+    if (pd) planDate = smslogFmtDate(pd);
+  }
+  const id = Date.now().toString();
+  const now = new Date().toLocaleString('ko-KR');
+  const record = {
+    id, name,
+    carrier: smslogCarrierVal,
+    cat: smslogCatVal,
+    plan: plan || '',
+    addon: addon || '',
+    planDate, addonDate,
+    msgType: smslogMsgType,
+    type: smslogTypeVal,
+    msg,
+    status: 'pending',
+    createdAt: id,
+    createdStr: now
+  };
+  db.ref(HUB + '/smsLog/' + id).set(record).then(() => {
+    const btn = document.querySelector('[onclick="smslogRecord()"]');
+    if (btn) { btn.textContent = '✅ 기록됨!'; setTimeout(() => btn.textContent = '✅ 발송완료 기록', 1500); }
+  });
+}
+
+function smslogDone(id) {
+  db.ref(HUB + '/smsLog/' + id).update({ status: 'done', doneStr: new Date().toLocaleString('ko-KR') });
+}
+
+function smslogDelete(id) {
+  if (!confirm('이 내역을 삭제할까요?')) return;
+  db.ref(HUB + '/smsLog/' + id).remove();
+}
+
+function smslogFilter(f, btn) {
+  smslogFilterVal = f;
+  document.querySelectorAll('.smslog-filter').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  smslogListRender();
+}
+
+function smslogCopyItem(id) {
+  const r = smslogList.find(x => x.id === id);
+  if (!r) return;
+  navigator.clipboard.writeText(r.msg || '').catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = r.msg || ''; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  });
+}
+
+function smslogListRender() {
+  const wrap = document.getElementById('smslog-list');
+  if (!wrap) return;
+  const all = [...smslogList].reverse();
+  const filtered = smslogFilterVal === 'all' ? all : all.filter(r => smslogFilterVal === 'pending' ? r.status !== 'done' : r.status === 'done');
+  if (!filtered.length) {
+    wrap.innerHTML = '<div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">내역이 없습니다.</div>';
+    return;
+  }
+  const typeLabel = t => t === 'self' ? '📥 나에게' : '📤 고객에게';
+  const statusBadge = s => s === 'done'
+    ? '<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">✅ 완료</span>'
+    : '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">⏳ 대기</span>';
+  wrap.innerHTML = filtered.map(r => `
+    <div class="smslog-item${r.status === 'done' ? ' done' : ''}">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">
+        <span style="font-weight:800;font-size:13px;">${r.name}고객님</span>
+        <span style="background:#e0e7ff;color:#3730a3;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">${r.carrier}${r.cat ? ' '+r.cat : ''}</span>
+        ${r.plan ? `<span style="background:#f1f5f9;color:#334155;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">${r.plan}</span>` : ''}
+        ${r.addon ? `<span style="background:#fef3c7;color:#92400e;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">${r.addon}</span>` : ''}
+        <span style="font-size:11px;color:var(--ink-soft);">${typeLabel(r.type)}</span>
+        ${statusBadge(r.status)}
+        <span style="flex:1;"></span>
+        <span style="font-size:11px;color:var(--ink-soft);">${r.createdStr || ''}</span>
+      </div>
+      ${(r.planDate||r.addonDate) ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        ${r.planDate  ? `<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">📅 요금제 변경 ${r.planDate}</span>` : ''}
+        ${r.addonDate ? `<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">🗓 부가서비스 삭제 ${r.addonDate}</span>` : ''}
+      </div>` : ''}
+      <div style="font-size:12px;color:var(--ink-soft);background:var(--panel);padding:6px 10px;border-radius:7px;margin-bottom:8px;line-height:1.6;">${r.msg || ''}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${r.status !== 'done'
+          ? `<button onclick="smslogDone('${r.id}')" style="padding:4px 12px;background:#0d9488;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">✅ 처리완료</button>`
+          : `<span style="font-size:11px;color:#065f46;align-self:center;">완료: ${r.doneStr || ''}</span>`}
+        <button onclick="smslogCopyItem('${r.id}')" style="padding:4px 12px;background:var(--line);color:var(--ink);border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">📋 복사</button>
+        <button onclick="smslogDelete('${r.id}')" style="padding:4px 10px;background:none;border:1.5px solid #fca5a5;color:#dc2626;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">삭제</button>
+      </div>
+    </div>`).join('');
+}
+
+// 초기 렌더
+smslogAddonBtnsRender();
+smslogCatsRender();
+smslogPlansRender();
+smslogPreview();
+
 async function smsTestKey() {
   const apiKey = localStorage.getItem('httpsms_apikey')||'';
   const el = document.getElementById('sms-key-status');
@@ -4318,7 +5002,7 @@ db.ref(HUB + '/uploadDealers').on('value', snap => {
 
 // 설정 저장
 // 텔레그램 설정 — Firebase 공유 저장
-var tgCfg = { token:'', chatId:'', consultTopic:'', smsTopic:'' };
+var tgCfg = { token:'', chatId:'', consultTopic:'', smsTopic:'', activationTopic:'' };
 
 function uploadTgSaveSettings() {
   const tok = document.getElementById('tg-token')?.value.trim();
@@ -4831,6 +5515,210 @@ function sendTelegramNotify(msg) {
     body: JSON.stringify(body)
   }).then(r=>r.json()).then(j=>{ if(!j.ok) console.error('[TG] 공유업무 알림 실패:', j.description); })
     .catch(e=>console.error('[TG] 공유업무 알림 오류:', e));
+}
+
+function sendTelegramActivation(msg) {
+  const token   = tgCfg.token;
+  const chatId  = tgCfg.chatId;
+  const topicId = tgCfg.activationTopic;
+  if (!token || !chatId) { console.warn('[TG] token/chatId 없음'); return; }
+  const body = { chat_id: chatId, text: msg, parse_mode: 'HTML' };
+  if (topicId) body.message_thread_id = parseInt(topicId);
+  fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).then(r=>r.json()).then(j=>{ if(!j.ok) console.error('[TG] 개통확인 알림 실패:', j.description); })
+    .catch(e=>console.error('[TG] 개통확인 알림 오류:', e));
+}
+
+// ── 개통확인 ──────────────────────────────────────
+var actDataList = [];
+var actFilterVal = 'all';
+var actDiscVal = '공시지원금';
+var actContractVal = '24';
+var actWelfareVal = false;
+var actAlarmTimer = null;
+
+function actSaveTopic() {
+  const v = (document.getElementById('tg-activation-topic')?.value || '').trim();
+  tgCfg.activationTopic = v;
+  if (db) db.ref(HUB + '/tgSettings').update({ activationTopic: v });
+}
+
+function actDisc(v) {
+  actDiscVal = v;
+  document.getElementById('act-disc-pub').style.background = v === '공시지원금' ? '#6366f1' : 'var(--panel)';
+  document.getElementById('act-disc-pub').style.color      = v === '공시지원금' ? '#fff'    : 'var(--ink)';
+  document.getElementById('act-disc-pub').style.borderColor= v === '공시지원금' ? '#6366f1' : 'var(--line)';
+  document.getElementById('act-disc-sel').style.background = v === '선택약정'   ? '#6366f1' : 'var(--panel)';
+  document.getElementById('act-disc-sel').style.color      = v === '선택약정'   ? '#fff'    : 'var(--ink)';
+  document.getElementById('act-disc-sel').style.borderColor= v === '선택약정'   ? '#6366f1' : 'var(--line)';
+}
+
+function actContract(v) {
+  actContractVal = v;
+  ['12','24'].forEach(x => {
+    const el = document.getElementById('act-contract-' + x);
+    if (!el) return;
+    el.style.background  = x === v ? '#6366f1' : 'var(--panel)';
+    el.style.color       = x === v ? '#fff'    : 'var(--ink)';
+    el.style.borderColor = x === v ? '#6366f1' : 'var(--line)';
+  });
+}
+
+function actWelfare(v) {
+  actWelfareVal = v;
+  document.getElementById('act-welfare-n').style.background  = !v ? '#6366f1' : 'var(--panel)';
+  document.getElementById('act-welfare-n').style.color       = !v ? '#fff'    : 'var(--ink)';
+  document.getElementById('act-welfare-n').style.borderColor = !v ? '#6366f1' : 'var(--line)';
+  document.getElementById('act-welfare-y').style.background  = v  ? '#6366f1' : 'var(--panel)';
+  document.getElementById('act-welfare-y').style.color       = v  ? '#fff'    : 'var(--ink)';
+  document.getElementById('act-welfare-y').style.borderColor = v  ? '#6366f1' : 'var(--line)';
+}
+
+function actSubmit() {
+  const dealer      = (document.getElementById('act-dealer')?.value || '').trim();
+  const customer    = (document.getElementById('act-customer')?.value || '').trim();
+  const phone       = (document.getElementById('act-phone')?.value || '').trim();
+  const plan        = (document.getElementById('act-plan')?.value || '').trim();
+  const addon       = (document.getElementById('act-addon')?.value || '').trim();
+  const principal   = (document.getElementById('act-principal')?.value || '').trim();
+  const extra       = (document.getElementById('act-extra')?.value || '').trim();
+  const installment = document.getElementById('act-installment')?.value || '24';
+
+  if (!dealer || !customer || !phone || !plan) {
+    alert('거래처, 고객명, 번호, 요금제는 필수입니다.');
+    return;
+  }
+
+  const rec = {
+    dealer, customer, phone, plan,
+    addon: addon || '없음',
+    principal, extra, installment,
+    disc: actDiscVal,
+    contract: actContractVal + '개월',
+    welfare: actWelfareVal ? '있음' : '없음',
+    status: 'pending',
+    ts: Date.now()
+  };
+
+  const ref = db.ref(HUB + '/activation').push();
+  rec.id = ref.key;
+  ref.set(rec);
+
+  const msg = [
+    '❗【一煩免後禍】한번의 귀찮음이 나중에 다가올 화를 면한다❗',
+    '━━━━━━━━━━━━━━━━━',
+    '📱 <b>개통확인 요청</b>',
+    `거래처: ${dealer}`,
+    `고객명: ${customer}  번호: ${phone}`,
+    `요금제: ${plan}`,
+    `부가서비스: ${rec.addon}`,
+    `할부원금: ${principal || '-'}  추가지원금: ${extra || '-'}`,
+    `지원금유형: ${actDiscVal}`,
+    `할부: ${installment}개월  약정: ${rec.contract}`,
+    `복지할인: ${rec.welfare}`,
+  ].join('\n');
+  sendTelegramActivation(msg);
+
+  // 폼 초기화
+  ['act-dealer','act-customer','act-phone','act-plan','act-addon','act-principal','act-extra'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('act-installment').value = '24';
+  actDiscVal = '공시지원금'; actContractVal = '24'; actWelfareVal = false;
+  actDisc('공시지원금'); actContract('24'); actWelfare(false);
+
+  actStartAlarm();
+}
+
+function actComplete(id) {
+  if (!db) return;
+  db.ref(HUB + '/activation/' + id).update({ status: 'done' });
+}
+
+function actDelete(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  if (!db) return;
+  db.ref(HUB + '/activation/' + id).remove();
+}
+
+function actFilter(v, el) {
+  actFilterVal = v;
+  document.querySelectorAll('#csub-activation .smslog-filter').forEach(b => b.classList.remove('on'));
+  if (el) el.classList.add('on');
+  actListRender();
+}
+
+function actListRender() {
+  const wrap = document.getElementById('act-list');
+  if (!wrap) return;
+  let list = actDataList;
+  if (actFilterVal === 'pending') list = list.filter(x => x.status !== 'done');
+  if (actFilterVal === 'done')    list = list.filter(x => x.status === 'done');
+
+  const pendingCount = actDataList.filter(x => x.status !== 'done').length;
+  const statusEl = document.getElementById('act-alarm-status');
+  if (statusEl) {
+    statusEl.textContent = pendingCount > 0 ? `⏳ 미확인 ${pendingCount}건 — 알림 울리는 중` : '';
+  }
+
+  if (!list.length) {
+    wrap.innerHTML = '<div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">내역이 없습니다.</div>';
+    return;
+  }
+
+  wrap.innerHTML = list.map(r => {
+    const done = r.status === 'done';
+    const dt = new Date(r.ts || 0);
+    const dtStr = `${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+    return `<div style="border:1.5px solid ${done ? '#d1fae5' : '#fde68a'};border-radius:12px;padding:12px 14px;margin-bottom:10px;background:${done ? '#f0fdf4' : '#fffbeb'};">
+      <div style="display:flex;align-items:flex-start;gap:8px;">
+        <div style="flex:1;">
+          <div style="font-weight:800;font-size:14px;color:var(--ink);">
+            ${done ? '✅' : '⏳'} ${r.dealer} — ${r.customer} (${r.phone})
+          </div>
+          <div style="font-size:12px;color:var(--ink-soft);margin-top:4px;line-height:1.7;">
+            요금제: <b>${r.plan}</b> | 부가서비스: ${r.addon}<br>
+            할부원금: ${r.principal||'-'} | 추가지원금: ${r.extra||'-'} | ${r.disc}<br>
+            할부: ${r.installment}개월 | 약정: ${r.contract} | 복지할인: ${r.welfare}<br>
+            <span style="color:#94a3b8;font-size:11px;">${dtStr}</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${!done ? `<button onclick="actComplete('${r.id}')" style="padding:5px 12px;background:#1f9d55;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">✅ 완료</button>` : ''}
+          <button onclick="actDelete('${r.id}')" style="padding:5px 12px;background:var(--panel);color:#dc2626;border:1px solid #fca5a5;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">삭제</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function actNextAlarmMs() {
+  const now = new Date();
+  const candidates = [11, 18].map(h => {
+    const t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, 0, 0, 0);
+    if (t <= now) t.setDate(t.getDate() + 1);
+    return t - now;
+  });
+  return Math.min(...candidates);
+}
+
+function actStartAlarm() {
+  if (actAlarmTimer) return;
+  function schedule() {
+    actAlarmTimer = setTimeout(() => {
+      actAlarmTimer = null;
+      const pending = actDataList.filter(x => x.status !== 'done');
+      if (pending.length) {
+        const names = pending.map(x => `${x.dealer} ${x.customer}`).join(', ');
+        sendTelegramActivation(`❗【一煩免後禍】한번의 귀찮음이 나중에 다가올 화를 면한다❗\n━━━━━━━━━━━━━━━━━\n🔔 개통확인 미처리 알림 (${pending.length}건)\n${names}`);
+      }
+      schedule(); // 다음 알림 예약
+    }, actNextAlarmMs());
+  }
+  schedule();
 }
 
 // 매일 오전 11시 미처리 업무 알림
