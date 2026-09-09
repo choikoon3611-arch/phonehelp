@@ -799,6 +799,7 @@
     <div class="consult-sub-tabs">
       <button class="csub-btn active" data-csub="csub-consult">📋 상담업무</button>
       <button class="csub-btn" data-csub="csub-sms">💬 문자업무공유</button>
+      <button class="csub-btn" data-csub="csub-calendar">📅 달력</button>
     </div>
 
     <!-- ── 상담업무 (기존) ── -->
@@ -857,6 +858,41 @@
       </div>
     </div>
     </div><!-- /csub-consult -->
+
+    <!-- ── 달력 ── -->
+    <div class="csub-panel" id="csub-calendar">
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;">
+        <!-- 달력 헤더 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <button onclick="calPrevMonth()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--ink);padding:4px 8px;border-radius:8px;" onmouseover="this.style.background='var(--line)'" onmouseout="this.style.background='none'">‹</button>
+          <span id="cal-title" style="font-size:16px;font-weight:800;color:var(--ink);"></span>
+          <button onclick="calNextMonth()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--ink);padding:4px 8px;border-radius:8px;" onmouseover="this.style.background='var(--line)'" onmouseout="this.style.background='none'">›</button>
+        </div>
+        <!-- 요일 헤더 -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">
+          <div style="text-align:center;font-size:11px;font-weight:700;color:#ef4444;padding:4px 0;">일</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--ink-soft);padding:4px 0;">월</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--ink-soft);padding:4px 0;">화</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--ink-soft);padding:4px 0;">수</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--ink-soft);padding:4px 0;">목</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:var(--ink-soft);padding:4px 0;">금</div>
+          <div style="text-align:center;font-size:11px;font-weight:700;color:#3b82f6;padding:4px 0;">토</div>
+        </div>
+        <!-- 달력 그리드 -->
+        <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
+      </div>
+    </div><!-- /csub-calendar -->
+
+    <!-- 달력 상세 팝업 -->
+    <div id="cal-detail-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:3000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+      <div style="background:var(--panel);border-radius:16px;padding:20px;max-width:380px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <span id="cal-detail-date" style="font-size:15px;font-weight:800;color:var(--ink);"></span>
+          <button onclick="document.getElementById('cal-detail-bg').style.display='none'" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--ink-soft);">✕</button>
+        </div>
+        <div id="cal-detail-list"></div>
+      </div>
+    </div>
 
     <!-- ── 문자업무공유 ── -->
     <div class="csub-panel" id="csub-sms">
@@ -2329,6 +2365,7 @@
         <div class="mrow"><label>잔여할부 / 위약금</label><input type="text" id="cs-penalty" placeholder="예) 할부 12개월 / 위약금 없음"></div>
         <div class="mrow"><label>담당자</label><input type="text" id="cs-agent" placeholder="이름"></div>
       </div>
+      <div class="mrow"><label>처리가능일자</label><input type="date" id="cs-schedule-date" style="width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);"></div>
       <div class="mrow"><label>상담내용</label><textarea id="cs-content" rows="5" placeholder="상담 내용을 입력하세요..."></textarea></div>
     </div>
     <div class="modal-foot">
@@ -2552,6 +2589,7 @@ function setupFirebaseSync() {
     const d = snap.val() || {};
     consultList = Object.values(d).sort((a, b) => Number(b.id) - Number(a.id));
     consultRender();
+    if (document.getElementById('csub-calendar')?.classList.contains('active')) calRender();
   });
   // 이미지 교체 동기화
   db.ref(HUB + '/formImages').on('value', snap => {
@@ -2708,6 +2746,7 @@ document.querySelectorAll('.csub-btn').forEach(btn => {
     document.querySelectorAll('.csub-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.csub).classList.add('active');
+    if (btn.dataset.csub === 'csub-calendar') calRender();
   });
 });
 
@@ -4702,6 +4741,7 @@ function consultOpenModal(id = null) {
   document.getElementById('cs-ssn').value     = e?.ssn     || '';
   document.getElementById('cs-penalty').value = e?.penalty || '';
   document.getElementById('cs-agent').value   = e?.agent   || '';
+  document.getElementById('cs-schedule-date').value = e?.scheduleDate || '';
   document.getElementById('cs-content').value = e?.content || '';
   document.getElementById('consult-modal-bg').classList.add('open');
   setTimeout(() => document.getElementById('cs-name').focus(), 80);
@@ -4821,8 +4861,9 @@ function consultSaveEntry() {
     carrier:  document.getElementById('cs-carrier').value,
     ssn:      document.getElementById('cs-ssn').value.trim(),
     penalty:  document.getElementById('cs-penalty').value.trim(),
-    agent:    document.getElementById('cs-agent').value.trim(),
-    content:  document.getElementById('cs-content').value.trim(),
+    agent:        document.getElementById('cs-agent').value.trim(),
+    scheduleDate: document.getElementById('cs-schedule-date').value || '',
+    content:      document.getElementById('cs-content').value.trim(),
   };
   if (prev?.done) entry.done = prev.done;  // 완료된 항목 수정 시 done 상태 보존
   db.ref(HUB + '/consultations/' + entry.id).set(entry);
@@ -4846,6 +4887,88 @@ function consultSaveEntry() {
 function consultDelete(id) {
   if (!confirm('정말 삭제할까요?')) return;
   db.ref(HUB + '/consultations/' + id).remove();
+}
+
+/* ── 달력 ── */
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function calRender() {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  document.getElementById('cal-title').textContent = `${calYear}년 ${calMonth+1}월`;
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+
+  // 날짜별 상담 맵
+  const schedMap = {};
+  consultList.forEach(e => {
+    if (e.scheduleDate) {
+      if (!schedMap[e.scheduleDate]) schedMap[e.scheduleDate] = [];
+      schedMap[e.scheduleDate].push(e);
+    }
+  });
+
+  // 빈 칸
+  for (let i = 0; i < firstDay; i++) {
+    grid.insertAdjacentHTML('beforeend', '<div></div>');
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayOfWeek = new Date(calYear, calMonth, d).getDay();
+    const isToday = dateStr === todayStr;
+    const events = schedMap[dateStr] || [];
+    const numColor = dayOfWeek === 0 ? '#ef4444' : dayOfWeek === 6 ? '#3b82f6' : 'var(--ink)';
+
+    let evHtml = events.slice(0,3).map(e =>
+      `<div onclick="calShowDetail('${dateStr}')" style="background:${e.done?'#d1fae5':'#ede9fe'};color:${e.done?'#065f46':'#5b21b6'};font-size:10px;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;margin-top:1px;">${e.name}</div>`
+    ).join('');
+    if (events.length > 3) evHtml += `<div style="font-size:9px;color:var(--ink-soft);margin-top:1px;">+${events.length-3}건</div>`;
+
+    grid.insertAdjacentHTML('beforeend', `
+      <div onclick="calShowDetail('${dateStr}')" style="min-height:60px;border:1px solid var(--line);border-radius:8px;padding:4px;cursor:${events.length?'pointer':'default'};background:${isToday?'rgba(124,58,237,0.08)':'var(--panel)'};transition:background .15s;" onmouseover="this.style.background='rgba(124,58,237,0.06)'" onmouseout="this.style.background='${isToday?'rgba(124,58,237,0.08)':'var(--panel)'}'">
+        <div style="font-size:12px;font-weight:${isToday?'900':'600'};color:${isToday?'#7c3aed':numColor};${isToday?'background:#7c3aed;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;':''}">${d}</div>
+        ${evHtml}
+      </div>`);
+  }
+}
+
+function calPrevMonth() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  calRender();
+}
+function calNextMonth() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  calRender();
+}
+
+function calShowDetail(dateStr) {
+  const events = consultList.filter(e => e.scheduleDate === dateStr);
+  if (!events.length) return;
+  const [y,m,d] = dateStr.split('-');
+  document.getElementById('cal-detail-date').textContent = `${y}년 ${parseInt(m)}월 ${parseInt(d)}일 일정 (${events.length}건)`;
+  document.getElementById('cal-detail-list').innerHTML = events.map(e => `
+    <div style="border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:${e.done?'#f0fdf4':'var(--panel)'};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-weight:800;font-size:14px;color:var(--ink);">${e.name}</span>
+        <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:${e.done?'#d1fae5':'#ede9fe'};color:${e.done?'#065f46':'#5b21b6'};font-weight:700;">${e.done?'완료':'처리중'}</span>
+      </div>
+      <div style="font-size:12px;color:var(--ink-soft);line-height:1.7;">
+        ${e.phone?`📱 ${e.phone}<br>`:''}
+        📡 ${e.carrier} ${e.agent?`| 👨‍💼 ${e.agent}`:''}
+        ${e.penalty?`<br>💰 ${e.penalty}`:''}
+        ${e.content?`<br><br>📝 ${e.content.slice(0,100)}${e.content.length>100?'...':''}`:''}
+      </div>
+    </div>
+  `).join('');
+  const bg = document.getElementById('cal-detail-bg');
+  bg.style.display = 'flex';
 }
 document.getElementById('consult-modal-bg').addEventListener('click', e => {
   if (e.target === document.getElementById('consult-modal-bg')) consultCloseModal();
