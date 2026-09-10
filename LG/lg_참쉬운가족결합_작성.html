@@ -22,6 +22,9 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
 .sb-row{display:flex;gap:4px;margin-bottom:3px;}
 .sb-row input{flex:1;height:24px;padding:0 5px;border:1.5px solid #e2e8f0;border-radius:4px;font-size:11px;font-family:'Malgun Gothic',sans-serif;color:#1e293b;background:#fff;min-width:0;}
 .sb-row input:focus{border-color:#7c3aed;outline:none;}
+.cb-row{display:flex;gap:6px;margin-bottom:4px;}
+.cb-row button{flex:1;padding:5px 4px;border:1.5px solid #e2e8f0;border-radius:6px;background:#fff;font-size:11px;font-weight:700;color:#475569;cursor:pointer;font-family:'Malgun Gothic',sans-serif;}
+.cb-row button.on{border-color:#dc2626;background:#dc2626;color:#fff;}
 .copy-btn{width:100%;padding:8px;border:2px dashed #7c3aed;border-radius:8px;background:#faf5ff;color:#6d28d9;font-size:12px;font-weight:800;cursor:pointer;font-family:'Malgun Gothic',sans-serif;margin-bottom:4px;}
 .reset-btn{width:100%;padding:5px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:#94a3b8;font-size:11px;cursor:pointer;font-family:'Malgun Gothic',sans-serif;}
 #notice{font-size:11px;font-weight:700;text-align:center;padding:3px;border-radius:4px;opacity:0;transition:opacity .3s;margin-top:3px;color:#16a34a;}
@@ -158,6 +161,17 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
     </div>
   </div>
   <div class="sb-sec">
+    <div class="sb-ttl">💰 할인방식</div>
+    <div class="cb-row">
+      <button id="disc-ind-btn" onclick="toggleDisc('ind')">☐ 개별할인</button>
+      <button id="disc-des-btn" onclick="toggleDisc('des')">☐ 1인 지정 할인</button>
+    </div>
+    <div id="disc-num-wrap" class="sb-field" style="display:none;margin-top:4px;">
+      <label>지정번호</label>
+      <input id="s-disc-num" placeholder="지정번호 입력" oninput="sync(this,'disc-num')">
+    </div>
+  </div>
+  <div class="sb-sec">
     <button class="copy-btn" onclick="copyCoords()">📋 좌표 복사</button>
     <div id="notice"></div>
     <button class="reset-btn" onclick="resetAll()">↺ 전체 초기화</button>
@@ -250,6 +264,9 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
 <span class="ft" id="n3-phone" data-fid="n3-phone" style="left:55.8%;top:43.4%;"></span>
 <span class="ft" id="n3-addr" data-fid="n3-addr" style="left:65.2%;top:43.4%;"></span>
 <span class="ft" id="n3-plan" data-fid="n3-plan" style="left:89.1%;top:43.4%;"></span>
+<span class="ft" id="disc-ind" data-fid="disc-ind" style="left:10.5%;top:47.2%;font-size:14px;color:#dc2626;"></span>
+<span class="ft" id="disc-des" data-fid="disc-des" style="left:10.5%;top:48.8%;font-size:14px;color:#dc2626;"></span>
+<span class="ft" id="disc-num" data-fid="disc-num" style="left:36.0%;top:48.8%;"></span>
 
     </div>
   </div>
@@ -278,6 +295,25 @@ function makeDrag(el){
   });
 }
 document.querySelectorAll('.ft').forEach(makeDrag);
+var discState={};
+function toggleDisc(key){
+  var fid='disc-'+key;
+  var btn=document.getElementById(fid+'-btn');
+  var el=document.getElementById(fid);
+  if(discState[key]){
+    discState[key]=false;
+    btn.classList.remove('on');
+    btn.textContent=(key==='ind'?'☐ 개별할인':'☐ 1인 지정 할인');
+    if(el) el.textContent='';
+    if(key==='des')document.getElementById('disc-num-wrap').style.display='none';
+  }else{
+    discState[key]=true;
+    btn.classList.add('on');
+    btn.textContent=(key==='ind'?'☑ 개별할인':'☑ 1인 지정 할인');
+    if(el) el.textContent='✔';
+    if(key==='des')document.getElementById('disc-num-wrap').style.display='';
+  }
+}
 function sync(inp,fid){
   var el=document.getElementById(fid);
   if(el) el.textContent=inp.value;
@@ -295,6 +331,11 @@ function showN(msg){var n=document.getElementById('notice');n.textContent=msg;n.
 function resetAll(){
   document.querySelectorAll('.sb-field input,.sb-row input').forEach(function(i){i.value='';});
   document.querySelectorAll('.ft').forEach(function(ft){ft.textContent='';});
+  discState={};
+  document.querySelectorAll('.cb-row button').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('disc-ind-btn').textContent='☐ 개별할인';
+  document.getElementById('disc-des-btn').textContent='☐ 1인 지정 할인';
+  document.getElementById('disc-num-wrap').style.display='none';
   dinfo.style.display='none';
 }
 </script>
