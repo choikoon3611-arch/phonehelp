@@ -1210,9 +1210,13 @@
           <button class="smslog-carrier on" data-c="SK" onclick="smslogCarrier('SK',this)">SK</button>
           <button class="smslog-carrier" data-c="KT" onclick="smslogCarrier('KT',this)">KT</button>
           <button class="smslog-carrier" data-c="LG" onclick="smslogCarrier('LG',this)">LG</button>
+          <button class="smslog-carrier" data-c="알뜰" onclick="smslogCarrier('알뜰',this)">알뜰</button>
           <div style="width:1px;height:20px;background:var(--line);margin:0 4px;"></div>
-          <button class="smslog-type on" id="smslog-type-cust" onclick="smslogType('customer')">📤 고객에게</button>
-          <button class="smslog-type" id="smslog-type-self" onclick="smslogType('self')">📥 나에게</button>
+          <div id="smslog-type-row" style="display:flex;gap:6px;align-items:center;">
+            <button class="smslog-type on" id="smslog-type-cust" onclick="smslogType('customer')">📤 고객에게</button>
+            <button class="smslog-type" id="smslog-type-self" onclick="smslogType('self')">📥 나에게</button>
+          </div>
+          <span id="smslog-mvno-badge" style="display:none;font-size:12px;font-weight:800;color:#6366f1;background:#ede9fe;padding:4px 10px;border-radius:8px;">📥 나에게 고정</span>
         </div>
 
         <!-- 2줄: 고객명 + 개통일 -->
@@ -1257,10 +1261,19 @@
         <!-- 부가서비스 -->
         <div id="smslog-addon-row" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px;">
           <div id="smslog-addon-btns" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
-          <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <input id="smslog-addon" type="text" placeholder="직접 입력"
-              style="flex:1;height:32px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+              style="flex:1;min-width:120px;height:32px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
               oninput="smslogAddonInput()">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <span style="font-size:11px;color:var(--ink-soft);font-weight:700;">삭제일</span>
+              <button id="smslog-addon-d30" onclick="smslogAddonDateOverride('D30')"
+                style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">D+30</button>
+              <button id="smslog-addon-m1" onclick="smslogAddonDateOverride('M1')"
+                style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">M+1</button>
+              <button id="smslog-addon-m3" onclick="smslogAddonDateOverride('M3')"
+                style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">M+3</button>
+            </div>
             <span id="smslog-addon-date" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;"></span>
           </div>
         </div>
@@ -1276,6 +1289,45 @@
         <div style="display:flex;gap:8px;">
           <button onclick="smslogCopy()" style="flex:1;padding:10px;background:#0d9488;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">📋 복사</button>
           <button onclick="smslogRecord()" style="flex:1;padding:10px;background:var(--sk);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">✅ 발송완료 기록</button>
+        </div>
+
+        <!-- 템플릿 편집 (접힘) -->
+        <div style="margin-top:10px;">
+          <button onclick="smsTplEditorOpen()"
+            style="width:100%;padding:7px 14px;border:1.5px dashed var(--line);border-radius:9px;background:transparent;color:var(--ink-soft);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;">
+            ✏️ 문자 멘트 수정
+          </button>
+          <div id="smstpl-editor-wrap" style="display:none;margin-top:8px;border:1.5px solid var(--line);border-radius:10px;padding:14px;background:var(--bg);">
+            <div style="font-size:11px;color:var(--ink-soft);margin-bottom:10px;">
+              사용 가능 변수: <code style="background:var(--panel);padding:1px 5px;border-radius:4px;">{name}</code> 고객명&nbsp;
+              <code style="background:var(--panel);padding:1px 5px;border-radius:4px;">{phone}</code> 전화번호&nbsp;
+              <code style="background:var(--panel);padding:1px 5px;border-radius:4px;">{plan}</code> 요금제&nbsp;
+              <code style="background:var(--panel);padding:1px 5px;border-radius:4px;">{addon}</code> 부가서비스
+            </div>
+            <div style="display:grid;gap:8px;">
+              <label style="font-size:11px;font-weight:800;color:var(--ink-soft);">📤 요금제 변경 (고객에게)</label>
+              <textarea id="smstpl-plan" rows="2" oninput="smslogPreview()"
+                style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+              <label style="font-size:11px;font-weight:800;color:var(--ink-soft);">📤 요금제+부가서비스 (고객에게)</label>
+              <textarea id="smstpl-plan_addon" rows="2" oninput="smslogPreview()"
+                style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+              <label style="font-size:11px;font-weight:800;color:var(--ink-soft);">📤 부가서비스만 (고객에게)</label>
+              <textarea id="smstpl-addon" rows="2" oninput="smslogPreview()"
+                style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+              <label style="font-size:11px;font-weight:800;color:var(--ink-soft);">📥 나에게 (SK/KT/LG)</label>
+              <textarea id="smstpl-self" rows="2" oninput="smslogPreview()"
+                style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+              <label style="font-size:11px;font-weight:800;color:var(--ink-soft);">📥 알뜰 (나에게 고정)</label>
+              <textarea id="smstpl-mvno" rows="2" oninput="smslogPreview()"
+                style="width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button id="smstpl-save-btn" onclick="smsTplEditorSave()"
+                style="flex:1;padding:8px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">💾 저장</button>
+              <button onclick="smsTplEditorReset()"
+                style="padding:8px 14px;background:var(--panel);color:var(--ink-soft);border:1.5px solid var(--line);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">↩ 기본값 초기화</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3968,7 +4020,8 @@ const SMS_PLANS = {
     '5G시니어': [
       '데이터플랜9GB(시니어+3GB)','데이터플랜5GB(시니어+3GB)','데이터플랜1.5GB(시니어+1GB)','데이터플랜750MB(시니어+0.5GB)','데이터플랜300MB(시니어+0.7GB)'
     ]
-  }
+  },
+  알뜰: {}
 };
 
 var smslogCarrierVal = 'SK';
@@ -3982,6 +4035,60 @@ var smslogList = [];
 var smslogFilterVal = 'all';
 var smslogFilterType = 'all';
 
+const SMS_TPL_DEFAULTS = {
+  plan:      '이쁜핸드폰집입니다^^ {name}고객님 114연결 또는 매장내방하셔서 요금제({plan}) 변경 부탁드립니다',
+  plan_addon:'이쁜핸드폰집입니다^^{name}고객님114고객센터연결또는매장내방하셔서요금제({plan})변경및 부가서비스({addon})삭제부탁드립니다',
+  addon:     '이쁜핸드폰집입니다^^{name}고객님114연결또는매장내방하셔서부가서비스({addon})삭제부탁드립니다',
+  self:      '{name}고객님 전화번호 {phone} 요금제({plan}) 자체변경요망 또는 유선으로 연락요망',
+  mvno:      'M모바일 {name}고객님 전화번호 {phone} 캐치콜삭제',
+};
+
+function smsTplLoad() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('smslogTemplates') || '{}');
+    return Object.assign({}, SMS_TPL_DEFAULTS, saved);
+  } catch(e) { return Object.assign({}, SMS_TPL_DEFAULTS); }
+}
+function smsTplSave(tpls) {
+  try { localStorage.setItem('smslogTemplates', JSON.stringify(tpls)); } catch(e) {}
+}
+function smsTplApply(key, vars) {
+  const tpls = smsTplLoad();
+  return (tpls[key] || SMS_TPL_DEFAULTS[key] || '').replace(/\{(\w+)\}/g, (_, k) => vars[k] || '');
+}
+
+function smsTplEditorOpen() {
+  const wrap = document.getElementById('smstpl-editor-wrap');
+  if (!wrap) return;
+  const vis = wrap.style.display !== 'none';
+  wrap.style.display = vis ? 'none' : 'block';
+  if (!vis) smsTplEditorFill();
+}
+function smsTplEditorFill() {
+  const tpls = smsTplLoad();
+  ['plan','plan_addon','addon','self','mvno'].forEach(k => {
+    const el = document.getElementById('smstpl-' + k);
+    if (el) el.value = tpls[k] !== undefined ? tpls[k] : SMS_TPL_DEFAULTS[k];
+  });
+}
+function smsTplEditorSave() {
+  const tpls = {};
+  ['plan','plan_addon','addon','self','mvno'].forEach(k => {
+    const el = document.getElementById('smstpl-' + k);
+    if (el) tpls[k] = el.value;
+  });
+  smsTplSave(tpls);
+  smslogPreview();
+  const btn = document.getElementById('smstpl-save-btn');
+  if (btn) { btn.textContent = '✅ 저장됨'; setTimeout(() => btn.textContent = '💾 저장', 1200); }
+}
+function smsTplEditorReset() {
+  if (!confirm('기본 멘트로 초기화할까요?')) return;
+  smsTplSave({});
+  smsTplEditorFill();
+  smslogPreview();
+}
+
 function smslogCarrier(c, btn) {
   smslogCarrierVal = c;
   document.querySelectorAll('.smslog-carrier').forEach(b => b.classList.remove('on'));
@@ -3994,6 +4101,33 @@ function smslogCarrier(c, btn) {
   const addonDateEl = document.getElementById('smslog-addon-date');
   if (addonDateEl) addonDateEl.textContent = '';
   smslogOpenGroup = null;
+
+  const isMvno = c === '알뜰';
+  const typeRow  = document.getElementById('smslog-type-row');
+  const mvnoBadge= document.getElementById('smslog-mvno-badge');
+  const catWrap  = document.getElementById('smslog-cats');
+  const planWrap = document.getElementById('smslog-plans');
+  const retRow   = document.getElementById('smslog-retention-row');
+  const catLabel = document.querySelector('[for="smslog-cats"]') || null;
+
+  if (typeRow)   typeRow.style.display   = isMvno ? 'none' : 'flex';
+  if (mvnoBadge) mvnoBadge.style.display = isMvno ? '' : 'none';
+  if (catWrap)   catWrap.style.display   = isMvno ? 'none' : 'flex';
+  if (planWrap)  planWrap.style.display  = isMvno ? 'none' : 'block';
+  if (retRow)    retRow.style.display    = isMvno ? 'none' : 'flex';
+
+  if (isMvno) {
+    smslogTypeVal = 'self';
+    document.getElementById('smslog-type-cust')?.classList.remove('on');
+    document.getElementById('smslog-type-self')?.classList.add('on');
+    const ph = document.getElementById('smslog-phone');
+    const pl = document.getElementById('smslog-phone-label');
+    const tplRow = document.getElementById('smslog-tpl-row');
+    if (ph) ph.style.display = '';
+    if (pl) pl.style.display = '';
+    if (tplRow) tplRow.style.display = 'none';
+  }
+
   smslogAddonBtnsRender();
   smslogCatsRender();
   smslogPlansRender();
@@ -4101,6 +4235,7 @@ const ADDON_CONFIG = {
     { label: '보험',    rule: 'M3' },
   ],
   LG: [],
+  알뜰: [],
 };
 
 function smslogAddonBtnsRender() {
@@ -4130,6 +4265,19 @@ function smslogCalcDate(rule, base) {
 function smslogFmtDate(d) {
   if (!d) return '';
   return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+
+function smslogAddonDateOverride(rule) {
+  smslogAddonDateRule = rule;
+  const d = smslogCalcDate(rule);
+  const dateEl = document.getElementById('smslog-addon-date');
+  if (dateEl) dateEl.textContent = d ? `삭제가능: ${smslogFmtDate(d)}` : '';
+  const styleOn  = 'padding:4px 10px;border:1.5px solid #6366f1;border-radius:7px;background:#6366f1;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;';
+  const styleOff = 'padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;';
+  document.getElementById('smslog-addon-d30')?.setAttribute('style', rule === 'D30' ? styleOn : styleOff);
+  document.getElementById('smslog-addon-m1')?.setAttribute('style',  rule === 'M1'  ? styleOn : styleOff);
+  document.getElementById('smslog-addon-m3')?.setAttribute('style',  rule === 'M3'  ? styleOn : styleOff);
+  smslogPreview();
 }
 
 function smslogAddonInput() {
@@ -4197,21 +4345,26 @@ function smslogPreview() {
   const dateEl = document.getElementById('smslog-date-preview');
   if (!msgEl) return;
   let msg = '', dates = [];
-  if (smslogTypeVal === 'self') {
-    msg = `${name}고객님 전화번호 ${phone} 요금제(${plan}) 자체변경요망 또는 유선으로 연락요망`;
+  const vars = { name, phone, plan, addon };
+  if (smslogCarrierVal === '알뜰') {
+    msg = smsTplApply('mvno', vars);
+    const pd = smslogCalcDate('M3');
+    if (pd) dates.push(`📅 삭제가능일: ${smslogFmtDate(pd)}`);
+  } else if (smslogTypeVal === 'self') {
+    msg = smsTplApply('self', vars);
     const pd = smslogCalcDate(smslogRetentionRule);
     if (pd) dates.push(`📅 변경가능일: ${smslogFmtDate(pd)}`);
   } else if (smslogMsgType === 'plan_addon') {
-    msg = `이쁜핸드폰집입니다^^${name}고객님114고객센터연결또는매장내방하셔서요금제(${plan})변경및 부가서비스(${addon})삭제부탁드립니다`;
+    msg = smsTplApply('plan_addon', vars);
     const pd = smslogCalcDate(smslogRetentionRule), ad = smslogCalcDate(smslogAddonDateRule);
     if (pd) dates.push(`📅 요금제 변경가능일: ${smslogFmtDate(pd)}`);
     if (ad) dates.push(`🗓 부가서비스 삭제가능일: ${smslogFmtDate(ad)}`);
   } else if (smslogMsgType === 'addon') {
-    msg = `이쁜핸드폰집입니다^^${name}고객님114연결또는매장내방하셔서부가서비스(${addon})삭제부탁드립니다`;
+    msg = smsTplApply('addon', vars);
     const ad = smslogCalcDate(smslogAddonDateRule);
     if (ad) dates.push(`🗓 삭제가능일: ${smslogFmtDate(ad)}`);
   } else {
-    msg = `이쁜핸드폰집입니다^^ ${name}고객님 114연결 또는 매장내방하셔서 요금제(${plan}) 변경 부탁드립니다`;
+    msg = smsTplApply('plan', vars);
     const pd = smslogCalcDate(smslogRetentionRule);
     if (pd) dates.push(`📅 변경가능일: ${smslogFmtDate(pd)}`);
   }
@@ -4240,20 +4393,23 @@ function smslogCopy() {
   const plan  = smslogPlanVal || '';
   const addon = (document.getElementById('smslog-addon')?.value.trim()) || '';
   if (!name) { alert('고객명을 입력하세요.'); return; }
+  const vars = { name, phone, plan, addon };
   let text;
-  if (smslogTypeVal === 'self') {
+  if (smslogCarrierVal === '알뜰') {
+    text = smsTplApply('mvno', vars);
+  } else if (smslogTypeVal === 'self') {
     if (!plan) { alert('요금제를 선택하세요.'); return; }
-    text = `${name}고객님 전화번호 ${phone} 요금제(${plan}) 자체변경요망 또는 유선으로 연락요망`;
+    text = smsTplApply('self', vars);
   } else if (smslogMsgType === 'addon') {
     if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
-    text = `이쁜핸드폰집입니다^^${name}고객님114연결또는매장내방하셔서부가서비스(${addon})삭제부탁드립니다`;
+    text = smsTplApply('addon', vars);
   } else if (smslogMsgType === 'plan_addon') {
     if (!plan)  { alert('요금제를 선택하세요.'); return; }
     if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
-    text = `이쁜핸드폰집입니다^^${name}고객님114고객센터연결또는매장내방하셔서요금제(${plan})변경및 부가서비스(${addon})삭제부탁드립니다`;
+    text = smsTplApply('plan_addon', vars);
   } else {
     if (!plan) { alert('요금제를 선택하세요.'); return; }
-    text = `이쁜핸드폰집입니다^^ ${name}고객님 114연결 또는 매장내방하셔서 요금제(${plan}) 변경 부탁드립니다`;
+    text = smsTplApply('plan', vars);
   }
   const btn = document.querySelector('[onclick="smslogCopy()"]');
   navigator.clipboard.writeText(text).then(() => {
@@ -4271,27 +4427,32 @@ function smslogRecord() {
   const plan  = smslogPlanVal || '';
   const addon = (document.getElementById('smslog-addon')?.value.trim()) || '';
   if (!name) { alert('고객명을 입력하세요.'); return; }
+  const vars = { name, phone, plan, addon };
   let msg, planDate = '', addonDate = '';
-  if (smslogTypeVal === 'self') {
+  if (smslogCarrierVal === '알뜰') {
+    msg = smsTplApply('mvno', vars);
+    const pd = smslogCalcDate('M3');
+    if (pd) planDate = smslogFmtDate(pd);
+  } else if (smslogTypeVal === 'self') {
     if (!plan) { alert('요금제를 선택하세요.'); return; }
-    msg = `${name}고객님 전화번호 ${phone} 요금제(${plan}) 자체변경요망 또는 유선으로 연락요망`;
+    msg = smsTplApply('self', vars);
     const pd = smslogCalcDate(smslogRetentionRule || 'M3');
     if (pd) planDate = smslogFmtDate(pd);
   } else if (smslogMsgType === 'addon') {
     if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
-    msg = `이쁜핸드폰집입니다^^${name}고객님114연결또는매장내방하셔서부가서비스(${addon})삭제부탁드립니다`;
+    msg = smsTplApply('addon', vars);
     const ad = smslogCalcDate(smslogAddonDateRule);
     if (ad) addonDate = smslogFmtDate(ad);
   } else if (smslogMsgType === 'plan_addon') {
     if (!plan)  { alert('요금제를 선택하세요.'); return; }
     if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
-    msg = `이쁜핸드폰집입니다^^${name}고객님114고객센터연결또는매장내방하셔서요금제(${plan})변경및 부가서비스(${addon})삭제부탁드립니다`;
+    msg = smsTplApply('plan_addon', vars);
     const pd = smslogCalcDate(smslogRetentionRule), ad = smslogCalcDate(smslogAddonDateRule);
     if (pd) planDate  = smslogFmtDate(pd);
     if (ad) addonDate = smslogFmtDate(ad);
   } else {
     if (!plan) { alert('요금제를 선택하세요.'); return; }
-    msg = `이쁜핸드폰집입니다^^ ${name}고객님 114연결 또는 매장내방하셔서 요금제(${plan}) 변경 부탁드립니다`;
+    msg = smsTplApply('plan', vars);
     const pd = smslogCalcDate(smslogRetentionRule);
     if (pd) planDate = smslogFmtDate(pd);
   }
