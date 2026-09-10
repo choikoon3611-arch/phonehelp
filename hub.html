@@ -983,6 +983,7 @@
     </div><!-- /csub-activation -->
 
     <!-- ── 달력 ── -->
+    <!-- ── 달력 ── -->
     <div class="csub-panel" id="csub-calendar">
       <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;">
         <!-- 달력 헤더 -->
@@ -1019,6 +1020,7 @@
 
     <!-- ── 문자업무공유 ── -->
     <div class="csub-panel" id="csub-sms">
+
       <!-- 텔레그램 설정 -->
       <div style="background:var(--panel);border:1px solid #ddd6fe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;">
         <div style="font-size:11px;font-weight:800;color:#7c3aed;width:100%;margin-bottom:2px;">🔔 텔레그램 알림 설정</div>
@@ -1054,6 +1056,7 @@
       <div class="sms-task-list" id="sms-task-list">
         <div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">등록된 문자 업무가 없습니다.</div>
       </div>
+
     </div><!-- /csub-sms -->
 
   </div><!-- /panel-consult -->
@@ -1188,49 +1191,59 @@
     <div style="max-width:960px;margin:0 auto;">
       <div class="section-head"><h2>💬 문자발송 및 처리내역</h2><p>요금제 클릭 → 문자 복사 → 발송완료 기록</p></div>
 
+      <!-- 내부 탭 -->
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--line);margin-bottom:18px;">
+        <button id="smstab-write" onclick="smstabSwitch('write')"
+          style="padding:9px 24px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent,#7c3aed);border-bottom:2.5px solid var(--accent,#7c3aed);margin-bottom:-2px;font-family:inherit;">✏️ 문자작성</button>
+        <button id="smstab-cal" onclick="smstabSwitch('cal')"
+          style="padding:9px 24px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--ink-soft);border-bottom:2.5px solid transparent;margin-bottom:-2px;font-family:inherit;">📆 달력</button>
+      </div>
+
+      <!-- 문자작성 패널 -->
+      <div id="smspanel-write">
+
       <!-- 작성 영역 -->
       <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;">
 
-        <!-- 통신사 + 고객명 -->
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">통신사</span>
-          <div style="display:flex;gap:5px;">
-            <button class="smslog-carrier on" data-c="SK" onclick="smslogCarrier('SK',this)">SK</button>
-            <button class="smslog-carrier" data-c="KT" onclick="smslogCarrier('KT',this)">KT</button>
-            <button class="smslog-carrier" data-c="LG" onclick="smslogCarrier('LG',this)">LG</button>
-          </div>
-          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-left:8px;">고객명</span>
-          <input id="smslog-name" type="text" placeholder="홍길동"
-            style="width:110px;height:30px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
-            oninput="smslogPreview()">
-          <span id="smslog-phone-label" style="display:none;font-size:12px;font-weight:700;color:var(--ink-soft);margin-left:8px;">전화번호</span>
-          <input id="smslog-phone" type="tel" placeholder="010-0000-0000"
-            style="display:none;width:140px;height:30px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
-            oninput="smslogPreview()">
-          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-left:8px;">개통일</span>
-          <input id="smslog-actdate" type="date"
-            style="height:30px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--panel);"
-            oninput="smslogPreview()">
-          <button onclick="document.getElementById('smslog-actdate').value='';smslogPreview();"
-            style="height:30px;padding:0 8px;border:1px solid var(--line);border-radius:8px;font-size:11px;font-weight:700;background:var(--panel);color:var(--ink-soft);cursor:pointer;">오늘</button>
+        <!-- 1줄: 통신사 + 발송대상 -->
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+          <button class="smslog-carrier on" data-c="SK" onclick="smslogCarrier('SK',this)">SK</button>
+          <button class="smslog-carrier" data-c="KT" onclick="smslogCarrier('KT',this)">KT</button>
+          <button class="smslog-carrier" data-c="LG" onclick="smslogCarrier('LG',this)">LG</button>
+          <div style="width:1px;height:20px;background:var(--line);margin:0 4px;"></div>
+          <button class="smslog-type on" id="smslog-type-cust" onclick="smslogType('customer')">📤 고객에게</button>
+          <button class="smslog-type" id="smslog-type-self" onclick="smslogType('self')">📥 나에게</button>
         </div>
 
-        <!-- 문자 유형 -->
-        <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
-          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">문자유형</span>
+        <!-- 2줄: 고객명 + 개통일 -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+          <input id="smslog-name" type="text" placeholder="고객명"
+            style="width:100px;height:34px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+            oninput="smslogPreview()">
+          <input id="smslog-phone" type="tel" placeholder="010-0000-0000"
+            style="display:none;width:150px;height:34px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+            oninput="smslogPreview()">
+          <span id="smslog-phone-label" style="display:none;font-size:11px;color:var(--ink-soft);">← 번호</span>
+          <input id="smslog-actdate" type="date"
+            style="height:34px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--panel);"
+            oninput="smslogPreview()">
+          <span style="font-size:11px;color:var(--ink-soft);">개통일 (비우면 오늘)</span>
+        </div>
+
+        <!-- 3줄: 문자유형 (나에게 선택 시 숨김) -->
+        <div id="smslog-tpl-row" style="display:flex;gap:5px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
           <button class="smslog-type on" id="smslog-tpl-plan" onclick="smslogTpl('plan')">요금제 변경</button>
           <button class="smslog-type" id="smslog-tpl-both" onclick="smslogTpl('plan_addon')">요금제+부가서비스</button>
           <button class="smslog-type" id="smslog-tpl-addon" onclick="smslogTpl('addon')">부가서비스만</button>
         </div>
 
-        <!-- 유지기간 선택 (요금제 포함 유형) -->
-        <div id="smslog-retention-row" style="display:flex;align-items:center;gap:5px;margin-bottom:8px;flex-wrap:wrap;">
-          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">유지기간</span>
+        <!-- 유지기간 (요금제 포함 시) -->
+        <div id="smslog-retention-row" style="display:flex;align-items:center;gap:5px;margin-bottom:10px;flex-wrap:wrap;">
           <button id="smslog-ret-m3" onclick="smslogRetention('M3')"
-            style="padding:5px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">M+3개월</button>
+            style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">M+3개월</button>
           <button id="smslog-ret-d183" onclick="smslogRetention('D183')"
-            style="padding:5px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">D+183일</button>
-          <span id="smslog-plan-date" style="font-size:12px;font-weight:700;color:#0d9488;margin-left:2px;"></span>
+            style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">D+184일</button>
+          <span id="smslog-plan-date" style="font-size:12px;font-weight:700;color:#0d9488;"></span>
         </div>
 
         <!-- 카테고리 탭 -->
@@ -1241,12 +1254,12 @@
           <span style="color:var(--ink-soft);font-size:12px;padding:4px;">위에서 카테고리를 선택하세요</span>
         </div>
 
-        <!-- 부가서비스 입력 -->
+        <!-- 부가서비스 -->
         <div id="smslog-addon-row" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px;">
           <div id="smslog-addon-btns" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
           <div style="display:flex;align-items:center;gap:8px;">
             <input id="smslog-addon" type="text" placeholder="직접 입력"
-              style="flex:1;height:30px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+              style="flex:1;height:32px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
               oninput="smslogAddonInput()">
             <span id="smslog-addon-date" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;"></span>
           </div>
@@ -1254,19 +1267,15 @@
 
         <!-- 미리보기 -->
         <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);">
-          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:5px;">선택된 요금제: <strong id="smslog-sel-plan" style="color:var(--sk);">-</strong></div>
-          <div id="smslog-preview" style="font-size:14px;font-weight:600;color:var(--ink);line-height:1.8;word-break:keep-all;margin-bottom:5px;">이쁜핸드폰집입니다^^ -고객님 114연결 또는 매장내방하셔서 요금제(-) 변경 부탁드립니다</div>
+          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px;">요금제: <strong id="smslog-sel-plan" style="color:var(--sk);">-</strong></div>
+          <div id="smslog-preview" style="font-size:14px;font-weight:600;color:var(--ink);line-height:1.8;word-break:keep-all;margin-bottom:4px;"></div>
           <div id="smslog-date-preview" style="font-size:12px;font-weight:700;color:#0d9488;line-height:1.8;"></div>
         </div>
 
-        <!-- 발송유형 + 버튼 -->
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <span style="font-size:12px;font-weight:700;color:var(--ink-soft);">발송</span>
-          <button class="smslog-type on" id="smslog-type-cust" onclick="smslogType('customer')">📤 고객에게</button>
-          <button class="smslog-type" id="smslog-type-self" onclick="smslogType('self')">📥 나에게</button>
-          <div style="flex:1;min-width:10px;"></div>
-          <button onclick="smslogCopy()" style="padding:8px 16px;background:#0d9488;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;">📋 복사</button>
-          <button onclick="smslogRecord()" style="padding:8px 16px;background:var(--sk);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;">✅ 발송완료 기록</button>
+        <!-- 버튼 -->
+        <div style="display:flex;gap:8px;">
+          <button onclick="smslogCopy()" style="flex:1;padding:10px;background:#0d9488;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">📋 복사</button>
+          <button onclick="smslogRecord()" style="flex:1;padding:10px;background:var(--sk);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">✅ 발송완료 기록</button>
         </div>
       </div>
 
@@ -1297,6 +1306,50 @@
           <div id="smslog-list"><div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">내역이 없습니다.</div></div>
         </div>
       </div>
+      </div><!-- /smspanel-write -->
+
+      <!-- 달력 패널 -->
+      <div id="smspanel-cal" style="display:none;">
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;">
+          <div style="padding:14px 18px 10px;">
+            <!-- 연도 선택 -->
+            <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px;">
+              <button onclick="smscalYearPrev()" style="border:none;background:var(--bg);font-size:18px;cursor:pointer;color:var(--ink);width:32px;height:32px;border-radius:8px;">‹</button>
+              <div id="smscal-title" style="font-size:18px;font-weight:900;color:var(--ink);min-width:70px;text-align:center;"></div>
+              <button onclick="smscalYearNext()" style="border:none;background:var(--bg);font-size:18px;cursor:pointer;color:var(--ink);width:32px;height:32px;border-radius:8px;">›</button>
+            </div>
+            <!-- 월 버튼 -->
+            <div id="smscal-month-btns" style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:10px;"></div>
+            <!-- 범례 -->
+            <div style="display:flex;gap:14px;justify-content:center;font-size:11px;font-weight:700;">
+              <span style="color:#166534;display:flex;align-items:center;gap:3px;"><span style="width:10px;height:10px;border-radius:2px;background:#16a34a;display:inline-block;"></span>요금제 변경일</span>
+              <span style="color:#991b1b;display:flex;align-items:center;gap:3px;"><span style="width:10px;height:10px;border-radius:2px;background:#dc2626;display:inline-block;"></span>부가서비스 삭제일</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg);">
+            <div style="text-align:center;font-size:12px;font-weight:800;color:#ef4444;padding:8px 0;">일</div>
+            <div style="text-align:center;font-size:12px;font-weight:800;color:var(--ink-soft);padding:8px 0;">월</div>
+            <div style="text-align:center;font-size:12px;font-weight:800;color:var(--ink-soft);padding:8px 0;">화</div>
+            <div style="text-align:center;font-size:12px;font-weight:800;color:var(--ink-soft);padding:8px 0;">수</div>
+            <div style="text-align:center;font-size:12px;font-weight:800;color:var(--ink-soft);padding:8px 0;">목</div>
+            <div style="text-align:center;font-size:12px;font-weight:800;color:var(--ink-soft);padding:8px 0;">금</div>
+            <div style="text-align:center;font-size:12px;font-weight:800;color:#3b82f6;padding:8px 0;">토</div>
+          </div>
+          <div id="smscal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--line);"></div>
+        </div>
+      </div><!-- /smspanel-cal -->
+
+      <!-- 달력 상세 팝업 -->
+      <div id="smscal-detail-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:3000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+        <div style="background:var(--panel);border-radius:16px;padding:20px;max-width:400px;width:92%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.3);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <span id="smscal-detail-date" style="font-size:15px;font-weight:800;color:var(--ink);"></span>
+            <button onclick="document.getElementById('smscal-detail-bg').style.display='none'" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--ink-soft);">✕</button>
+          </div>
+          <div id="smscal-detail-list"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2860,6 +2913,8 @@ function setupFirebaseSync() {
     const d = snap.val() || {};
     smslogList = Object.values(d).sort((a, b) => Number(a.id) - Number(b.id));
     smslogListRender();
+    if (document.getElementById('csub-calendar')?.classList.contains('active')) calRender();
+    if (document.getElementById('smspanel-cal')?.style.display !== 'none') smscalRender();
   });
 }
 
@@ -2997,6 +3052,7 @@ document.querySelectorAll('.csub-btn').forEach(btn => {
     btn.classList.add('active');
     document.getElementById(btn.dataset.csub).classList.add('active');
     if (btn.dataset.csub === 'csub-calendar') calRender();
+    // smscal is now an internal tab inside csub-sms
   });
 });
 
@@ -3858,7 +3914,7 @@ const SMS_PLANS = {
     '5G시니어': [
       '라이트 45 (시니어)','라이트 39 (시니어)'
     ],
-    'LTE표준': [], 'LTE키즈': [], 'LTE시니어': [], '5G복지': []
+    '5G복지': []
   },
   KT: {
     '5G성인': [
@@ -3893,7 +3949,6 @@ const SMS_PLANS = {
     '키즈': [
       '키즈38','키즈28','키즈24','키즈20','키즈13'
     ],
-    'LTE성인': [], 'LTE청년': [], 'LTE청소년': [], 'LTE시니어': []
   },
   LG: {
     '5G성인': [
@@ -4173,6 +4228,9 @@ function smslogType(t) {
   const ph = document.getElementById('smslog-phone');
   if (pl) pl.style.display = showPhone ? '' : 'none';
   if (ph) ph.style.display = showPhone ? '' : 'none';
+  const tplRow = document.getElementById('smslog-tpl-row');
+  if (tplRow) tplRow.style.display = t === 'self' ? 'none' : 'flex';
+  if (t === 'self') smslogTpl('plan');
   smslogPreview();
 }
 
@@ -4217,7 +4275,7 @@ function smslogRecord() {
   if (smslogTypeVal === 'self') {
     if (!plan) { alert('요금제를 선택하세요.'); return; }
     msg = `${name}고객님 전화번호 ${phone} 요금제(${plan}) 자체변경요망 또는 유선으로 연락요망`;
-    const pd = smslogCalcDate(smslogRetentionRule);
+    const pd = smslogCalcDate(smslogRetentionRule || 'M3');
     if (pd) planDate = smslogFmtDate(pd);
   } else if (smslogMsgType === 'addon') {
     if (!addon) { alert('부가서비스명을 선택하거나 입력하세요.'); return; }
@@ -5872,6 +5930,195 @@ function consultDelete(id) {
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
+// ── 문자 내부탭 전환 ───────────────────────────────
+function smstabSwitch(tab) {
+  const writePanel = document.getElementById('smspanel-write');
+  const calPanel   = document.getElementById('smspanel-cal');
+  const writBtn    = document.getElementById('smstab-write');
+  const calBtn     = document.getElementById('smstab-cal');
+  const on  = 'padding:9px 24px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--accent,#7c3aed);border-bottom:2.5px solid var(--accent,#7c3aed);margin-bottom:-2px;font-family:inherit;';
+  const off = 'padding:9px 24px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--ink-soft);border-bottom:2.5px solid transparent;margin-bottom:-2px;font-family:inherit;';
+  if (tab === 'write') {
+    if (writePanel) writePanel.style.display = '';
+    if (calPanel)   calPanel.style.display   = 'none';
+    if (writBtn)    writBtn.style.cssText    = on;
+    if (calBtn)     calBtn.style.cssText     = off;
+  } else {
+    if (writePanel) writePanel.style.display = 'none';
+    if (calPanel)   calPanel.style.display   = '';
+    if (writBtn)    writBtn.style.cssText    = off;
+    if (calBtn)     calBtn.style.cssText     = on;
+    smscalGoNearest();
+    smscalRender();
+  }
+}
+
+// ── 문자달력 ─────────────────────────────────────
+var smscalYear  = new Date().getFullYear();
+var smscalMonth = new Date().getMonth();
+
+function smscalGoNearest() {
+  const today = new Date().toISOString().slice(0, 10);
+  const dates = [];
+  smslogList.filter(r => r.type === 'self' && r.status !== 'done').forEach(r => {
+    const pd = calParseKorDate(r.planDate);  if (pd) dates.push(pd);
+    const ad = calParseKorDate(r.addonDate); if (ad) dates.push(ad);
+  });
+  const upcoming = dates.filter(d => d >= today).sort();
+  if (!upcoming.length) return;
+  const [y, m] = upcoming[0].split('-');
+  smscalYear  = parseInt(y);
+  smscalMonth = parseInt(m) - 1;
+}
+
+function smscalRender() {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  document.getElementById('smscal-title').textContent = `${smscalYear}년`;
+
+  // 이벤트 있는 월 미리 계산
+  const selfAll = smslogList.filter(r => r.type === 'self' && r.status !== 'done');
+  const monthsWithEvents = new Set();
+  selfAll.forEach(r => {
+    [r.planDate, r.addonDate].forEach(dt => {
+      const p = calParseKorDate(dt);
+      if (p && p.startsWith(String(smscalYear))) monthsWithEvents.add(parseInt(p.split('-')[1]) - 1);
+    });
+  });
+  const monthBtnWrap = document.getElementById('smscal-month-btns');
+  if (monthBtnWrap) {
+    monthBtnWrap.innerHTML = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'].map((lbl, i) => {
+      const isActive = i === smscalMonth;
+      const hasDot   = monthsWithEvents.has(i);
+      return `<button onclick="smscalGoMonth(${i})" style="padding:5px 2px;border:1.5px solid ${isActive?'#6366f1':'var(--line)'};border-radius:8px;background:${isActive?'#6366f1':'var(--panel)'};color:${isActive?'#fff':'var(--ink)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;position:relative;">
+        ${lbl}${hasDot?`<span style="position:absolute;top:2px;right:3px;width:5px;height:5px;border-radius:50%;background:${isActive?'#a5f3fc':'#16a34a'};"></span>`:''}
+      </button>`;
+    }).join('');
+  }
+  const grid = document.getElementById('smscal-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const firstDay    = new Date(smscalYear, smscalMonth, 1).getDay();
+  const daysInMonth = new Date(smscalYear, smscalMonth+1, 0).getDate();
+
+  const selfList = smslogList.filter(r => r.type === 'self' && r.status !== 'done');
+  const planMap = {}, addonMap = {};
+  selfList.forEach(r => {
+    const pd = calParseKorDate(r.planDate);
+    if (pd) { if (!planMap[pd]) planMap[pd] = []; planMap[pd].push(r); }
+    const ad = calParseKorDate(r.addonDate);
+    if (ad) { if (!addonMap[ad]) addonMap[ad] = []; addonMap[ad].push(r); }
+  });
+
+  // 빈 칸
+  for (let i = 0; i < firstDay; i++) {
+    grid.insertAdjacentHTML('beforeend',
+      `<div style="min-height:110px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg);opacity:.4;"></div>`);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${smscalYear}-${String(smscalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow     = new Date(smscalYear, smscalMonth, d).getDay();
+    const isToday = dateStr === todayStr;
+    const plans   = planMap[dateStr]  || [];
+    const addons  = addonMap[dateStr] || [];
+    const hasAny  = plans.length + addons.length > 0;
+    const numColor = dow === 0 ? '#ef4444' : dow === 6 ? '#3b82f6' : 'var(--ink)';
+
+    let evHtml = '';
+    plans.forEach(r => {
+      const chk = r.calChecked;
+      evHtml += `<div style="background:${chk?'#f0fdf4':'#dcfce7'};color:${chk?'#6b7280':'#166534'};font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid ${chk?'#86efac':'#16a34a'};${chk?'text-decoration:line-through;opacity:.7;':''}">📅 ${r.name}${chk?' ✅':''}</div>`;
+    });
+    addons.forEach(r => {
+      const chk = r.calChecked;
+      evHtml += `<div style="background:${chk?'#fef2f2':'#fee2e2'};color:${chk?'#6b7280':'#991b1b'};font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid ${chk?'#fca5a5':'#dc2626'};${chk?'text-decoration:line-through;opacity:.7;':''}">🗓 ${r.name}${chk?' ✅':''}</div>`;
+    });
+
+    grid.insertAdjacentHTML('beforeend', `
+      <div onclick="${hasAny ? `smscalDetail('${dateStr}')` : ''}"
+        style="min-height:110px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 6px;cursor:${hasAny?'pointer':'default'};background:${isToday?'#faf5ff':hasAny?'#fafffe':'var(--panel)'};transition:background .1s;"
+        onmouseover="if(${hasAny})this.style.background='#f0fdf4'"
+        onmouseout="this.style.background='${isToday?'#faf5ff':hasAny?'#fafffe':'var(--panel)'}'">
+        <div style="font-size:14px;font-weight:${isToday?900:600};margin-bottom:2px;
+          ${isToday?'background:#7c3aed;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;':'color:'+numColor+';'}">
+          ${d}
+        </div>
+        ${evHtml}
+      </div>`);
+  }
+}
+
+function smscalPrev() { smscalMonth--; if (smscalMonth < 0) { smscalMonth = 11; smscalYear--; } smscalRender(); }
+function smscalNext() { smscalMonth++; if (smscalMonth > 11) { smscalMonth = 0; smscalYear++; } smscalRender(); }
+function smscalYearPrev() { smscalYear--; smscalRender(); }
+function smscalYearNext() { smscalYear++; smscalRender(); }
+function smscalGoMonth(m) { smscalMonth = m; smscalRender(); }
+
+function smscalDetail(dateStr) {
+  const selfList = smslogList.filter(r => r.type === 'self' && r.status !== 'done');
+  const plans  = selfList.filter(r => calParseKorDate(r.planDate)  === dateStr);
+  const addons = selfList.filter(r => calParseKorDate(r.addonDate) === dateStr);
+  if (!plans.length && !addons.length) return;
+  const [y,m,d] = dateStr.split('-');
+  document.getElementById('smscal-detail-date').textContent = `${y}년 ${parseInt(m)}월 ${parseInt(d)}일`;
+  let html = '';
+  plans.forEach(r => {
+    html += `<div style="border:1.5px solid #86efac;border-radius:12px;padding:14px;margin-bottom:10px;background:#f0fdf4;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#166534;margin-bottom:6px;">📅 요금제 변경일</div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">${r.name} 고객님</div>
+          <div style="font-size:12px;color:var(--ink-soft);margin-top:5px;line-height:1.8;">
+            통신사: <b>${r.carrier}</b><br>요금제: <b>${r.plan||'-'}</b>
+          </div>
+        </div>
+        ${r.calChecked
+          ? `<span style="padding:6px 12px;border-radius:8px;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 확인완료</span>`
+          : `<button onclick="smscalDone('${r.id}',this)" style="padding:6px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:10px;flex-shrink:0;">👁 확인</button>`
+        }
+      </div>
+    </div>`;
+  });
+  addons.forEach(r => {
+    html += `<div style="border:1.5px solid #fca5a5;border-radius:12px;padding:14px;margin-bottom:10px;background:#fef2f2;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#991b1b;margin-bottom:6px;">🗓 부가서비스 삭제일</div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">${r.name} 고객님</div>
+          <div style="font-size:12px;color:var(--ink-soft);margin-top:5px;line-height:1.8;">
+            통신사: <b>${r.carrier}</b><br>부가서비스: <b>${r.addon||'-'}</b>
+          </div>
+        </div>
+        ${r.calChecked
+          ? `<span style="padding:6px 12px;border-radius:8px;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 확인완료</span>`
+          : `<button onclick="smscalDone('${r.id}',this)" style="padding:6px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:10px;flex-shrink:0;">👁 확인</button>`
+        }
+      </div>
+    </div>`;
+  });
+  document.getElementById('smscal-detail-list').innerHTML = html;
+  document.getElementById('smscal-detail-bg').style.display = 'flex';
+}
+
+function smscalDone(id, btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '✅ 확인완료';
+    btn.style.background = '#16a34a';
+    btn.style.cursor = 'default';
+  }
+  db.ref(HUB + '/smsLog/' + id).update({ calChecked: true });
+}
+
+function calParseKorDate(s) {
+  if (!s) return null;
+  const m = s.match(/(\d+)년\s*(\d+)월\s*(\d+)일/);
+  if (!m) return null;
+  return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+}
+
 function calRender() {
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -5946,8 +6193,7 @@ function calShowDetail(dateStr) {
       </div>
     </div>
   `).join('');
-  const bg = document.getElementById('cal-detail-bg');
-  bg.style.display = 'flex';
+  document.getElementById('cal-detail-bg').style.display = 'flex';
 }
 document.getElementById('consult-modal-bg').addEventListener('click', e => {
   if (e.target === document.getElementById('consult-modal-bg')) consultCloseModal();
