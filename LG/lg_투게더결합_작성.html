@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>U+투게더 결합 신청서</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;background:#e8edf2;overflow-x:hidden;}
+.toolbar{background:#1a0a2e;color:#fff;height:42px;padding:0 14px;display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;right:0;z-index:500;}
+.toolbar a{color:#c4b5fd;font-size:13px;text-decoration:none;}
+.toolbar .title{flex:1;font-size:14px;font-weight:700;}
+.toolbar button{padding:5px 13px;border:none;border-radius:6px;background:#7c3aed;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.app{display:flex;margin-top:42px;min-height:calc(100vh - 42px);}
+.sidebar{width:220px;flex-shrink:0;background:#f8fafc;border-right:2px solid #e2e8f0;padding:10px;overflow-y:auto;}
+.sb-ttl{font-size:10px;font-weight:800;color:#7c3aed;letter-spacing:.5px;margin-bottom:7px;margin-top:10px;}
+.sb-ttl:first-child{margin-top:0;}
+.sb-field{margin-bottom:5px;}
+.sb-field label{font-size:10px;font-weight:700;color:#94a3b8;display:block;margin-bottom:2px;}
+.sb-field input,.sb-field select{width:100%;height:26px;padding:0 7px;border:1.5px solid #e2e8f0;border-radius:5px;font-size:12px;font-family:'Malgun Gothic',sans-serif;color:#1e293b;background:#fff;}
+.sb-field input:focus,.sb-field select:focus{border-color:#7c3aed;outline:none;}
+.reset-btn{width:100%;padding:7px;border:1.5px solid #e2e8f0;border-radius:7px;background:#fff;color:#94a3b8;font-size:11px;cursor:pointer;font-family:inherit;margin-top:8px;}
+.reset-btn:hover{background:#f1f5f9;color:#64748b;}
+.main{flex:1;padding:14px;overflow-x:auto;}
+.a4{background:#fff;width:794px;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.12);padding:28px 30px 32px;}
+.form-title{text-align:center;font-size:17px;font-weight:900;letter-spacing:1px;margin-bottom:4px;color:#1e1e1e;}
+.form-sub{text-align:right;font-size:10px;color:#64748b;margin-bottom:14px;}
+.biz-sel{display:flex;gap:0;border:1px solid #000;margin-bottom:10px;}
+.biz-sel .biz-lbl{background:#ddd;font-size:11px;font-weight:700;padding:5px 10px;border-right:1px solid #000;white-space:nowrap;}
+.biz-sel .biz-opts{display:flex;gap:14px;align-items:center;padding:5px 12px;font-size:12px;}
+.biz-sel .biz-opts label{display:flex;align-items:center;gap:4px;cursor:pointer;}
+.info-box{border:1px solid #000;margin-bottom:0;}
+.info-box table{width:100%;border-collapse:collapse;}
+.info-box table td{border:1px solid #000;padding:3px 6px;font-size:11px;vertical-align:middle;}
+.info-box table td.lbl{background:#f0f0f0;font-weight:700;white-space:nowrap;}
+.info-box table td input{width:100%;border:none;outline:none;font-size:12px;font-family:'Malgun Gothic',sans-serif;background:transparent;height:20px;}
+.combo-row{border:1px solid #000;border-top:none;display:flex;align-items:stretch;}
+.combo-lbl{background:#f0f0f0;font-size:11px;font-weight:700;padding:5px 10px;border-right:1px solid #000;white-space:nowrap;display:flex;align-items:center;}
+.combo-opts{display:flex;gap:20px;align-items:center;padding:5px 14px;font-size:11px;}
+.combo-opts label{display:flex;align-items:center;gap:5px;cursor:pointer;}
+.combo-opts .desc{font-size:10px;color:#666;margin-left:4px;}
+.sec-title{background:#b0bec5;text-align:center;font-size:11px;font-weight:800;padding:4px;border:1px solid #000;border-bottom:none;margin-top:10px;}
+.data-table{width:100%;border-collapse:collapse;font-size:10.5px;}
+.data-table th{background:#dde;border:1px solid #000;padding:3px 4px;text-align:center;font-weight:700;white-space:nowrap;}
+.data-table td{border:1px solid #000;padding:2px 4px;text-align:center;vertical-align:middle;}
+.data-table td input{width:100%;border:none;outline:none;font-size:11px;font-family:'Malgun Gothic',sans-serif;background:transparent;text-align:center;height:18px;}
+.data-table td.no-col{background:#f5f5f5;font-weight:700;color:#555;width:24px;}
+.discount-row{border:1px solid #000;border-top:none;padding:6px 10px;font-size:11px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.discount-row label{display:flex;align-items:center;gap:5px;cursor:pointer;font-weight:700;}
+.pkg-row{border:1px solid #000;border-top:none;padding:5px 10px;font-size:11px;display:flex;align-items:center;gap:10px;}
+.notice-box{border:1px solid #000;border-top:none;padding:6px 10px;font-size:9.5px;color:#333;line-height:1.7;margin-bottom:10px;}
+.sign-area{display:flex;border:1px solid #000;margin-top:10px;}
+.sign-cell{flex:1;border-right:1px solid #000;padding:6px 10px;}
+.sign-cell:last-child{border-right:none;}
+.sign-cell .lbl{font-size:10px;font-weight:700;color:#555;margin-bottom:4px;}
+.sign-cell .line{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.sign-cell .line label{font-size:10.5px;white-space:nowrap;min-width:60px;}
+.sign-cell .line input{flex:1;border:none;border-bottom:1px solid #999;outline:none;font-size:11px;font-family:'Malgun Gothic',sans-serif;background:transparent;}
+.sign-cell .sign-box{margin-top:6px;border:1px solid #ccc;height:36px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#aaa;}
+.lg-footer{text-align:center;font-size:9px;color:#888;margin-top:8px;}
+@media print{
+  .toolbar,.sidebar{display:none!important;}
+  body{background:#fff;}
+  .app{margin-top:0;}
+  .main{padding:0;}
+  .a4{box-shadow:none;width:100%;padding:14px 16px;}
+  @page{margin:8mm;}
+}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a href="../hub.html">← 허브</a>
+  <span class="title">U+투게더 결합 신청서</span>
+  <button onclick="window.print()">🖨️ 인쇄</button>
+  <button onclick="resetAll()">↩ 초기화</button>
+</div>
+<div class="app">
+<div class="sidebar">
+  <div class="sb-ttl">👤 대표자 정보</div>
+  <div class="sb-field"><label>가입자명</label><input id="s-name" oninput="fill('p-name',this.value)"></div>
+  <div class="sb-field"><label>생년월일</label><input id="s-birth" placeholder="YYMMDD" oninput="fill('p-birth',this.value)"></div>
+  <div class="sb-field"><label>휴대폰 번호</label><input id="s-phone" oninput="fill('p-phone',this.value)"></div>
+  <div class="sb-field"><label>주소(설치주소)</label><input id="s-addr" oninput="fill('p-addr',this.value)"></div>
+  <div class="sb-ttl">📋 업무 선택</div>
+  <div class="sb-field">
+    <select id="s-biz" onchange="setBiz(this.value)">
+      <option value="신청">신청</option>
+      <option value="변경">변경</option>
+      <option value="해지">해지</option>
+    </select>
+  </div>
+  <div class="sb-ttl">🔗 결합방식</div>
+  <div class="sb-field">
+    <select id="s-combo" onchange="setCombo(this.value)">
+      <option value="">선택</option>
+      <option value="일반">일반 (가족결합)</option>
+      <option value="청구통합">청구통합 (지인결합)</option>
+    </select>
+  </div>
+  <div class="sb-ttl">💰 할인방식</div>
+  <div class="sb-field">
+    <select id="s-disc" onchange="setDisc(this.value)">
+      <option value="">선택</option>
+      <option value="개별">개별할인</option>
+      <option value="1인">1인 지정 할인</option>
+    </select>
+  </div>
+  <div class="sb-field"><label>지정 번호</label><input id="s-dphone" oninput="fill('p-dphone',this.value)"></div>
+  <div class="sb-ttl">📦 패키지</div>
+  <div class="sb-field">
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+      <input type="checkbox" id="s-allinone" onchange="document.getElementById('pkg-allinone').checked=this.checked">
+      올인원 패키지
+    </label>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↩ 전체 초기화</button>
+</div>
+<div class="main">
+<div class="a4">
+  <div class="form-title">U+ 투게더 결합 신청서</div>
+  <div class="form-sub">4601011-20260708</div>
+
+  <!-- 업무 선택 -->
+  <div class="biz-sel">
+    <div class="biz-lbl">업무<br>선택</div>
+    <div class="biz-opts">
+      <label><input type="checkbox" id="chk-신청"> 신청</label>
+      <label><input type="checkbox" id="chk-변경"> 변경</label>
+      <label><input type="checkbox" id="chk-해지"> 해지</label>
+    </div>
+  </div>
+
+  <!-- 대표자 정보 -->
+  <div class="info-box">
+    <table>
+      <tr>
+        <td class="lbl" rowspan="2">대표자<br>정보</td>
+        <td class="lbl">가입자명</td>
+        <td><input id="p-name" placeholder="홍길동"></td>
+        <td class="lbl">생년월일</td>
+        <td><input id="p-birth" placeholder="YYMMDD"></td>
+        <td class="lbl">휴대폰 번호</td>
+        <td><input id="p-phone" placeholder="010-0000-0000"></td>
+      </tr>
+      <tr>
+        <td class="lbl">주소 (설치주소)</td>
+        <td colspan="5"><input id="p-addr" placeholder="주소를 입력하세요" style="width:100%"></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 결합방식 -->
+  <div class="combo-row">
+    <div class="combo-lbl">결합방식</div>
+    <div class="combo-opts">
+      <label>
+        <input type="checkbox" id="combo-일반"> 일반 (가족결합)
+        <span class="desc">가족관계증명서 제출을 통한 결합</span>
+      </label>
+      <label>
+        <input type="checkbox" id="combo-청구통합"> 청구통합 (지인결합)
+        <span class="desc">통신 요금 일괄 납부를 통한 결합 (가족관계증명서 불필요)</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- 휴대폰 구성 회선 -->
+  <div class="sec-title">휴대폰 구성 회선</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>고객명</th>
+        <th>생년월일</th>
+        <th>대표자와의 관계</th>
+        <th>휴대폰 번호</th>
+        <th>휴대폰 요금제</th>
+      </tr>
+    </thead>
+    <tbody id="mobile-rows"></tbody>
+  </table>
+
+  <!-- 인터넷 구성 회선 -->
+  <div class="sec-title" style="margin-top:8px;">인터넷 구성 회선</div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>고객명</th>
+        <th>생년월일</th>
+        <th>대표자와의 관계</th>
+        <th>주소</th>
+        <th>인터넷 요금제</th>
+      </tr>
+    </thead>
+    <tbody id="inet-rows"></tbody>
+  </table>
+
+  <!-- 할인방식 -->
+  <div class="discount-row">
+    <span style="font-weight:700;min-width:52px;">할인방식</span>
+    <label><input type="checkbox" id="disc-개별"> 개별할인 (할인나눔 포함)</label>
+    <label><input type="checkbox" id="disc-1인"> 1인 지정 할인
+      <span style="margin-left:6px;">(지정번호 :</span>
+      <input id="p-dphone" style="width:120px;border:none;border-bottom:1px solid #000;outline:none;font-size:11px;font-family:'Malgun Gothic',sans-serif;margin:0 4px;">
+      <span>)</span>
+    </label>
+    <span style="font-size:10px;color:#555;margin-left:auto;">※ 인터넷 할인금액은 인터넷 월정액 요금에서 할인됩니다. 인터넷 해지 시 모바일은 자동 무선결합으로 변경됩니다.</span>
+  </div>
+
+  <!-- 패키지 -->
+  <div class="pkg-row">
+    <span style="font-weight:700;">패키지</span>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;">
+      <input type="checkbox" id="pkg-allinone"> 올인원
+    </label>
+    <span style="font-size:10px;color:#555;margin-left:8px;">※ 올인원 패키지 인터넷 할인은 U+투게더 결합의 인터넷 할인과 중복 적용되지 않습니다.</span>
+  </div>
+
+  <!-- 동의 안내 -->
+  <div class="notice-box">
+    <b>신청 결합 구성원에 대한 위임 및 동의</b><br>
+    1. 결합 구성원에 명시된 인원은 U+투게더 상품 가입에 동의합니다.<br>
+    2. 결합 구성원에 명시된 인원은 U+투게더 상품 가입과 신청서상 가입 구성원의 개인정보 이용/구성원 간 개인정보 공개 등 제반 업무 수행에 대한 모든 권한을 신청인에게 위임합니다.<br>
+    3. 결합 구성원에 명시된 인원은 가입의사 확인을 위해 신청서상 가입 구성원의 이동전화번호로 LG U+로부터 연락을 받는 것에 동의합니다.
+  </div>
+
+  <!-- 서명란 -->
+  <div class="sign-area">
+    <div class="sign-cell">
+      <div class="lbl">신청인 (대표자)</div>
+      <div class="line"><label>이름</label><input placeholder="홍길동"></div>
+      <div class="line"><label>휴대폰 번호</label><input placeholder="010-0000-0000"></div>
+      <div class="sign-box">서명 / 인</div>
+    </div>
+    <div class="sign-cell">
+      <div class="lbl">판매점</div>
+      <div class="line"><label>대리점명</label><input placeholder="이쁜핸드폰집"></div>
+      <div class="line"><label>담당자명</label><input placeholder="담당자"></div>
+      <div class="sign-box">서명 / 인</div>
+    </div>
+  </div>
+
+  <div class="lg-footer">이 신청서는 LG U+ 전산시스템에 등록된 내용과 LG U+에 의한 모든 약관 내용에 동의하거나 따르므로 대신할 수 없습니다. Copyright © LG Uplus Corp. All rights Reserved. (주)LG유플러스</div>
+</div>
+</div>
+</div>
+<script>
+function fill(id, v){ const el=document.getElementById(id); if(el) el.value=v; }
+function setBiz(v){
+  ['신청','변경','해지'].forEach(k=>{ const c=document.getElementById('chk-'+k); if(c) c.checked=(k===v); });
+}
+function setCombo(v){
+  document.getElementById('combo-일반').checked       = v==='일반';
+  document.getElementById('combo-청구통합').checked   = v==='청구통합';
+}
+function setDisc(v){
+  document.getElementById('disc-개별').checked = v==='개별';
+  document.getElementById('disc-1인').checked  = v==='1인';
+}
+function resetAll(){
+  document.querySelectorAll('input[type=text],input:not([type]),input[type=checkbox]').forEach(el=>{
+    if(el.type==='checkbox') el.checked=false; else el.value='';
+  });
+  document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+}
+
+// 휴대폰 회선 5개
+const mobileBody = document.getElementById('mobile-rows');
+for(let i=1;i<=5;i++){
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td class="no-col">${i}</td>
+    <td><input placeholder="고객명"></td>
+    <td><input placeholder="YYMMDD"></td>
+    <td><input placeholder="관계"></td>
+    <td><input placeholder="010-0000-0000"></td>
+    <td><input placeholder="요금제명"></td>`;
+  mobileBody.appendChild(tr);
+}
+
+// 인터넷 회선 5개
+const inetBody = document.getElementById('inet-rows');
+for(let i=1;i<=5;i++){
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td class="no-col">${i}</td>
+    <td><input placeholder="고객명"></td>
+    <td><input placeholder="YYMMDD"></td>
+    <td><input placeholder="관계"></td>
+    <td><input placeholder="주소" style="min-width:130px;"></td>
+    <td><input placeholder="인터넷 요금제"></td>`;
+  inetBody.appendChild(tr);
+}
+
+setBiz('신청');
+</script>
+</body>
+</html>
