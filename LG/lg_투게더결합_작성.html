@@ -180,6 +180,23 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
     </div>
   </div>
   <div class="sb-sec">
+    <div class="sb-ttl">💰 할인방식</div>
+    <div class="cb-row">
+      <button id="disc-ind-btn" onclick="toggleDisc('ind')">☐ 개별할인</button>
+      <button id="disc-des-btn" onclick="toggleDisc('des')">☐ 1인 지정 할인</button>
+    </div>
+    <div id="disc-num-wrap" class="sb-field" style="display:none;margin-top:4px;">
+      <label>지정번호</label>
+      <input id="s-disc-num" placeholder="지정번호 입력" oninput="sync(this,'disc-num')">
+    </div>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-ttl">📦 패키지</div>
+    <div class="cb-row">
+      <button id="pkg-all-btn" onclick="togglePkg()">☐ 올인원</button>
+    </div>
+  </div>
+  <div class="sb-sec">
     <button class="copy-btn" onclick="copyCoords()">📋 좌표 복사</button>
     <div id="notice"></div>
     <button class="reset-btn" onclick="resetAll()">↺ 전체 초기화</button>
@@ -246,6 +263,10 @@ body{font-family:'Malgun Gothic','맑은 고딕',sans-serif;overflow:hidden;}
 <span class="ft" id="n5-rel" data-fid="n5-rel" style="left:48.0%;top:43.9%;"></span>
 <span class="ft" id="n5-addr" data-fid="n5-addr" style="left:63.5%;top:43.9%;"></span>
 <span class="ft" id="n5-plan" data-fid="n5-plan" style="left:84.6%;top:43.9%;"></span>
+<span class="ft" id="disc-ind" data-fid="disc-ind" style="left:10.5%;top:46.2%;font-size:14px;color:#dc2626;"></span>
+<span class="ft" id="disc-des" data-fid="disc-des" style="left:10.5%;top:47.8%;font-size:14px;color:#dc2626;"></span>
+<span class="ft" id="disc-num" data-fid="disc-num" style="left:28.0%;top:48.0%;"></span>
+<span class="ft" id="pkg-all" data-fid="pkg-all" style="left:10.5%;top:50.5%;font-size:14px;color:#dc2626;"></span>
 
     </div>
   </div>
@@ -292,6 +313,36 @@ function makeDrag(el){
 }
 document.querySelectorAll('.ft').forEach(makeDrag);
 
+var discState={};
+function toggleDisc(key){
+  var fid='disc-'+key;
+  var btn=document.getElementById(fid+'-btn');
+  var el=document.getElementById(fid);
+  if(discState[key]){
+    discState[key]=false;
+    btn.classList.remove('on');
+    btn.textContent=(key==='ind'?'☐ 개별할인':'☐ 1인 지정 할인');
+    if(el) el.textContent='';
+    if(key==='des') document.getElementById('disc-num-wrap').style.display='none';
+  }else{
+    discState[key]=true;
+    btn.classList.add('on');
+    btn.textContent=(key==='ind'?'☑ 개별할인':'☑ 1인 지정 할인');
+    if(el) el.textContent='✔';
+    if(key==='des') document.getElementById('disc-num-wrap').style.display='';
+  }
+}
+
+var pkgState=false;
+function togglePkg(){
+  var btn=document.getElementById('pkg-all-btn');
+  var el=document.getElementById('pkg-all');
+  pkgState=!pkgState;
+  btn.classList.toggle('on',pkgState);
+  btn.textContent=pkgState?'☑ 올인원':'☐ 올인원';
+  if(el) el.textContent=pkgState?'✔':'';
+}
+
 function sync(inp,fid){
   var el=document.getElementById(fid);
   if(el) el.textContent=inp.value;
@@ -309,8 +360,12 @@ function showN(msg){var n=document.getElementById('notice');n.textContent=msg;n.
 function resetAll(){
   document.querySelectorAll('.sb-field input,.sb-row input').forEach(function(i){i.value='';});
   document.querySelectorAll('.ft').forEach(function(ft){ft.textContent='';});
-  cbState={};
+  cbState={};discState={};pkgState=false;
   document.querySelectorAll('.cb-row button').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('disc-ind-btn').textContent='☐ 개별할인';
+  document.getElementById('disc-des-btn').textContent='☐ 1인 지정 할인';
+  document.getElementById('pkg-all-btn').textContent='☐ 올인원';
+  document.getElementById('disc-num-wrap').style.display='none';
   dinfo.style.display='none';
 }
 </script>
