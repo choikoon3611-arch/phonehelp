@@ -1203,96 +1203,102 @@
       <div id="smspanel-write">
 
       <!-- 작성 영역 -->
-      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;">
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;">
 
-        <!-- 1줄: 통신사 + 발송대상 -->
-        <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-          <button class="smslog-carrier on" data-c="SK" onclick="smslogCarrier('SK',this)">SK</button>
-          <button class="smslog-carrier" data-c="KT" onclick="smslogCarrier('KT',this)">KT</button>
-          <button class="smslog-carrier" data-c="LG" onclick="smslogCarrier('LG',this)">LG</button>
-          <button class="smslog-carrier" data-c="알뜰" onclick="smslogCarrier('알뜰',this)">알뜰</button>
-          <div style="width:1px;height:20px;background:var(--line);margin:0 4px;"></div>
-          <div id="smslog-type-row" style="display:flex;gap:6px;align-items:center;">
-            <button class="smslog-type on" id="smslog-type-cust" onclick="smslogType('customer')">📤 고객에게</button>
-            <button class="smslog-type" id="smslog-type-self" onclick="smslogType('self')">📥 나에게</button>
-          </div>
-          <span id="smslog-mvno-badge" style="display:none;font-size:12px;font-weight:800;color:#6366f1;background:#ede9fe;padding:4px 10px;border-radius:8px;">📥 나에게 고정</span>
-        </div>
-
-        <!-- 2줄: 고객명 + 개통일 -->
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-          <input id="smslog-name" type="text" placeholder="고객명"
-            style="width:100px;height:34px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
-            oninput="smslogPreview()">
-          <input id="smslog-phone" type="tel" placeholder="010-0000-0000"
-            style="display:none;width:150px;height:34px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
-            oninput="smslogPreview()">
-          <span id="smslog-phone-label" style="display:none;font-size:11px;color:var(--ink-soft);">← 번호</span>
-          <input id="smslog-actdate" type="date"
-            style="height:34px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--panel);"
-            oninput="smslogPreview()">
-          <span style="font-size:11px;color:var(--ink-soft);">개통일 (비우면 오늘)</span>
-        </div>
-
-        <!-- 3줄: 문자유형 (나에게 선택 시 숨김) -->
-        <div id="smslog-tpl-row" style="display:flex;gap:5px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-          <button class="smslog-type on" id="smslog-tpl-plan" onclick="smslogTpl('plan')">요금제 변경</button>
-          <button class="smslog-type" id="smslog-tpl-both" onclick="smslogTpl('plan_addon')">요금제+부가서비스</button>
-          <button class="smslog-type" id="smslog-tpl-addon" onclick="smslogTpl('addon')">부가서비스만</button>
-        </div>
-
-        <!-- 유지기간 (요금제 포함 시) -->
-        <div id="smslog-retention-row" style="display:flex;align-items:center;gap:5px;margin-bottom:10px;flex-wrap:wrap;">
-          <button id="smslog-ret-m3" onclick="smslogRetention('M3')"
-            style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">M+3개월</button>
-          <button id="smslog-ret-d183" onclick="smslogRetention('D183')"
-            style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">D+184일</button>
-          <span id="smslog-plan-date" style="font-size:12px;font-weight:700;color:#0d9488;"></span>
-        </div>
-
-        <!-- 카테고리 탭 -->
-        <div id="smslog-cats" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;"></div>
-
-        <!-- 요금제 목록 -->
-        <div id="smslog-plans" style="margin-bottom:10px;">
-          <span style="color:var(--ink-soft);font-size:12px;padding:4px;">위에서 카테고리를 선택하세요</span>
-        </div>
-
-        <!-- 부가서비스 -->
-        <div id="smslog-addon-row" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px;">
-          <div id="smslog-addon-btns" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <input id="smslog-addon" type="text" placeholder="직접 입력"
-              style="flex:1;min-width:120px;height:32px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
-              oninput="smslogAddonInput()">
-            <div style="display:flex;gap:5px;align-items:center;">
-              <span style="font-size:11px;color:var(--ink-soft);font-weight:700;">삭제일</span>
-              <button id="smslog-addon-d30" onclick="smslogAddonDateOverride('D30')"
-                style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">D+30</button>
-              <button id="smslog-addon-m1" onclick="smslogAddonDateOverride('M1')"
-                style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">M+1</button>
-              <button id="smslog-addon-m3" onclick="smslogAddonDateOverride('M3')"
-                style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">M+3</button>
+        <!-- ① 고객 정보 섹션 -->
+        <div style="padding:14px 16px 12px;">
+          <div style="font-size:10px;font-weight:800;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">① 고객 정보</div>
+          <!-- 통신사 + 발송대상 한 줄 -->
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+            <button class="smslog-carrier on" data-c="SK" onclick="smslogCarrier('SK',this)">SK</button>
+            <button class="smslog-carrier" data-c="KT" onclick="smslogCarrier('KT',this)">KT</button>
+            <button class="smslog-carrier" data-c="LG" onclick="smslogCarrier('LG',this)">LG</button>
+            <button class="smslog-carrier" data-c="알뜰" onclick="smslogCarrier('알뜰',this)">알뜰</button>
+            <div style="width:1px;height:20px;background:var(--line);margin:0 4px;flex-shrink:0;"></div>
+            <div id="smslog-type-row" style="display:flex;gap:6px;align-items:center;">
+              <button class="smslog-type on" id="smslog-type-cust" onclick="smslogType('customer')">📤 고객에게</button>
+              <button class="smslog-type" id="smslog-type-self" onclick="smslogType('self')">📥 나에게</button>
             </div>
-            <span id="smslog-addon-date" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;"></span>
+            <span id="smslog-mvno-badge" style="display:none;font-size:12px;font-weight:800;color:#6366f1;background:#ede9fe;padding:4px 10px;border-radius:8px;">📥 나에게 고정</span>
+          </div>
+          <!-- 고객명 + 개통일 -->
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input id="smslog-name" type="text" placeholder="고객명"
+              style="width:100px;height:34px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+              oninput="smslogPreview()">
+            <input id="smslog-phone" type="tel" placeholder="010-0000-0000"
+              style="display:none;width:150px;height:34px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+              oninput="smslogPreview()">
+            <span id="smslog-phone-label" style="display:none;font-size:11px;color:var(--ink-soft);">← 번호</span>
+            <input id="smslog-actdate" type="date"
+              style="height:34px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--panel);"
+              oninput="smslogPreview()">
+            <span style="font-size:11px;color:var(--ink-soft);">개통일 (비우면 오늘)</span>
           </div>
         </div>
 
-        <!-- 미리보기 -->
-        <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);">
-          <div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px;">요금제: <strong id="smslog-sel-plan" style="color:var(--sk);">-</strong></div>
-          <div id="smslog-preview" style="font-size:14px;font-weight:600;color:var(--ink);line-height:1.8;word-break:keep-all;margin-bottom:4px;"></div>
-          <div id="smslog-date-preview" style="font-size:12px;font-weight:700;color:#0d9488;line-height:1.8;"></div>
+        <div style="border-top:1px solid var(--line);"></div>
+
+        <!-- ② 문자 유형 섹션 -->
+        <div style="padding:12px 16px;">
+          <div style="font-size:10px;font-weight:800;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">② 문자 유형</div>
+          <div id="smslog-tpl-row" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+            <button class="smslog-type on" id="smslog-tpl-plan" onclick="smslogTpl('plan')">요금제 변경</button>
+            <button class="smslog-type" id="smslog-tpl-both" onclick="smslogTpl('plan_addon')">요금제+부가서비스</button>
+            <button class="smslog-type" id="smslog-tpl-addon" onclick="smslogTpl('addon')">부가서비스만</button>
+          </div>
+          <div id="smslog-retention-row" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+            <button id="smslog-ret-m3" onclick="smslogRetention('M3')"
+              style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">M+3개월</button>
+            <button id="smslog-ret-d183" onclick="smslogRetention('D183')"
+              style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">D+184일</button>
+            <span id="smslog-plan-date" style="font-size:12px;font-weight:700;color:#0d9488;"></span>
+          </div>
         </div>
 
-        <!-- 버튼 -->
-        <div style="display:flex;gap:8px;">
-          <button onclick="smslogCopy()" style="flex:1;padding:10px;background:#0d9488;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">📋 복사</button>
-          <button onclick="smslogRecord()" style="flex:1;padding:10px;background:var(--sk);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">✅ 발송완료 기록</button>
+        <div style="border-top:1px solid var(--line);"></div>
+
+        <!-- ③ 요금제 선택 섹션 -->
+        <div style="padding:12px 16px 14px;">
+          <div style="font-size:10px;font-weight:800;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">③ 요금제 선택</div>
+          <div id="smslog-cats" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;"></div>
+          <div id="smslog-plans" style="margin-bottom:10px;">
+            <span style="color:var(--ink-soft);font-size:12px;padding:4px;">위에서 카테고리를 선택하세요</span>
+          </div>
+          <!-- 부가서비스 -->
+          <div id="smslog-addon-row" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px;">
+            <div id="smslog-addon-btns" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <input id="smslog-addon" type="text" placeholder="직접 입력"
+                style="flex:1;min-width:120px;height:32px;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;"
+                oninput="smslogAddonInput()">
+              <div style="display:flex;gap:5px;align-items:center;">
+                <span style="font-size:11px;color:var(--ink-soft);font-weight:700;">삭제일</span>
+                <button id="smslog-addon-d30" onclick="smslogAddonDateOverride('D30')"
+                  style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">D+30</button>
+                <button id="smslog-addon-m1" onclick="smslogAddonDateOverride('M1')"
+                  style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">M+1</button>
+                <button id="smslog-addon-m3" onclick="smslogAddonDateOverride('M3')"
+                  style="padding:4px 10px;border:1.5px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">M+3</button>
+              </div>
+              <span id="smslog-addon-date" style="font-size:12px;font-weight:700;color:#dc2626;white-space:nowrap;"></span>
+            </div>
+          </div>
         </div>
 
-        <!-- 템플릿 편집 (접힘) -->
-        <div style="margin-top:10px;">
+        <div style="border-top:1px solid var(--line);"></div>
+
+        <!-- 미리보기 + 버튼 -->
+        <div style="padding:12px 16px 14px;">
+          <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);">
+            <div style="font-size:11px;color:var(--ink-soft);margin-bottom:4px;">요금제: <strong id="smslog-sel-plan" style="color:var(--sk);">-</strong></div>
+            <div id="smslog-preview" style="font-size:14px;font-weight:600;color:var(--ink);line-height:1.8;word-break:keep-all;margin-bottom:4px;"></div>
+            <div id="smslog-date-preview" style="font-size:12px;font-weight:700;color:#0d9488;line-height:1.8;"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <button onclick="smslogCopy()" style="flex:1;padding:10px;background:#0d9488;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">📋 복사</button>
+            <button onclick="smslogRecord()" style="flex:1;padding:10px;background:var(--sk);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">✅ 발송완료 기록</button>
+          </div>
           <button onclick="smsTplEditorOpen()"
             style="width:100%;padding:7px 14px;border:1.5px dashed var(--line);border-radius:9px;background:transparent;color:var(--ink-soft);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;">
             ✏️ 문자 멘트 수정
@@ -4238,36 +4244,35 @@ function smslogGroupPlans(plans) {
   return [...groupMap.entries()].map(([name, items]) => ({ name, items }));
 }
 
-function smslogToggleGroup(name) {
-  smslogOpenGroup = smslogOpenGroup === name ? null : name;
-  smslogPlansRender();
-}
+function smslogToggleGroup(name) { /* legacy — no-op */ }
 
 function smslogPlansRender() {
   const plans = (SMS_PLANS[smslogCarrierVal] || {})[smslogCatVal] || [];
   const wrap = document.getElementById('smslog-plans');
   if (!wrap) return;
   if (!plans.length) {
-    wrap.innerHTML = '<span style="color:var(--ink-soft);font-size:12px;padding:4px;">해당 카테고리 요금제가 없습니다. (KT/LG는 추가 예정)</span>';
+    wrap.innerHTML = '<span style="color:var(--ink-soft);font-size:12px;padding:4px;">해당 카테고리 요금제가 없습니다.</span>';
     return;
   }
   const groups = smslogGroupPlans(plans);
-  wrap.innerHTML = groups.map(g => {
-    const isOpen = smslogOpenGroup === g.name;
-    const safeG = g.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    return `<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:5px;">
-      <button onclick="smslogToggleGroup('${safeG}')"
-        style="width:100%;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;
-               background:${isOpen ? '#6366f1' : 'var(--panel)'};color:${isOpen ? '#fff' : 'var(--ink)'};
-               border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;">
-        <span>${g.name}</span>
-        <span style="font-size:11px;opacity:.7;">${isOpen ? '▲' : '▼'} ${g.items.length}개</span>
-      </button>
-      ${isOpen ? `<div style="padding:10px;display:flex;flex-wrap:wrap;gap:5px;background:var(--bg);">
-        ${g.items.map(item => `<button class="smslog-plan${item.full === smslogPlanVal ? ' on' : ''}" onclick="smslogSelectPlan(this)" data-full="${item.full.replace(/"/g,'&quot;')}">${item.label || item.full}</button>`).join('')}
-      </div>` : ''}
-    </div>`;
-  }).join('');
+  const opts = groups.map(g =>
+    `<optgroup label="${g.name.replace(/"/g,'&quot;')}">`
+    + g.items.map(item => `<option value="${item.full.replace(/"/g,'&quot;')}"${item.full === smslogPlanVal ? ' selected' : ''}>${item.label || item.full}</option>`).join('')
+    + `</optgroup>`
+  ).join('');
+  wrap.innerHTML = `<select onchange="smslogSelectPlanFromSel(this)"
+    style="width:100%;height:36px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--panel);color:var(--ink);cursor:pointer;">
+    <option value="">— 요금제 선택 —</option>
+    ${opts}
+  </select>`;
+}
+
+function smslogSelectPlanFromSel(sel) {
+  const p = sel.value;
+  smslogPlanVal = p;
+  const el = document.getElementById('smslog-sel-plan');
+  if (el) el.textContent = p || '-';
+  smslogPreview();
 }
 
 function smslogSelectPlan(btn) {
