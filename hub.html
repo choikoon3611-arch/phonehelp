@@ -6290,8 +6290,14 @@ function smscalRenderMemoList(dateStr) {
   var memos = _smscalGetMemos(dateStr);
   if (!memos.length) { list.innerHTML = '<div style="font-size:12px;color:var(--ink-soft);padding:4px 0;">저장된 메모가 없습니다.</div>'; return; }
   list.innerHTML = memos.map(function(m, i) {
+    var done = !!m.done;
+    var textStyle = done ? 'flex:1;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all;text-decoration:line-through;color:var(--ink-soft);' : 'flex:1;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all;';
+    var doneBtn = done
+      ? '<button onclick="smscalToggleDone(\'' + dateStr + '\',' + i + ')" style="flex-shrink:0;border:none;border-radius:6px;background:#22c55e;color:#fff;cursor:pointer;font-size:11px;font-weight:700;padding:3px 7px;white-space:nowrap;" title="완료 취소">완료</button>'
+      : '<button onclick="smscalToggleDone(\'' + dateStr + '\',' + i + ')" style="flex-shrink:0;border:1.5px solid #22c55e;border-radius:6px;background:none;color:#22c55e;cursor:pointer;font-size:11px;font-weight:700;padding:3px 7px;white-space:nowrap;" title="완료">완료</button>';
     return '<div style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-card,var(--bg));border:1px solid var(--line);border-radius:8px;padding:8px 10px;">'
-      + '<div style="flex:1;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all;">' + m.text.replace(/</g,'&lt;') + '</div>'
+      + '<div style="' + textStyle + '">' + m.text.replace(/</g,'&lt;') + '</div>'
+      + doneBtn
       + '<button onclick="smscalDeleteMemo(\'' + dateStr + '\',' + i + ')" style="flex-shrink:0;border:none;background:none;cursor:pointer;font-size:14px;color:#94a3b8;padding:0 2px;line-height:1;" title="삭제">✕</button>'
       + '</div>';
   }).join('');
@@ -6314,6 +6320,12 @@ function smscalDeleteMemo(dateStr, idx) {
   _smscalSaveMemos(dateStr, memos);
   smscalRenderMemoList(dateStr);
   smscalRender();
+}
+function smscalToggleDone(dateStr, idx) {
+  var memos = _smscalGetMemos(dateStr);
+  memos[idx].done = !memos[idx].done;
+  _smscalSaveMemos(dateStr, memos);
+  smscalRenderMemoList(dateStr);
 }
 function smscalDetail(dateStr) {
   _smscalMemoDate = dateStr;
