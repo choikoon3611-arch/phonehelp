@@ -1174,7 +1174,7 @@
       <table class="pr-table">
         <thead>
           <tr>
-            <th>예약날짜</th><th>이름</th><th>현통신사</th><th>예약통신사</th>
+            <th>예약날짜</th><th>이름</th><th>전화번호</th><th>현통신사</th><th>예약통신사</th>
             <th>모델명</th><th>색상</th><th>매핑일련번호</th><th>개통상태</th><th>예약형태</th><th>메모</th><th>작업</th>
           </tr>
         </thead>
@@ -2429,8 +2429,9 @@
     <div class="modal-body">
       <div class="two-col">
         <div class="mrow"><label>이름</label><input type="text" id="pr-name" placeholder="홍길동"></div>
-        <div class="mrow"><label>예약날짜</label><input type="date" id="pr-date"></div>
+        <div class="mrow"><label>전화번호</label><input type="tel" id="pr-phone" placeholder="010-0000-0000"></div>
       </div>
+      <div class="mrow"><label>예약날짜</label><input type="date" id="pr-date"></div>
       <div class="mrow"><label>현통신사</label>
         <select id="pr-cur-carrier">
           <option value="SKT">SKT</option><option value="KT">KT</option>
@@ -5209,6 +5210,7 @@ function prRender() {
   tbody.innerHTML = f.map(e => `<tr>
     <td style="white-space:nowrap;">${e.date||'-'}</td>
     <td><strong>${e.name||'-'}</strong></td>
+    <td style="white-space:nowrap;font-size:12px;">${e.phone||'-'}</td>
     <td>${e.curCarrier||'-'}</td>
     <td>${(e.carriers||[]).map(c=>`<span class="prbadge ${carCls[c]||''}">${c}</span>`).join('')||'-'}</td>
     <td>${e.model||'-'}</td>
@@ -5244,6 +5246,7 @@ function prOpenModal(id = null) {
   const e = id ? prList.find(x => x.id === id) : null;
   document.getElementById('pr-modal-title').textContent = id ? '예약 수정' : '새 예약 등록';
   document.getElementById('pr-name').value       = e?.name || '';
+  document.getElementById('pr-phone').value      = e?.phone || '';
   document.getElementById('pr-date').value       = e?.date || new Date().toISOString().slice(0,10);
   document.getElementById('pr-cur-carrier').value= e?.curCarrier || 'SKT';
   document.getElementById('prc-sk').checked = (e?.carriers||[]).includes('SK');
@@ -5277,6 +5280,7 @@ function prSaveEntry() {
     id:         prEditId || Date.now().toString(),
     date:       document.getElementById('pr-date').value,
     name,
+    phone:      document.getElementById('pr-phone').value.trim(),
     curCarrier: document.getElementById('pr-cur-carrier').value,
     carriers,
     model:      document.getElementById('pr-model').value,
@@ -5301,9 +5305,9 @@ document.getElementById('pr-modal-bg').addEventListener('click', e => {
 function exportPreorderExcel() {
   if (!prList.length) { alert('내보낼 데이터가 없습니다.'); return; }
   const name = prCampaign.name || '사전예약';
-  const headers = ['예약날짜','이름','현통신사','예약통신사','모델명','색상','매핑일련번호','개통상태','예약형태','메모'];
+  const headers = ['예약날짜','이름','전화번호','현통신사','예약통신사','모델명','색상','매핑일련번호','개통상태','예약형태','메모'];
   function esc(v) { const s=String(v||''); return (s.includes(',')||s.includes('"')||s.includes('\n'))?'"'+s.replace(/"/g,'""')+'"':s; }
-  const rows = prList.map(e => [e.date,e.name,e.curCarrier,(e.carriers||[]).join('/'),e.model,e.color,e.serial||'',e.openStatus||'즉시개통',e.type,e.memo||''].map(esc).join(','));
+  const rows = prList.map(e => [e.date,e.name,e.phone||'',e.curCarrier,(e.carriers||[]).join('/'),e.model,e.color,e.serial||'',e.openStatus||'즉시개통',e.type,e.memo||''].map(esc).join(','));
   const csv  = '﻿' + headers.join(',') + '\n' + rows.join('\n');
   const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
