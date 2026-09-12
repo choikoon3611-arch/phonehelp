@@ -1369,6 +1369,11 @@
             <button onclick="document.getElementById('smscal-detail-bg').style.display='none'" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--ink-soft);">✕</button>
           </div>
           <div id="smscal-detail-list"></div>
+          <!-- 메모 영역 -->
+          <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px;">
+            <div style="font-size:12px;font-weight:800;color:var(--ink-soft);margin-bottom:6px;">📝 메모</div>
+            <textarea id="smscal-memo-ta" rows="4" placeholder="이 날에 대한 메모를 입력하세요..." oninput="smscalSaveMemo()" style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--ink);resize:vertical;line-height:1.7;box-sizing:border-box;"></textarea>
+          </div>
         </div>
       </div>
 
@@ -6156,7 +6161,6 @@ function smstabSwitch(tab) {
     if (calPanel)   calPanel.style.display   = '';
     if (writBtn)    writBtn.style.cssText    = off;
     if (calBtn)     calBtn.style.cssText     = on;
-    smscalGoNearest();
     smscalRender();
   }
 }
@@ -6232,6 +6236,7 @@ function smscalRender() {
     const plans   = planMap[dateStr]  || [];
     const addons  = addonMap[dateStr] || [];
     const hasAny  = plans.length + addons.length > 0;
+    const hasMemo = !!(localStorage.getItem('smscal-memo-' + dateStr) || '').trim();
     const numColor = dow === 0 ? '#ef4444' : dow === 6 ? '#3b82f6' : 'var(--ink)';
 
     let evHtml = '';
@@ -6245,13 +6250,16 @@ function smscalRender() {
     });
 
     grid.insertAdjacentHTML('beforeend', `
-      <div onclick="${hasAny ? `smscalDetail('${dateStr}')` : ''}"
-        style="min-height:110px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 6px;cursor:${hasAny?'pointer':'default'};background:${isToday?'#faf5ff':hasAny?'#fafffe':'var(--panel)'};transition:background .1s;"
-        onmouseover="if(${hasAny})this.style.background='#f0fdf4'"
+      <div onclick="smscalDetail('${dateStr}')"
+        style="min-height:110px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 6px;cursor:pointer;background:${isToday?'#faf5ff':hasAny?'#fafffe':'var(--panel)'};transition:background .1s;"
+        onmouseover="this.style.background='${isToday?'#f3e8ff':hasAny?'#f0fdf4':'var(--bg)'}'"
         onmouseout="this.style.background='${isToday?'#faf5ff':hasAny?'#fafffe':'var(--panel)'}'">
-        <div style="font-size:14px;font-weight:${isToday?900:600};margin-bottom:2px;
-          ${isToday?'background:#7c3aed;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;':'color:'+numColor+';'}">
-          ${d}
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px;">
+          <div style="font-size:14px;font-weight:${isToday?900:600};
+            ${isToday?'background:#7c3aed;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;':'color:'+numColor+';'}">
+            ${d}
+          </div>
+          ${hasMemo?`<span title="메모있음" style="font-size:10px;color:#f59e0b;line-height:1;">📝</span>`:''}
         </div>
         ${evHtml}
       </div>`);
@@ -6264,11 +6272,20 @@ function smscalYearPrev() { smscalYear--; smscalRender(); }
 function smscalYearNext() { smscalYear++; smscalRender(); }
 function smscalGoMonth(m) { smscalMonth = m; smscalRender(); }
 
+var _smscalMemoDate = '';
+function smscalSaveMemo() {
+  const ta = document.getElementById('smscal-memo-ta');
+  if (!ta || !_smscalMemoDate) return;
+  const val = ta.value;
+  if (val.trim()) localStorage.setItem('smscal-memo-' + _smscalMemoDate, val);
+  else localStorage.removeItem('smscal-memo-' + _smscalMemoDate);
+  smscalRender();
+}
 function smscalDetail(dateStr) {
+  _smscalMemoDate = dateStr;
   const selfList = smslogList.filter(r => r.type === 'self' && r.status !== 'done');
   const plans  = selfList.filter(r => calParseKorDate(r.planDate)  === dateStr);
   const addons = selfList.filter(r => calParseKorDate(r.addonDate) === dateStr);
-  if (!plans.length && !addons.length) return;
   const [y,m,d] = dateStr.split('-');
   document.getElementById('smscal-detail-date').textContent = `${y}년 ${parseInt(m)}월 ${parseInt(d)}일`;
   let html = '';
@@ -6307,6 +6324,8 @@ function smscalDetail(dateStr) {
     </div>`;
   });
   document.getElementById('smscal-detail-list').innerHTML = html;
+  const ta = document.getElementById('smscal-memo-ta');
+  if (ta) ta.value = localStorage.getItem('smscal-memo-' + dateStr) || '';
   document.getElementById('smscal-detail-bg').style.display = 'flex';
 }
 
