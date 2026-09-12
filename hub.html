@@ -1371,8 +1371,12 @@
           <div id="smscal-detail-list"></div>
           <!-- 메모 영역 -->
           <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px;">
-            <div style="font-size:12px;font-weight:800;color:var(--ink-soft);margin-bottom:6px;">📝 메모</div>
-            <textarea id="smscal-memo-ta" rows="4" placeholder="이 날에 대한 메모를 입력하세요..." oninput="smscalSaveMemo()" style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--ink);resize:vertical;line-height:1.7;box-sizing:border-box;"></textarea>
+            <div style="font-size:12px;font-weight:800;color:var(--ink-soft);margin-bottom:8px;">📝 메모</div>
+            <div id="smscal-memo-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <textarea id="smscal-memo-ta" rows="2" placeholder="메모 입력 후 추가 버튼..." style="flex:1;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--ink);resize:none;line-height:1.6;box-sizing:border-box;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();smscalAddMemo();}"></textarea>
+              <button onclick="smscalAddMemo()" style="padding:9px 16px;border:none;border-radius:10px;background:#7c3aed;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">추가</button>
+            </div>
           </div>
         </div>
       </div>
@@ -6236,7 +6240,7 @@ function smscalRender() {
     const plans   = planMap[dateStr]  || [];
     const addons  = addonMap[dateStr] || [];
     const hasAny  = plans.length + addons.length > 0;
-    const hasMemo = !!(localStorage.getItem('smscal-memo-' + dateStr) || '').trim();
+    const hasMemo = (function(){try{var m=JSON.parse(localStorage.getItem('smscal-memo-'+dateStr)||'[]');return Array.isArray(m)&&m.length>0;}catch(e){return !!(localStorage.getItem('smscal-memo-'+dateStr)||'').trim();}})();
     const numColor = dow === 0 ? '#ef4444' : dow === 6 ? '#3b82f6' : 'var(--ink)';
 
     let evHtml = '';
@@ -6273,12 +6277,42 @@ function smscalYearNext() { smscalYear++; smscalRender(); }
 function smscalGoMonth(m) { smscalMonth = m; smscalRender(); }
 
 var _smscalMemoDate = '';
-function smscalSaveMemo() {
-  const ta = document.getElementById('smscal-memo-ta');
+function _smscalGetMemos(dateStr) {
+  try { var m = JSON.parse(localStorage.getItem('smscal-memo-' + dateStr) || '[]'); return Array.isArray(m) ? m : []; } catch(e) { return []; }
+}
+function _smscalSaveMemos(dateStr, arr) {
+  if (arr.length) localStorage.setItem('smscal-memo-' + dateStr, JSON.stringify(arr));
+  else localStorage.removeItem('smscal-memo-' + dateStr);
+}
+function smscalRenderMemoList(dateStr) {
+  var list = document.getElementById('smscal-memo-list');
+  if (!list) return;
+  var memos = _smscalGetMemos(dateStr);
+  if (!memos.length) { list.innerHTML = '<div style="font-size:12px;color:var(--ink-soft);padding:4px 0;">저장된 메모가 없습니다.</div>'; return; }
+  list.innerHTML = memos.map(function(m, i) {
+    return '<div style="display:flex;align-items:flex-start;gap:8px;background:var(--bg-card,var(--bg));border:1px solid var(--line);border-radius:8px;padding:8px 10px;">'
+      + '<div style="flex:1;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all;">' + m.text.replace(/</g,'&lt;') + '</div>'
+      + '<button onclick="smscalDeleteMemo(\'' + dateStr + '\',' + i + ')" style="flex-shrink:0;border:none;background:none;cursor:pointer;font-size:14px;color:#94a3b8;padding:0 2px;line-height:1;" title="삭제">✕</button>'
+      + '</div>';
+  }).join('');
+}
+function smscalAddMemo() {
+  var ta = document.getElementById('smscal-memo-ta');
   if (!ta || !_smscalMemoDate) return;
-  const val = ta.value;
-  if (val.trim()) localStorage.setItem('smscal-memo-' + _smscalMemoDate, val);
-  else localStorage.removeItem('smscal-memo-' + _smscalMemoDate);
+  var val = ta.value.trim();
+  if (!val) return;
+  var memos = _smscalGetMemos(_smscalMemoDate);
+  memos.push({text: val, time: new Date().toISOString()});
+  _smscalSaveMemos(_smscalMemoDate, memos);
+  ta.value = '';
+  smscalRenderMemoList(_smscalMemoDate);
+  smscalRender();
+}
+function smscalDeleteMemo(dateStr, idx) {
+  var memos = _smscalGetMemos(dateStr);
+  memos.splice(idx, 1);
+  _smscalSaveMemos(dateStr, memos);
+  smscalRenderMemoList(dateStr);
   smscalRender();
 }
 function smscalDetail(dateStr) {
@@ -6324,8 +6358,9 @@ function smscalDetail(dateStr) {
     </div>`;
   });
   document.getElementById('smscal-detail-list').innerHTML = html;
+  smscalRenderMemoList(dateStr);
   const ta = document.getElementById('smscal-memo-ta');
-  if (ta) ta.value = localStorage.getItem('smscal-memo-' + dateStr) || '';
+  if (ta) ta.value = '';
   document.getElementById('smscal-detail-bg').style.display = 'flex';
 }
 
