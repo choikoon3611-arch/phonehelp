@@ -4318,7 +4318,7 @@ function smslogGetBase() {
 }
 function smslogCalcDate(rule, base) {
   const n = base || smslogGetBase();
-  if (rule === 'M3')   return new Date(n.getFullYear(), n.getMonth() + 3, 1);
+  if (rule === 'M3')   return new Date(n.getFullYear(), n.getMonth() + 4, 1);
   if (rule === 'D183') return new Date(n.getTime() + 184 * 86400000);
   if (rule === 'D30')  return new Date(n.getTime() + 30  * 86400000);
   if (rule === 'M1')   return new Date(n.getFullYear(), n.getMonth() + 1, 1);
