@@ -6202,7 +6202,7 @@ function smscalRender() {
   document.getElementById('smscal-title').textContent = `${smscalYear}년`;
 
   // 이벤트 있는 월 미리 계산
-  const selfAll = smslogList.filter(r => r.type === 'self' && r.status !== 'done');
+  const selfAll = smslogList.filter(r => r.type === 'self');
   const monthsWithEvents = new Set();
   selfAll.forEach(r => {
     [r.planDate, r.addonDate].forEach(dt => {
@@ -6227,7 +6227,7 @@ function smscalRender() {
   const firstDay    = new Date(smscalYear, smscalMonth, 1).getDay();
   const daysInMonth = new Date(smscalYear, smscalMonth+1, 0).getDate();
 
-  const selfList = smslogList.filter(r => r.type === 'self' && r.status !== 'done');
+  const selfList = smslogList.filter(r => r.type === 'self');
   const planMap = {}, addonMap = {};
   selfList.forEach(r => {
     const pd = calParseKorDate(r.planDate);
@@ -6254,12 +6254,14 @@ function smscalRender() {
 
     let evHtml = '';
     plans.forEach(r => {
-      const chk = r.calChecked;
-      evHtml += `<div style="background:${chk?'#f0fdf4':'#dcfce7'};color:${chk?'#6b7280':'#166534'};font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid ${chk?'#86efac':'#16a34a'};${chk?'text-decoration:line-through;opacity:.7;':''}">📅 ${r.name}${chk?' ✅':''}</div>`;
+      const done = r.status === 'done';
+      const chk = done || r.calChecked;
+      evHtml += `<div style="background:${chk?'#f0fdf4':'#dcfce7'};color:${chk?'#6b7280':'#166534'};font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid ${chk?'#86efac':'#16a34a'};${chk?'text-decoration:line-through;opacity:.7;':''}">📅 ${r.name}${done?' 처리완료':chk?' ✅':''}</div>`;
     });
     addons.forEach(r => {
-      const chk = r.calChecked;
-      evHtml += `<div style="background:${chk?'#fef2f2':'#fee2e2'};color:${chk?'#6b7280':'#991b1b'};font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid ${chk?'#fca5a5':'#dc2626'};${chk?'text-decoration:line-through;opacity:.7;':''}">🗓 ${r.name}${chk?' ✅':''}</div>`;
+      const done = r.status === 'done';
+      const chk = done || r.calChecked;
+      evHtml += `<div style="background:${chk?'#fef2f2':'#fee2e2'};color:${chk?'#6b7280':'#991b1b'};font-size:11px;font-weight:700;padding:3px 7px;border-radius:5px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid ${chk?'#fca5a5':'#dc2626'};${chk?'text-decoration:line-through;opacity:.7;':''}">🗓 ${r.name}${done?' 처리완료':chk?' ✅':''}</div>`;
     });
 
     grid.insertAdjacentHTML('beforeend', `
@@ -6338,7 +6340,7 @@ function smscalToggleDone(dateStr, idx) {
 }
 function smscalDetail(dateStr) {
   _smscalMemoDate = dateStr;
-  const selfList = smslogList.filter(r => r.type === 'self' && r.status !== 'done');
+  const selfList = smslogList.filter(r => r.type === 'self');
   const plans  = selfList.filter(r => calParseKorDate(r.planDate)  === dateStr);
   const addons = selfList.filter(r => calParseKorDate(r.addonDate) === dateStr);
   const [y,m,d] = dateStr.split('-');
@@ -6354,9 +6356,11 @@ function smscalDetail(dateStr) {
             통신사: <b>${r.carrier}</b><br>요금제: <b>${r.plan||'-'}</b>
           </div>
         </div>
-        ${r.calChecked
-          ? `<span style="padding:6px 12px;border-radius:8px;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 확인완료</span>`
-          : `<button onclick="smscalDone('${r.id}',this)" style="padding:6px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:10px;flex-shrink:0;">👁 확인</button>`
+        ${r.status === 'done'
+          ? `<span style="padding:6px 12px;border-radius:8px;background:#f1f5f9;color:#64748b;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 처리완료</span>`
+          : r.calChecked
+            ? `<span style="padding:6px 12px;border-radius:8px;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 확인완료</span>`
+            : `<button onclick="smscalDone('${r.id}',this)" style="padding:6px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:10px;flex-shrink:0;">👁 확인</button>`
         }
       </div>
     </div>`;
@@ -6371,9 +6375,11 @@ function smscalDetail(dateStr) {
             통신사: <b>${r.carrier}</b><br>부가서비스: <b>${r.addon||'-'}</b>
           </div>
         </div>
-        ${r.calChecked
-          ? `<span style="padding:6px 12px;border-radius:8px;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 확인완료</span>`
-          : `<button onclick="smscalDone('${r.id}',this)" style="padding:6px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:10px;flex-shrink:0;">👁 확인</button>`
+        ${r.status === 'done'
+          ? `<span style="padding:6px 12px;border-radius:8px;background:#f1f5f9;color:#64748b;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 처리완료</span>`
+          : r.calChecked
+            ? `<span style="padding:6px 12px;border-radius:8px;background:#dcfce7;color:#16a34a;font-size:12px;font-weight:800;white-space:nowrap;margin-left:10px;flex-shrink:0;">✅ 확인완료</span>`
+            : `<button onclick="smscalDone('${r.id}',this)" style="padding:6px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:10px;flex-shrink:0;">👁 확인</button>`
         }
       </div>
     </div>`;
