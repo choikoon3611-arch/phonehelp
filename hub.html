@@ -4432,6 +4432,17 @@ function smslogPreview() {
   }
   msgEl.textContent = msg;
   if (dateEl) dateEl.innerHTML = dates.map(d => `<span style="margin-right:12px;">${d}</span>`).join('');
+  // 버튼 옆 인라인 날짜 표시 동기화
+  const planDateEl = document.getElementById('smslog-plan-date');
+  if (planDateEl && smslogRetentionRule) {
+    const pd = smslogCalcDate(smslogRetentionRule);
+    planDateEl.textContent = pd ? `→ ${smslogFmtDate(pd)}` : '';
+  }
+  const addonDateEl2 = document.getElementById('smslog-addon-date');
+  if (addonDateEl2 && smslogAddonDateRule) {
+    const ad = smslogCalcDate(smslogAddonDateRule);
+    addonDateEl2.textContent = ad ? `삭제가능: ${smslogFmtDate(ad)}` : '';
+  }
 }
 
 function smslogType(t) {
