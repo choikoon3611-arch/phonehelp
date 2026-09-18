@@ -5279,7 +5279,7 @@ function prRender() {
   const carCls = { SK:'psk', KT:'pkt', LG:'plg' };
   tbody.innerHTML = f.map(e => `<tr style="${e.activated?'background:#fef9c3;':''}">
     <td style="white-space:nowrap;">${e.date||'-'}</td>
-    <td><strong>${e.name||'-'}</strong></td>
+    <td style="white-space:nowrap;"><strong>${e.name||'-'}</strong></td>
     <td style="white-space:nowrap;font-size:12px;">${e.phone||'-'}</td>
     <td>${e.curCarrier||'-'}</td>
     <td>${(e.carriers||[]).map(c=>`<span class="prbadge ${carCls[c]||''}">${c}</span>`).join('')||'-'}</td>
