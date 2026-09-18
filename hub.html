@@ -2458,8 +2458,8 @@
 </div>
 
 <!-- 이미지 전체화면 -->
-<div id="pr-img-fullscreen" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;align-items:center;justify-content:center;cursor:zoom-out;" onclick="this.style.display='none';">
-  <img id="pr-img-fullscreen-src" style="max-width:95vw;max-height:92vh;object-fit:contain;border-radius:8px;">
+<div id="pr-img-fullscreen" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;align-items:center;justify-content:center;cursor:zoom-out;" onclick="document.getElementById('pr-img-fullscreen').style.display='none';">
+  <img id="pr-img-fullscreen-src" style="max-width:95vw;max-height:92vh;object-fit:contain;border-radius:8px;cursor:zoom-out;" onclick="document.getElementById('pr-img-fullscreen').style.display='none';">
 </div>
 
 <!-- 메모 뷰어 팝업 -->
