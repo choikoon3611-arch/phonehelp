@@ -1184,6 +1184,16 @@
         등록된 예약이 없습니다. <strong>+ 새 예약 등록</strong>을 눌러 추가하세요.
       </div>
     </div>
+
+    <!-- 거래처별 예약 정책 -->
+    <div style="margin-top:28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--line);">
+        <div style="font-size:15px;font-weight:800;color:var(--ink);">📋 거래처별 예약 정책</div>
+        <button class="btn-share add" onclick="prPolicyOpenModal()">+ 정책 추가</button>
+      </div>
+      <div id="pr-policy-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;"></div>
+      <div id="pr-policy-empty" style="color:var(--ink-soft);font-size:13px;padding:24px;text-align:center;">등록된 정책이 없습니다.</div>
+    </div>
   </div>
 
   <!-- 💬 문자발송 및 처리내역 -->
@@ -2420,6 +2430,38 @@
 </div>
 
 <!-- 사전예약 모달 -->
+<!-- 거래처 정책 추가/수정 모달 -->
+<div class="modal-bg" id="pr-policy-modal-bg">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head">
+      <h2 id="pr-policy-modal-title">정책 추가</h2>
+      <button class="cbtn" onclick="prPolicyCloseModal()">✕</button>
+    </div>
+    <div class="mrow"><label>거래처명</label><input type="text" id="pp-vendor" placeholder="예) SKT 직영, 현성네트워크"></div>
+    <div class="mrow"><label>정책 내용</label><textarea id="pp-text" rows="6" placeholder="예약 조건, 혜택, 주의사항 등을 자유롭게 입력하세요." style="width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--bg);resize:vertical;"></textarea></div>
+    <div class="mrow">
+      <label>이미지 첨부</label>
+      <div>
+        <label style="cursor:pointer;">
+          <span class="cbtn" style="display:inline-block;">📎 이미지 선택 (최대 2MB)</span>
+          <input type="file" id="pp-img-file" accept="image/*" style="display:none;" onchange="prPolicyImgPreview(this)">
+        </label>
+        <button class="cbtn del" id="pp-img-clear" style="display:none;margin-left:6px;" onclick="prPolicyImgClear()">✕ 이미지 제거</button>
+        <div id="pp-img-preview" style="margin-top:10px;"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+      <button class="mbtn-no" onclick="prPolicyCloseModal()">취소</button>
+      <button class="mbtn-ok" onclick="prPolicySave()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 이미지 전체화면 -->
+<div id="pr-img-fullscreen" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;align-items:center;justify-content:center;cursor:zoom-out;" onclick="this.style.display='none';">
+  <img id="pr-img-fullscreen-src" style="max-width:95vw;max-height:92vh;object-fit:contain;border-radius:8px;">
+</div>
+
 <!-- 메모 뷰어 팝업 -->
 <div id="pr-memo-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
   <div style="background:var(--panel);border-radius:16px;padding:24px;max-width:480px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.2);">
@@ -2904,6 +2946,12 @@ function setupFirebaseSync() {
     const d = snap.val() || {};
     prList = Object.values(d).sort((a, b) => Number(b.id) - Number(a.id));
     prRender();
+  });
+  // 사전예약 정책
+  db.ref(HUB + '/prPolicies').on('value', snap => {
+    const d = snap.val() || {};
+    prPolicyList = Object.values(d).sort((a, b) => Number(b.id) - Number(a.id));
+    prPolicyRender();
   });
   // 사전예약 캠페인
   db.ref(HUB + '/campaign').on('value', snap => {
@@ -5338,6 +5386,119 @@ function prDelete(id) {
 document.getElementById('pr-modal-bg').addEventListener('click', e => {
   if (e.target === document.getElementById('pr-modal-bg')) prCloseModal();
 });
+document.getElementById('pr-policy-modal-bg').addEventListener('click', e => {
+  if (e.target === document.getElementById('pr-policy-modal-bg')) prPolicyCloseModal();
+});
+
+/* ===== 거래처별 예약 정책 ===== */
+var prPolicyList = [];
+var prPolicyEditId = null;
+var prPolicyImgData = null;
+
+function prPolicyRender() {
+  const grid  = document.getElementById('pr-policy-grid');
+  const empty = document.getElementById('pr-policy-empty');
+  if (!prPolicyList.length) { grid.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = prPolicyList.map(p => {
+    const shortText = (p.text||'').length > 180 ? (p.text||'').slice(0,180) + '…' : (p.text||'');
+    return `<div style="background:var(--panel);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;">
+      ${p.image ? `<img src="${p.image}" style="width:100%;max-height:200px;object-fit:contain;background:#f8fafc;cursor:zoom-in;border-bottom:1px solid var(--line);" onclick="prPolicyViewImg('${p.id}')">` : ''}
+      <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:14px;font-weight:800;color:var(--ink);">🏢 ${(p.vendor||'거래처 미기재').replace(/</g,'&lt;')}</div>
+        ${p.text ? `<div style="font-size:12.5px;color:var(--ink-soft);white-space:pre-wrap;line-height:1.7;">${shortText.replace(/</g,'&lt;')}</div>` : ''}
+        <div style="display:flex;gap:6px;margin-top:auto;padding-top:4px;flex-wrap:wrap;">
+          ${(p.text||'').length > 180 ? `<button class="cbtn" onclick="prPolicyViewText('${p.id}')">전체보기</button>` : ''}
+          ${p.image ? `<button class="cbtn" onclick="prPolicyViewImg('${p.id}')">🔍 이미지</button>` : ''}
+          <button class="cbtn" onclick="prPolicyOpenModal('${p.id}')">수정</button>
+          <button class="cbtn del" onclick="prPolicyDelete('${p.id}')">삭제</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function prPolicyOpenModal(id = null) {
+  prPolicyEditId = id;
+  prPolicyImgData = null;
+  document.getElementById('pr-policy-modal-title').textContent = id ? '정책 수정' : '정책 추가';
+  document.getElementById('pp-vendor').value = '';
+  document.getElementById('pp-text').value = '';
+  document.getElementById('pp-img-preview').innerHTML = '';
+  document.getElementById('pp-img-file').value = '';
+  document.getElementById('pp-img-clear').style.display = 'none';
+  if (id) {
+    const p = prPolicyList.find(x => x.id == id);
+    if (p) {
+      document.getElementById('pp-vendor').value = p.vendor || '';
+      document.getElementById('pp-text').value = p.text || '';
+      if (p.image) {
+        prPolicyImgData = p.image;
+        document.getElementById('pp-img-preview').innerHTML = `<img src="${p.image}" style="max-width:100%;max-height:150px;border-radius:8px;border:1px solid var(--line);">`;
+        document.getElementById('pp-img-clear').style.display = '';
+      }
+    }
+  }
+  document.getElementById('pr-policy-modal-bg').classList.add('open');
+}
+
+function prPolicyCloseModal() {
+  document.getElementById('pr-policy-modal-bg').classList.remove('open');
+  prPolicyEditId = null; prPolicyImgData = null;
+}
+
+function prPolicyImgPreview(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('이미지는 2MB 이하로 선택해주세요.'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    prPolicyImgData = ev.target.result;
+    document.getElementById('pp-img-preview').innerHTML = `<img src="${prPolicyImgData}" style="max-width:100%;max-height:150px;border-radius:8px;border:1px solid var(--line);">`;
+    document.getElementById('pp-img-clear').style.display = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function prPolicyImgClear() {
+  prPolicyImgData = null;
+  document.getElementById('pp-img-preview').innerHTML = '';
+  document.getElementById('pp-img-file').value = '';
+  document.getElementById('pp-img-clear').style.display = 'none';
+}
+
+function prPolicySave() {
+  const vendor = document.getElementById('pp-vendor').value.trim();
+  const text   = document.getElementById('pp-text').value.trim();
+  if (!vendor) { alert('거래처명을 입력하세요.'); return; }
+  const id = prPolicyEditId || Date.now();
+  const existing = prPolicyEditId ? (prPolicyList.find(x => x.id == prPolicyEditId) || {}) : {};
+  const entry = { id, vendor, text };
+  const img = prPolicyImgData !== null ? prPolicyImgData : (existing.image || null);
+  if (img) entry.image = img;
+  db.ref(HUB + '/prPolicies/' + id).set(entry);
+  prPolicyCloseModal();
+}
+
+function prPolicyDelete(id) {
+  if (!confirm('이 정책을 삭제할까요?')) return;
+  db.ref(HUB + '/prPolicies/' + id).remove();
+}
+
+function prPolicyViewText(id) {
+  const p = prPolicyList.find(x => x.id == id);
+  if (!p) return;
+  document.getElementById('pr-memo-name').textContent = p.vendor || '';
+  document.getElementById('pr-memo-body').textContent = p.text || '';
+  document.getElementById('pr-memo-bg').style.display = 'flex';
+}
+
+function prPolicyViewImg(id) {
+  const p = prPolicyList.find(x => x.id == id);
+  if (!p || !p.image) return;
+  document.getElementById('pr-img-fullscreen-src').src = p.image;
+  document.getElementById('pr-img-fullscreen').style.display = 'flex';
+}
 
 /* 내보내기 / 가져오기 */
 function exportPreorderExcel() {
