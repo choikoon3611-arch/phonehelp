@@ -5503,46 +5503,66 @@ function prImgFsClose() {
 }
 
 (function(){
-  var fs, img, startY, startX, dragging = false;
+  var fs, img, scale = 1, minScale = 0.5, maxScale = 5;
+  var startY, startX, dragging = false, imgOffX = 0, imgOffY = 0, dragStartOffX, dragStartOffY;
+
+  function applyTransform(tr) {
+    img.style.transform = `translate(${imgOffX}px,${imgOffY}px) scale(${scale})`;
+  }
   function getY(e){ return e.touches ? e.touches[0].clientY : e.clientY; }
   function getX(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
+
   document.addEventListener('DOMContentLoaded', function(){
     fs  = document.getElementById('pr-img-fullscreen');
     img = document.getElementById('pr-img-fullscreen-src');
     if (!fs) return;
+
+    // 마우스 휠 줌
+    fs.addEventListener('wheel', function(e){
+      if (fs.style.display === 'none') return;
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.85 : 1.18;
+      scale = Math.min(maxScale, Math.max(minScale, scale * delta));
+      img.style.transition = 'transform .1s';
+      applyTransform();
+      setTimeout(() => img.style.transition = '', 120);
+    }, {passive: false});
+
+    // 드래그 이동 (확대 시 패닝)
     function onDown(e){
       if (e.target.tagName === 'BUTTON') return;
-      dragging = true; startY = getY(e); startX = getX(e);
-      fs.style.transition = 'none';
+      dragging = true;
+      startX = getX(e); startY = getY(e);
+      dragStartOffX = imgOffX; dragStartOffY = imgOffY;
+      img.style.transition = 'none';
     }
     function onMove(e){
       if (!dragging) return;
-      const dy = getY(e) - startY;
-      const dx = getX(e) - startX;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      fs.style.transform = `translate(${dx}px,${dy}px)`;
-      fs.style.opacity = String(Math.max(0.3, 1 - dist/300));
+      imgOffX = dragStartOffX + getX(e) - startX;
+      imgOffY = dragStartOffY + getY(e) - startY;
+      applyTransform();
     }
     function onUp(e){
       if (!dragging) return;
       dragging = false;
-      const dy = getY(e) - startY;
-      const dx = getX(e) - startX;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 8) { fs.style.transition=''; fs.style.transform=''; fs.style.opacity=''; return; }
-      if (dist > 80) {
-        fs.style.transition = 'opacity .2s,transform .2s';
-        fs.style.opacity = '0';
-        setTimeout(prImgFsClose, 200);
-      } else {
-        fs.style.transition = 'transform .2s,opacity .2s';
-        fs.style.transform = '';
-        fs.style.opacity = '';
+      const dx = getX(e) - startX, dy = getY(e) - startY;
+      // 거의 안 움직였고 배율 1 이하면 닫기
+      if (Math.sqrt(dx*dx+dy*dy) < 8 && scale <= 1) {
+        prImgFsClose(); return;
       }
+      img.style.transition = 'transform .15s';
+      applyTransform();
     }
-    fs.addEventListener('mousedown',  onDown); fs.addEventListener('mousemove',  onMove); fs.addEventListener('mouseup',   onUp);
-    fs.addEventListener('touchstart', onDown, {passive:true}); fs.addEventListener('touchmove', onMove, {passive:true}); fs.addEventListener('touchend', onUp);
+    fs.addEventListener('mousedown',  onDown);
+    fs.addEventListener('mousemove',  onMove);
+    fs.addEventListener('mouseup',    onUp);
+    fs.addEventListener('touchstart', onDown, {passive:true});
+    fs.addEventListener('touchmove',  onMove, {passive:true});
+    fs.addEventListener('touchend',   onUp);
   });
+
+  // 열 때 상태 초기화용
+  window._prImgFsReset = function(){ scale = 1; imgOffX = 0; imgOffY = 0; if(img){ img.style.transform=''; img.style.transition=''; } };
 })();
 
 function prPolicyViewImg(id) {
@@ -5551,6 +5571,7 @@ function prPolicyViewImg(id) {
   const fs = document.getElementById('pr-img-fullscreen');
   document.getElementById('pr-img-fullscreen-src').src = p.image;
   fs.style.transform = ''; fs.style.opacity = ''; fs.style.transition = '';
+  if (window._prImgFsReset) window._prImgFsReset();
   fs.style.display = 'flex';
 }
 
