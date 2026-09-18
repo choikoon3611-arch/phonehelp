@@ -1260,6 +1260,8 @@
           <div id="smslog-retention-row" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
             <button id="smslog-ret-m3" onclick="smslogRetention('M3')"
               style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">M+3개월</button>
+            <button id="smslog-ret-d124" onclick="smslogRetention('D124')"
+              style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">D+124일</button>
             <button id="smslog-ret-d183" onclick="smslogRetention('D183')"
               style="padding:5px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">D+184일</button>
             <span id="smslog-plan-date" style="font-size:12px;font-weight:700;color:#0d9488;"></span>
@@ -4379,6 +4381,7 @@ function smslogGetBase() {
 function smslogCalcDate(rule, base) {
   const n = base || smslogGetBase();
   if (rule === 'M3')   return new Date(n.getFullYear(), n.getMonth() + 4, 1);
+  if (rule === 'D124') return new Date(n.getTime() + 124 * 86400000);
   if (rule === 'D183') return new Date(n.getTime() + 184 * 86400000);
   if (rule === 'D30')  return new Date(n.getTime() + 30  * 86400000);
   if (rule === 'M1')   return new Date(n.getFullYear(), n.getMonth() + 1, 1);
@@ -4449,8 +4452,10 @@ function smslogRetention(r) {
   smslogRetentionRule = r;
   const s = 'padding:5px 12px;border:1.5px solid;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
   const m3   = document.getElementById('smslog-ret-m3');
+  const d124 = document.getElementById('smslog-ret-d124');
   const d183 = document.getElementById('smslog-ret-d183');
   if (m3)   m3.style.cssText   = s + (r==='M3'   ? 'background:#6366f1;color:#fff;border-color:#6366f1;' : 'background:var(--panel);color:var(--ink);border-color:var(--line);');
+  if (d124) d124.style.cssText = s + (r==='D124' ? 'background:#6366f1;color:#fff;border-color:#6366f1;' : 'background:var(--panel);color:var(--ink);border-color:var(--line);');
   if (d183) d183.style.cssText = s + (r==='D183' ? 'background:#6366f1;color:#fff;border-color:#6366f1;' : 'background:var(--panel);color:var(--ink);border-color:var(--line);');
   const d = smslogCalcDate(r);
   const el = document.getElementById('smslog-plan-date');
