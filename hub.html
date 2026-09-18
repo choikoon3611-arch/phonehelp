@@ -5218,7 +5218,7 @@ function prRender() {
   empty.style.display = 'none';
 
   const carCls = { SK:'psk', KT:'pkt', LG:'plg' };
-  tbody.innerHTML = f.map(e => `<tr>
+  tbody.innerHTML = f.map(e => `<tr style="${e.activated?'background:#fef9c3;':''}">
     <td style="white-space:nowrap;">${e.date||'-'}</td>
     <td><strong>${e.name||'-'}</strong></td>
     <td style="white-space:nowrap;font-size:12px;">${e.phone||'-'}</td>
@@ -5230,7 +5230,11 @@ function prRender() {
     <td><span class="prbadge ${e.openStatus==='개통보류'?'psid':'peas'}">${e.openStatus||'즉시개통'}</span></td>
     <td><span class="prbadge ${e.type==='신분증접수예약'?'psid':'peas'}">${e.type||'-'}</span></td>
     <td style="max-width:160px;white-space:pre-wrap;word-break:break-all;font-size:12px;color:#475569;">${e.memo||''}</td>
-    <td><div style="display:flex;gap:4px;">
+    <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
+      ${e.activated
+        ? `<button class="cbtn" style="background:#ca8a04;color:#fff;border-color:#ca8a04;" onclick="prActivate('${e.id}',false)">↩ 취소</button>`
+        : `<button class="cbtn" style="background:#16a34a;color:#fff;border-color:#16a34a;" onclick="prActivate('${e.id}',true)">✅ 개통완료</button>`
+      }
       <button class="cbtn" onclick="prOpenModal('${e.id}')">수정</button>
       <button class="cbtn del" onclick="prDelete('${e.id}')">삭제</button>
     </div></td>
@@ -5303,6 +5307,9 @@ function prSaveEntry() {
   };
   db.ref(HUB + '/preorders/' + entry.id).set(entry);
   prCloseModal();
+}
+function prActivate(id, val) {
+  db.ref(HUB + '/preorders/' + id).update({ activated: val });
 }
 function prDelete(id) {
   if (!confirm('정말 삭제할까요?')) return;
