@@ -5230,13 +5230,13 @@ function prRender() {
     <td><span class="prbadge ${e.openStatus==='개통보류'?'psid':'peas'}">${e.openStatus||'즉시개통'}</span></td>
     <td><span class="prbadge ${e.type==='신분증접수예약'?'psid':'peas'}">${e.type||'-'}</span></td>
     <td style="max-width:160px;white-space:pre-wrap;word-break:break-all;font-size:12px;color:#475569;">${e.memo||''}</td>
-    <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
+    <td><div style="display:flex;gap:3px;flex-wrap:nowrap;">
       ${e.activated
-        ? `<button class="cbtn" style="background:#ca8a04;color:#fff;border-color:#ca8a04;" onclick="prActivate('${e.id}',false)">↩ 취소</button>`
-        : `<button class="cbtn" style="background:#16a34a;color:#fff;border-color:#16a34a;" onclick="prActivate('${e.id}',true)">✅ 개통완료</button>`
+        ? `<button class="cbtn" style="background:#ca8a04;color:#fff;border-color:#ca8a04;padding:3px 7px;font-size:10px;" onclick="prActivate('${e.id}',false)">↩취소</button>`
+        : `<button class="cbtn" style="background:#16a34a;color:#fff;border-color:#16a34a;padding:3px 7px;font-size:10px;" onclick="prActivate('${e.id}',true)">✅개통</button>`
       }
-      <button class="cbtn" onclick="prOpenModal('${e.id}')">수정</button>
-      <button class="cbtn del" onclick="prDelete('${e.id}')">삭제</button>
+      <button class="cbtn" style="padding:3px 7px;font-size:10px;" onclick="prOpenModal('${e.id}')">수정</button>
+      <button class="cbtn del" style="padding:3px 7px;font-size:10px;" onclick="prDelete('${e.id}')">삭제</button>
     </div></td>
   </tr>`).join('');
 }
