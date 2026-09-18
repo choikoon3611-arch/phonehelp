@@ -2420,6 +2420,17 @@
 </div>
 
 <!-- 사전예약 모달 -->
+<!-- 메모 뷰어 팝업 -->
+<div id="pr-memo-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none';">
+  <div style="background:var(--panel);border-radius:16px;padding:24px;max-width:480px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:15px;font-weight:800;color:var(--ink);">📝 메모 — <span id="pr-memo-name"></span></div>
+      <button class="cbtn" onclick="document.getElementById('pr-memo-bg').style.display='none'">✕</button>
+    </div>
+    <div id="pr-memo-body" style="font-size:14px;line-height:1.9;color:var(--ink);white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow-y:auto;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--line);"></div>
+  </div>
+</div>
+
 <div class="modal-bg" id="pr-modal-bg">
   <div class="modal">
     <div class="modal-head">
@@ -5229,8 +5240,10 @@ function prRender() {
     <td style="font-size:12px;color:#1e293b;font-family:monospace;">${e.serial||'-'}</td>
     <td><span class="prbadge ${e.openStatus==='개통보류'?'psid':'peas'}">${e.openStatus||'즉시개통'}</span></td>
     <td><span class="prbadge ${e.type==='신분증접수예약'?'psid':'peas'}">${e.type||'-'}</span></td>
-    <td style="max-width:160px;white-space:pre-wrap;word-break:break-all;font-size:12px;color:#475569;">${e.memo||''}</td>
-    <td><div style="display:flex;gap:3px;flex-wrap:nowrap;">
+    <td style="max-width:140px;cursor:${e.memo?'pointer':'default'};" onclick="${e.memo?'prMemoView(\''+e.id+'\')':''}">
+      <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:${e.memo?'#475569':'#cbd5e1'};">${e.memo||'—'}</div>
+    </td>
+    <td style="white-space:nowrap;"><div style="display:flex;gap:3px;">
       ${e.activated
         ? `<button class="cbtn" style="background:#ca8a04;color:#fff;border-color:#ca8a04;padding:3px 7px;font-size:10px;" onclick="prActivate('${e.id}',false)">↩취소</button>`
         : `<button class="cbtn" style="background:#16a34a;color:#fff;border-color:#16a34a;padding:3px 7px;font-size:10px;" onclick="prActivate('${e.id}',true)">✅개통</button>`
@@ -5307,6 +5320,13 @@ function prSaveEntry() {
   };
   db.ref(HUB + '/preorders/' + entry.id).set(entry);
   prCloseModal();
+}
+function prMemoView(id) {
+  const e = prList.find(x => x.id == id);
+  if (!e || !e.memo) return;
+  document.getElementById('pr-memo-name').textContent = e.name || '';
+  document.getElementById('pr-memo-body').textContent = e.memo;
+  document.getElementById('pr-memo-bg').style.display = 'flex';
 }
 function prActivate(id, val) {
   db.ref(HUB + '/preorders/' + id).update({ activated: val });
