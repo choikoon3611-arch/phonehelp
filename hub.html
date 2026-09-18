@@ -2458,8 +2458,9 @@
 </div>
 
 <!-- 이미지 전체화면 -->
-<div id="pr-img-fullscreen" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;align-items:center;justify-content:center;cursor:zoom-out;" onclick="document.getElementById('pr-img-fullscreen').style.display='none';">
-  <img id="pr-img-fullscreen-src" style="max-width:95vw;max-height:92vh;object-fit:contain;border-radius:8px;cursor:zoom-out;" onclick="document.getElementById('pr-img-fullscreen').style.display='none';">
+<div id="pr-img-fullscreen" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:3000;align-items:center;justify-content:center;touch-action:none;">
+  <button onclick="prImgFsClose()" style="position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.2);color:#fff;font-size:20px;font-weight:700;cursor:pointer;z-index:1;line-height:1;">✕</button>
+  <img id="pr-img-fullscreen-src" style="max-width:95vw;max-height:88vh;object-fit:contain;border-radius:8px;user-select:none;-webkit-user-drag:none;">
 </div>
 
 <!-- 메모 뷰어 팝업 -->
@@ -5493,11 +5494,64 @@ function prPolicyViewText(id) {
   document.getElementById('pr-memo-bg').style.display = 'flex';
 }
 
+function prImgFsClose() {
+  const fs = document.getElementById('pr-img-fullscreen');
+  fs.style.transition = '';
+  fs.style.transform = '';
+  fs.style.opacity = '';
+  fs.style.display = 'none';
+}
+
+(function(){
+  var fs, img, startY, startX, dragging = false;
+  function getY(e){ return e.touches ? e.touches[0].clientY : e.clientY; }
+  function getX(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
+  document.addEventListener('DOMContentLoaded', function(){
+    fs  = document.getElementById('pr-img-fullscreen');
+    img = document.getElementById('pr-img-fullscreen-src');
+    if (!fs) return;
+    function onDown(e){
+      if (e.target.tagName === 'BUTTON') return;
+      dragging = true; startY = getY(e); startX = getX(e);
+      fs.style.transition = 'none';
+    }
+    function onMove(e){
+      if (!dragging) return;
+      const dy = getY(e) - startY;
+      const dx = getX(e) - startX;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      fs.style.transform = `translate(${dx}px,${dy}px)`;
+      fs.style.opacity = String(Math.max(0.3, 1 - dist/300));
+    }
+    function onUp(e){
+      if (!dragging) return;
+      dragging = false;
+      const dy = getY(e) - startY;
+      const dx = getX(e) - startX;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 8) { fs.style.transition=''; fs.style.transform=''; fs.style.opacity=''; return; }
+      if (dist > 80) {
+        fs.style.transition = 'opacity .2s,transform .2s';
+        fs.style.opacity = '0';
+        setTimeout(prImgFsClose, 200);
+      } else {
+        fs.style.transition = 'transform .2s,opacity .2s';
+        fs.style.transform = '';
+        fs.style.opacity = '';
+      }
+    }
+    fs.addEventListener('mousedown',  onDown); fs.addEventListener('mousemove',  onMove); fs.addEventListener('mouseup',   onUp);
+    fs.addEventListener('touchstart', onDown, {passive:true}); fs.addEventListener('touchmove', onMove, {passive:true}); fs.addEventListener('touchend', onUp);
+  });
+})();
+
 function prPolicyViewImg(id) {
   const p = prPolicyList.find(x => x.id == id);
   if (!p || !p.image) return;
+  const fs = document.getElementById('pr-img-fullscreen');
   document.getElementById('pr-img-fullscreen-src').src = p.image;
-  document.getElementById('pr-img-fullscreen').style.display = 'flex';
+  fs.style.transform = ''; fs.style.opacity = ''; fs.style.transition = '';
+  fs.style.display = 'flex';
 }
 
 /* 내보내기 / 가져오기 */
