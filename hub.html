@@ -2701,7 +2701,8 @@
       style="width:100%;padding:12px 14px;border:2px solid #e2e7ec;border-radius:10px;font-size:15px;font-weight:700;text-align:center;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px;"
       oninput="this.style.borderColor=this.value.trim()?'#7c3aed':'#e2e7ec'"
       onkeydown="if(event.key==='Enter')confirmStoreName()">
-    <button onclick="confirmStoreName()" style="width:100%;padding:12px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">시작하기</button>
+    <button onclick="confirmStoreName()" style="width:100%;padding:12px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:10px;">시작하기</button>
+    <button onclick="useDefaultStore()" style="width:100%;padding:10px;background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">기본 매장 사용 (새 코드 없이 바로 시작)</button>
   </div>
 </div>
 
@@ -2909,6 +2910,13 @@ function confirmStoreName() {
   HUB = storeNameToHUB(val);
   document.getElementById('store-modal-bg').style.display = 'none';
   updateStoreBadge(val === '__hub__' ? '내 매장' : val);
+  setupFirebaseSync();
+}
+function useDefaultStore() {
+  localStorage.setItem('hub_store_name', '__hub__');
+  HUB = 'hub';
+  document.getElementById('store-modal-bg').style.display = 'none';
+  updateStoreBadge('내 매장');
   setupFirebaseSync();
 }
 
