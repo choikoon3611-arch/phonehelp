@@ -2743,7 +2743,10 @@
         <div class="mrow"><label>잔여할부 / 위약금</label><input type="text" id="cs-penalty" placeholder="예) 할부 12개월 / 위약금 없음"></div>
         <div class="mrow"><label>담당자</label><input type="text" id="cs-agent" placeholder="이름"></div>
       </div>
-      <div class="mrow"><label>처리가능일자</label><input type="date" id="cs-schedule-date" style="width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);"></div>
+      <div class="two-col">
+        <div class="mrow"><label>📅 처리가능일자 (1차)</label><input type="date" id="cs-schedule-date" style="width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);"></div>
+        <div class="mrow"><label>🔔 2차 처리일</label><input type="date" id="cs-schedule-date2" style="width:100%;padding:8px 11px;border:1.5px solid #f59e0b;border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);"></div>
+      </div>
       <div class="mrow"><label>상담내용</label><textarea id="cs-content" rows="5" placeholder="상담 내용을 입력하세요..."></textarea></div>
     </div>
     <div class="modal-foot">
@@ -5968,6 +5971,8 @@ var consultFilter   = '전체';
 var consultSearch   = '';
 var consultEditId   = null;
 var consultShowDone = false;
+var consultPage     = 0;
+const CONSULT_PAGE_SIZE = 15;
 
 function toggleConsultDone() {
   consultShowDone = !consultShowDone;
@@ -6013,15 +6018,20 @@ function consultRender() {
 
   const tbody = document.getElementById('consult-tbody');
   const empty = document.getElementById('consult-empty');
-  if (!f.length) { tbody.innerHTML = ''; empty.style.display = ''; return; }
+  if (!f.length) { tbody.innerHTML = ''; empty.style.display = ''; consultRenderPager(0,0); return; }
   empty.style.display = 'none';
 
+  const totalPages = Math.ceil(f.length / CONSULT_PAGE_SIZE);
+  if (consultPage >= totalPages) consultPage = totalPages - 1;
+  const pageF = f.slice(consultPage * CONSULT_PAGE_SIZE, (consultPage + 1) * CONSULT_PAGE_SIZE);
+
   const carrierCls = { SKT:'csk', KT:'ckt', LG:'clg', '알뜰':'cktm' };
-  tbody.innerHTML = f.map(e => {
+  tbody.innerHTML = pageF.map(e => {
     const done = e.done === true;
     const rowStyle = done ? 'opacity:0.45;background:#f0fdf4;' : '';
+    const hasSecond = !!e.scheduleDate2;
     return `<tr style="${rowStyle}">
-      <td style="white-space:nowrap;font-size:12px;">${e.datetime||'-'}${done?'<br><span style="font-size:10px;color:#16a34a;font-weight:700;">✅ 처리완료</span>':''}</td>
+      <td style="white-space:nowrap;font-size:12px;">${e.datetime||'-'}${done?'<br><span style="font-size:10px;color:#16a34a;font-weight:700;">✅ 처리완료</span>':''}${hasSecond&&!done?`<br><span style="font-size:10px;color:#b45309;font-weight:700;">🔔 2차: ${e.scheduleDate2}</span>`:''}${hasSecond&&done?`<br><span style="font-size:10px;color:#b45309;opacity:.6;">🔔 2차: ${e.scheduleDate2}</span>`:''}</td>
       <td><strong>${e.name||'-'}</strong></td>
       <td>${e.phone||'-'}</td>
       <td><span class="cbadge ${carrierCls[e.carrier]||''}">${e.carrier||'-'}</span></td>
@@ -6036,6 +6046,31 @@ function consultRender() {
       </div></td>
     </tr>`;
   }).join('');
+  consultRenderPager(f.length, totalPages);
+}
+
+function consultRenderPager(total, totalPages) {
+  let pager = document.getElementById('consult-pager');
+  if (!pager) {
+    const wrap = document.querySelector('.consult-table-wrap');
+    if (!wrap) return;
+    pager = document.createElement('div');
+    pager.id = 'consult-pager';
+    pager.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 0;';
+    wrap.appendChild(pager);
+  }
+  if (totalPages <= 1) { pager.innerHTML = ''; return; }
+  const start = consultPage * CONSULT_PAGE_SIZE + 1;
+  const end   = Math.min((consultPage + 1) * CONSULT_PAGE_SIZE, total);
+  pager.innerHTML =
+    `<button onclick="consultPageGo(${consultPage-1})" ${consultPage===0?'disabled':''} style="padding:5px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer;font-size:13px;">◀</button>` +
+    `<span style="font-size:13px;color:var(--ink-soft);">${start}–${end} / ${total}건 (${consultPage+1}/${totalPages}페이지)</span>` +
+    `<button onclick="consultPageGo(${consultPage+1})" ${consultPage>=totalPages-1?'disabled':''} style="padding:5px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer;font-size:13px;">▶</button>`;
+}
+
+function consultPageGo(page) {
+  consultPage = page;
+  consultRender();
 }
 
 function consultViewOpen(name, content, el) {
@@ -6061,12 +6096,13 @@ document.querySelectorAll('.cftab').forEach(tab => {
     document.querySelectorAll('.cftab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     consultFilter = tab.dataset.csf;
+    consultPage = 0;
     consultRender();
   });
 });
 
 document.getElementById('consult-search-input').addEventListener('input', function() {
-  consultSearch = this.value.trim(); consultRender();
+  consultSearch = this.value.trim(); consultPage = 0; consultRender();
 });
 
 function consultOpenModal(id = null) {
@@ -6079,7 +6115,8 @@ function consultOpenModal(id = null) {
   document.getElementById('cs-ssn').value     = e?.ssn     || '';
   document.getElementById('cs-penalty').value = e?.penalty || '';
   document.getElementById('cs-agent').value   = e?.agent   || '';
-  document.getElementById('cs-schedule-date').value = e?.scheduleDate || '';
+  document.getElementById('cs-schedule-date').value  = e?.scheduleDate  || '';
+  document.getElementById('cs-schedule-date2').value = e?.scheduleDate2 || '';
   document.getElementById('cs-content').value = e?.content || '';
   document.getElementById('consult-modal-bg').classList.add('open');
   setTimeout(() => document.getElementById('cs-name').focus(), 80);
@@ -6404,8 +6441,9 @@ function consultSaveEntry() {
     ssn:      document.getElementById('cs-ssn').value.trim(),
     penalty:  document.getElementById('cs-penalty').value.trim(),
     agent:        document.getElementById('cs-agent').value.trim(),
-    scheduleDate: document.getElementById('cs-schedule-date').value || '',
-    content:      document.getElementById('cs-content').value.trim(),
+    scheduleDate:  document.getElementById('cs-schedule-date').value  || '',
+    scheduleDate2: document.getElementById('cs-schedule-date2').value || '',
+    content:       document.getElementById('cs-content').value.trim(),
   };
   if (prev?.done) entry.done = prev.done;  // 완료된 항목 수정 시 done 상태 보존
   db.ref(HUB + '/consultations/' + entry.id).set(entry);
@@ -6702,7 +6740,11 @@ function calRender() {
   consultList.forEach(e => {
     if (e.scheduleDate) {
       if (!schedMap[e.scheduleDate]) schedMap[e.scheduleDate] = [];
-      schedMap[e.scheduleDate].push(e);
+      schedMap[e.scheduleDate].push({ ...e, _isSecond: false });
+    }
+    if (e.scheduleDate2) {
+      if (!schedMap[e.scheduleDate2]) schedMap[e.scheduleDate2] = [];
+      schedMap[e.scheduleDate2].push({ ...e, _isSecond: true });
     }
   });
 
@@ -6719,7 +6761,9 @@ function calRender() {
     const numColor = dayOfWeek === 0 ? '#ef4444' : dayOfWeek === 6 ? '#3b82f6' : 'var(--ink)';
 
     let evHtml = events.slice(0,3).map(e =>
-      `<div onclick="calShowDetail('${dateStr}')" style="background:${e.done?'#d1fae5':'#ede9fe'};color:${e.done?'#065f46':'#5b21b6'};font-size:10px;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;margin-top:1px;">${e.name}</div>`
+      e._isSecond
+        ? `<div onclick="calShowDetail('${dateStr}')" style="background:${e.done?'#fef3c7':'#fef9c3'};color:${e.done?'#78350f':'#92400e'};font-size:10px;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;margin-top:1px;border-left:2px solid #f59e0b;">🔔 ${e.name}</div>`
+        : `<div onclick="calShowDetail('${dateStr}')" style="background:${e.done?'#d1fae5':'#ede9fe'};color:${e.done?'#065f46':'#5b21b6'};font-size:10px;padding:1px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;margin-top:1px;">📋 ${e.name}</div>`
     ).join('');
     if (events.length > 3) evHtml += `<div style="font-size:9px;color:var(--ink-soft);margin-top:1px;">+${events.length-3}건</div>`;
 
@@ -6743,15 +6787,20 @@ function calNextMonth() {
 }
 
 function calShowDetail(dateStr) {
-  const events = consultList.filter(e => e.scheduleDate === dateStr);
+  const first  = consultList.filter(e => e.scheduleDate  === dateStr).map(e => ({ ...e, _isSecond: false }));
+  const second = consultList.filter(e => e.scheduleDate2 === dateStr).map(e => ({ ...e, _isSecond: true }));
+  const events = [...first, ...second];
   if (!events.length) return;
   const [y,m,d] = dateStr.split('-');
   document.getElementById('cal-detail-date').textContent = `${y}년 ${parseInt(m)}월 ${parseInt(d)}일 일정 (${events.length}건)`;
   document.getElementById('cal-detail-list').innerHTML = events.map(e => `
-    <div style="border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:${e.done?'#f0fdf4':'var(--panel)'};">
+    <div style="border:1px solid ${e._isSecond?'#f59e0b':'var(--line)'};border-radius:10px;padding:12px;margin-bottom:10px;background:${e.done?'#f0fdf4':e._isSecond?'#fffbeb':'var(--panel)'};">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-weight:800;font-size:14px;color:var(--ink);">${e.name}</span>
-        <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:${e.done?'#d1fae5':'#ede9fe'};color:${e.done?'#065f46':'#5b21b6'};font-weight:700;">${e.done?'완료':'처리중'}</span>
+        <div>
+          <span style="font-size:10px;font-weight:800;color:${e._isSecond?'#b45309':'#5b21b6'};margin-right:6px;">${e._isSecond?'🔔 2차 처리일':'📋 처리가능일자'}</span>
+          <span style="font-weight:800;font-size:14px;color:var(--ink);">${e.name}</span>
+        </div>
+        <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:${e.done?'#d1fae5':e._isSecond?'#fef3c7':'#ede9fe'};color:${e.done?'#065f46':e._isSecond?'#92400e':'#5b21b6'};font-weight:700;">${e.done?'완료':'처리중'}</span>
       </div>
       <div style="font-size:12px;color:var(--ink-soft);line-height:1.7;">
         ${e.phone?`📱 ${e.phone}<br>`:''}
