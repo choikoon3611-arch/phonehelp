@@ -2744,10 +2744,20 @@
         <div class="mrow"><label>담당자</label><input type="text" id="cs-agent" placeholder="이름"></div>
       </div>
       <div class="two-col">
-        <div class="mrow"><label>📅 처리가능일자 (1차)</label><input type="date" id="cs-schedule-date" style="width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);"></div>
-        <div class="mrow"><label>🔔 2차 처리일</label><input type="date" id="cs-schedule-date2" style="width:100%;padding:8px 11px;border:1.5px solid #f59e0b;border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);"></div>
+        <div class="mrow" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:10px;">
+          <label style="color:#166534;">📅 처리가능일자 (1차)</label>
+          <input type="date" id="cs-schedule-date" style="width:100%;padding:8px 11px;border:1.5px solid #86efac;border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);margin-bottom:6px;">
+          <label style="color:#166534;font-size:11px;">1차 처리 메모</label>
+          <textarea id="cs-schedule-note" rows="2" placeholder="1차 처리 시 할 업무 내용..." style="width:100%;padding:8px 10px;border:1.5px solid #86efac;border-radius:8px;font-size:12px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);resize:vertical;"></textarea>
+        </div>
+        <div class="mrow" style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:10px;">
+          <label style="color:#92400e;">🔔 2차 처리일</label>
+          <input type="date" id="cs-schedule-date2" style="width:100%;padding:8px 11px;border:1.5px solid #fcd34d;border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);margin-bottom:6px;">
+          <label style="color:#92400e;font-size:11px;">2차 처리 메모</label>
+          <textarea id="cs-schedule-note2" rows="2" placeholder="2차 처리 시 할 업무 내용..." style="width:100%;padding:8px 10px;border:1.5px solid #fcd34d;border-radius:8px;font-size:12px;font-family:inherit;outline:none;color:var(--ink);background:var(--panel);resize:vertical;"></textarea>
+        </div>
       </div>
-      <div class="mrow"><label>상담내용</label><textarea id="cs-content" rows="5" placeholder="상담 내용을 입력하세요..."></textarea></div>
+      <div class="mrow"><label>상담내용</label><textarea id="cs-content" rows="4" placeholder="상담 내용을 입력하세요..."></textarea></div>
     </div>
     <div class="modal-foot">
       <button class="mbtn-no" onclick="consultCloseModal()">취소</button>
@@ -6115,8 +6125,10 @@ function consultOpenModal(id = null) {
   document.getElementById('cs-ssn').value     = e?.ssn     || '';
   document.getElementById('cs-penalty').value = e?.penalty || '';
   document.getElementById('cs-agent').value   = e?.agent   || '';
-  document.getElementById('cs-schedule-date').value  = e?.scheduleDate  || '';
-  document.getElementById('cs-schedule-date2').value = e?.scheduleDate2 || '';
+  document.getElementById('cs-schedule-date').value   = e?.scheduleDate   || '';
+  document.getElementById('cs-schedule-note').value   = e?.scheduleNote   || '';
+  document.getElementById('cs-schedule-date2').value  = e?.scheduleDate2  || '';
+  document.getElementById('cs-schedule-note2').value  = e?.scheduleNote2  || '';
   document.getElementById('cs-content').value = e?.content || '';
   document.getElementById('consult-modal-bg').classList.add('open');
   setTimeout(() => document.getElementById('cs-name').focus(), 80);
@@ -6441,9 +6453,11 @@ function consultSaveEntry() {
     ssn:      document.getElementById('cs-ssn').value.trim(),
     penalty:  document.getElementById('cs-penalty').value.trim(),
     agent:        document.getElementById('cs-agent').value.trim(),
-    scheduleDate:  document.getElementById('cs-schedule-date').value  || '',
-    scheduleDate2: document.getElementById('cs-schedule-date2').value || '',
-    content:       document.getElementById('cs-content').value.trim(),
+    scheduleDate:   document.getElementById('cs-schedule-date').value   || '',
+    scheduleNote:   document.getElementById('cs-schedule-note').value.trim(),
+    scheduleDate2:  document.getElementById('cs-schedule-date2').value  || '',
+    scheduleNote2:  document.getElementById('cs-schedule-note2').value.trim(),
+    content:        document.getElementById('cs-content').value.trim(),
   };
   if (prev?.done) entry.done = prev.done;  // 완료된 항목 수정 시 done 상태 보존
   db.ref(HUB + '/consultations/' + entry.id).set(entry);
@@ -6806,7 +6820,9 @@ function calShowDetail(dateStr) {
         ${e.phone?`📱 ${e.phone}<br>`:''}
         📡 ${e.carrier} ${e.agent?`| 👨‍💼 ${e.agent}`:''}
         ${e.penalty?`<br>💰 ${e.penalty}`:''}
-        ${e.content?`<br><br>📝 ${e.content.slice(0,100)}${e.content.length>100?'...':''}`:''}
+        ${e.content?`<br><br>📝 상담내용: ${e.content.slice(0,100)}${e.content.length>100?'...':''}`:''}
+        ${!e._isSecond&&e.scheduleNote?`<br>✏️ 1차 메모: <b>${e.scheduleNote}</b>`:''}
+        ${e._isSecond&&e.scheduleNote2?`<br>✏️ 2차 메모: <b>${e.scheduleNote2}</b>`:''}
       </div>
     </div>
   `).join('');
