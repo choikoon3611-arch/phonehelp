@@ -3357,7 +3357,9 @@ function cardRender() {
       <td>${e.처리완료날짜||'-'}</td>
       <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
         <button class="cbtn write" onclick="cardOpenDoc('${e.id}')">서류 작성</button>
-        ${!isDone?`<button class="cbtn ok" onclick="cardMarkDone('${e.id}')">✓ 완료</button>`:''}
+        ${!isDone
+          ? `<button class="cbtn ok" onclick="cardMarkDone('${e.id}')">✓ 완료</button>`
+          : `<button class="cbtn" style="background:#f59e0b;color:#fff;border-color:#f59e0b;" onclick="cardUndone('${e.id}')">↩ 완료취소</button>`}
         <button class="cbtn" onclick="cardOpenModal('${e.id}')">수정</button>
         <button class="cbtn del" onclick="cardDelete('${e.id}')">삭제</button>
       </div></td>
@@ -3384,6 +3386,9 @@ function cardMarkDone(id) {
   const e = cardList.find(x => x.id === id); if (!e) return;
   e.상태 = '처리완료'; e.처리완료날짜 = new Date().toLocaleDateString('ko-KR');
   db.ref(HUB + '/cards/' + id).update({ 상태: '처리완료', 처리완료날짜: e.처리완료날짜 });
+}
+function cardUndone(id) {
+  db.ref(HUB + '/cards/' + id).update({ 상태: '대기중', 처리완료날짜: '' });
 }
 function cardDelete(id) {
   if (!confirm('정말 삭제할까요?')) return;
