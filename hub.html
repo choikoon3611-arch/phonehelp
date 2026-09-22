@@ -143,7 +143,21 @@
     .card-search-bar, .consult-search-bar, .card-search-bar input, .consult-search-bar input { width: 100%; box-sizing: border-box; }
     .hdr-tools { gap: 4px; }
     .hdr-widget-btn { font-size: 11px; padding: 5px 8px; }
+    /* 모바일: 표 숨기고 카드 표시 */
+    .consult-table-wrap { display: none; }
+    #consult-card-list { display: block !important; }
   }
+  .consult-mobile-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px; margin-bottom: 10px; position: relative;
+  }
+  .consult-mobile-card.done { opacity: 0.5; background: #f0fdf4; border-color: #86efac; }
+  .consult-mobile-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .consult-mobile-card-name { font-size: 16px; font-weight: 900; color: var(--ink); }
+  .consult-mobile-card-meta { font-size: 12px; color: var(--ink-soft); line-height: 1.8; margin-bottom: 10px; }
+  .consult-mobile-card-content { font-size: 13px; color: var(--ink); background: var(--bg); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+  .consult-mobile-card-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .consult-mobile-card-note { font-size: 11px; color: #b45309; margin-top: 4px; font-weight: 700; }
 
   .carrier-card {
     background: var(--panel); border-radius: var(--radius);
@@ -888,6 +902,7 @@
         등록된 상담 내용이 없습니다. <strong>+ 새 상담 등록</strong>을 눌러 추가하세요.
       </div>
     </div>
+    <div id="consult-card-list" style="display:none;"></div>
     </div><!-- /csub-consult -->
 
     <!-- ── 개통확인 ── -->
@@ -6100,6 +6115,43 @@ function consultRender() {
     </tr>`;
   }).join('');
   consultRenderPager(f.length, totalPages);
+
+  // 모바일 카드 뷰
+  const cardListEl = document.getElementById('consult-card-list');
+  if (cardListEl) {
+    const carrierCls = { SKT:'csk', KT:'ckt', LG:'clg', '알뜰':'cktm' };
+    if (!pageF.length) {
+      cardListEl.innerHTML = '<div style="text-align:center;color:var(--ink-soft);padding:24px;font-size:13px;">등록된 상담 내용이 없습니다.</div>';
+    } else {
+      cardListEl.innerHTML = pageF.map(e => {
+        const done = e.done === true;
+        const cls = carrierCls[e.carrier] || '';
+        const contentPreview = (e.content || '').slice(0, 80) + ((e.content||'').length > 80 ? '...' : '');
+        return `<div class="consult-mobile-card${done ? ' done' : ''}">
+          <div class="consult-mobile-card-header">
+            <span class="consult-mobile-card-name">${e.name || '-'}</span>
+            <span class="cbadge ${cls}">${e.carrier || '-'}</span>
+            ${done ? '<span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:20px;font-weight:700;">✅ 완료</span>' : ''}
+          </div>
+          <div class="consult-mobile-card-meta">
+            📱 ${e.phone || '-'}&nbsp;&nbsp;👨‍💼 ${e.agent || '-'}<br>
+            🕐 ${e.datetime || '-'}<br>
+            ${e.ssn ? `🪪 ${e.ssn}&nbsp;&nbsp;` : ''}${e.penalty ? `💰 ${e.penalty}` : ''}
+            ${e.scheduleDate ? `<br>📅 1차: ${e.scheduleDate}${e.scheduleNote ? ' — ' + e.scheduleNote : ''}` : ''}
+            ${e.scheduleDate2 ? `<br>🔔 2차: ${e.scheduleDate2}${e.scheduleNote2 ? ' — ' + e.scheduleNote2 : ''}` : ''}
+          </div>
+          ${contentPreview ? `<div class="consult-mobile-card-content" onclick="consultViewOpen('${(e.name||'').replace(/'/g,"\\'")}','${(e.content||'').replace(/\n/g,'\\n').replace(/'/g,"\\'")}',this)">📝 ${contentPreview.replace(/</g,'&lt;')}</div>` : ''}
+          <div class="consult-mobile-card-btns">
+            ${!done
+              ? `<button class="cbtn" style="background:#16a34a;color:#fff;border-color:#16a34a;padding:6px 14px;" onclick="consultDone('${e.id}')">✅ 완료</button>`
+              : `<button class="cbtn" style="padding:6px 14px;" onclick="consultUndone('${e.id}')">↩ 되돌리기</button>`}
+            <button class="cbtn" style="padding:6px 14px;" onclick="consultOpenModal('${e.id}')">수정</button>
+            <button class="cbtn del" style="padding:6px 14px;" onclick="consultDelete('${e.id}')">삭제</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 function consultRenderPager(total, totalPages) {
