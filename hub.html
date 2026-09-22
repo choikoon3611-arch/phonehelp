@@ -3359,7 +3359,7 @@ function cardRender() {
         <button class="cbtn write" onclick="cardOpenDoc('${e.id}')">서류 작성</button>
         ${!isDone
           ? `<button class="cbtn ok" onclick="cardMarkDone('${e.id}')">✓ 완료</button>`
-          : `<button class="cbtn" style="background:#f59e0b;color:#fff;border-color:#f59e0b;" onclick="cardUndone('${e.id}')">↩ 완료취소</button>`}
+          : cardFilter === '처리완료' ? `<button class="cbtn" style="background:#f59e0b;color:#fff;border-color:#f59e0b;" onclick="cardUndone('${e.id}')">↩ 완료취소</button>` : ''}
         <button class="cbtn" onclick="cardOpenModal('${e.id}')">수정</button>
         <button class="cbtn del" onclick="cardDelete('${e.id}')">삭제</button>
       </div></td>
