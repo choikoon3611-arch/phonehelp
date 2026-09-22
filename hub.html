@@ -2938,12 +2938,26 @@ function copyStoreUrl(btn) {
 
 function changeStoreName() {
   const cur = localStorage.getItem('hub_store_name') || '';
-  const display = cur === '__hub__' ? '내 매장' : cur;
-  const newName = prompt('매장 코드를 변경하세요.\n현재: ' + display, display);
-  if (newName === null) return;
-  if (!newName.trim()) return;
-  localStorage.setItem('hub_store_name', newName.trim());
-  location.reload();
+  const display = cur === '__hub__' ? '기본 매장' : cur;
+  // 모달 생성
+  const bg = document.createElement('div');
+  bg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  bg.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:28px 24px;width:320px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="font-size:16px;font-weight:900;color:#16283f;margin-bottom:6px;">🏪 매장 코드 변경</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:16px;">현재: <b>${display}</b></div>
+      <input id="_store-change-input" type="text" placeholder="새 매장 코드 입력"
+        style="width:100%;padding:11px 13px;border:2px solid #e2e7ec;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:10px;"
+        value="${cur === '__hub__' ? '' : cur}">
+      <button onclick="(function(){var v=document.getElementById('_store-change-input').value.trim();if(!v)return;localStorage.setItem('hub_store_name',v);location.reload();})()"
+        style="width:100%;padding:11px;background:#7c3aed;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px;">변경하기</button>
+      <button onclick="localStorage.setItem('hub_store_name','__hub__');location.reload();"
+        style="width:100%;padding:10px;background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">기본 매장으로 (데이터 공유)</button>
+      <button onclick="this.closest('div').parentNode.remove()"
+        style="width:100%;padding:10px;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">취소</button>
+    </div>`;
+  document.body.appendChild(bg);
+  setTimeout(() => document.getElementById('_store-change-input')?.focus(), 80);
 }
 
 function doLogout() {
