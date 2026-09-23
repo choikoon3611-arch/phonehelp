@@ -4498,7 +4498,7 @@ function smslogCalcDate(rule, base) {
   if (rule === 'D124') return new Date(n.getTime() + 124 * 86400000);
   if (rule === 'D183') return new Date(n.getTime() + 184 * 86400000);
   if (rule === 'D30')  return new Date(n.getTime() + 30  * 86400000);
-  if (rule === 'M1')   return new Date(n.getFullYear(), n.getMonth() + 1, 1);
+  if (rule === 'M1')   return new Date(n.getFullYear(), n.getMonth() + 2, 1);
   return null;
 }
 function smslogFmtDate(d) {
