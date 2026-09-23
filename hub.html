@@ -3082,6 +3082,39 @@ function setupFirebaseSync() {
     if (document.getElementById('csub-calendar')?.classList.contains('active')) calRender();
     if (document.getElementById('smspanel-cal')?.style.display !== 'none') smscalRender();
   });
+  // 달력 메모 (Firebase 공유)
+  db.ref(HUB + '/calMemos').on('value', snap => {
+    var rawVal = snap.val();
+    var newCache = {};
+    if (rawVal) {
+      Object.entries(rawVal).forEach(([dateStr, val]) => {
+        try {
+          var arr = typeof val === 'string' ? JSON.parse(val) : val;
+          if (Array.isArray(arr) && arr.length) newCache[dateStr] = arr;
+        } catch(e) {}
+      });
+    } else {
+      // 첫 접속 시 localStorage 메모를 Firebase로 이전
+      var migrateKeys = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.startsWith('smscal-memo-')) migrateKeys.push(k);
+      }
+      migrateKeys.forEach(function(k) {
+        try {
+          var dateStr = k.replace('smscal-memo-', '');
+          var arr = JSON.parse(localStorage.getItem(k) || '[]');
+          if (Array.isArray(arr) && arr.length) {
+            db.ref(HUB + '/calMemos/' + dateStr).set(JSON.stringify(arr));
+            localStorage.removeItem(k);
+          }
+        } catch(e) {}
+      });
+    }
+    calMemoCache = newCache;
+    if (document.getElementById('smspanel-cal')?.style.display !== 'none') smscalRender();
+    if (_smscalMemoDate) smscalRenderMemoList(_smscalMemoDate);
+  });
 }
 
 /* ===== 서류 데이터 ===== */
@@ -6675,7 +6708,7 @@ function smscalRender() {
     const plans   = planMap[dateStr]  || [];
     const addons  = addonMap[dateStr] || [];
     const hasAny  = plans.length + addons.length > 0;
-    const hasMemo = (function(){try{var m=JSON.parse(localStorage.getItem('smscal-memo-'+dateStr)||'[]');return Array.isArray(m)&&m.length>0;}catch(e){return !!(localStorage.getItem('smscal-memo-'+dateStr)||'').trim();}})();
+    const hasMemo = !!(calMemoCache[dateStr] && calMemoCache[dateStr].length);
     const numColor = dow === 0 ? '#ef4444' : dow === 6 ? '#3b82f6' : 'var(--ink)';
 
     let evHtml = '';
@@ -6714,12 +6747,16 @@ function smscalYearNext() { smscalYear++; smscalRender(); }
 function smscalGoMonth(m) { smscalMonth = m; smscalRender(); }
 
 var _smscalMemoDate = '';
+var calMemoCache = {};
 function _smscalGetMemos(dateStr) {
-  try { var m = JSON.parse(localStorage.getItem('smscal-memo-' + dateStr) || '[]'); return Array.isArray(m) ? m : []; } catch(e) { return []; }
+  return Array.isArray(calMemoCache[dateStr]) ? calMemoCache[dateStr] : [];
 }
 function _smscalSaveMemos(dateStr, arr) {
-  if (arr.length) localStorage.setItem('smscal-memo-' + dateStr, JSON.stringify(arr));
-  else localStorage.removeItem('smscal-memo-' + dateStr);
+  if (arr.length) {
+    db.ref(HUB + '/calMemos/' + dateStr).set(JSON.stringify(arr));
+  } else {
+    db.ref(HUB + '/calMemos/' + dateStr).remove();
+  }
 }
 function smscalRenderMemoList(dateStr) {
   var list = document.getElementById('smscal-memo-list');
