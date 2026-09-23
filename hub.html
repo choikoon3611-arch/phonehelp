@@ -3083,6 +3083,33 @@ function setupFirebaseSync() {
     if (document.getElementById('smspanel-cal')?.style.display !== 'none') smscalRender();
   });
   // 달력 메모 (Firebase 공유)
+  db.ref(HUB + '/calMemos').once('value', snap => {
+    // 접속 시 이 기기의 localStorage에 남은 메모를 Firebase로 이전
+    var migrateKeys = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.startsWith('smscal-memo-')) migrateKeys.push(k);
+    }
+    if (migrateKeys.length) {
+      var existing = snap.val() || {};
+      migrateKeys.forEach(function(k) {
+        try {
+          var dateStr = k.replace('smscal-memo-', '');
+          var localArr = JSON.parse(localStorage.getItem(k) || '[]');
+          if (!Array.isArray(localArr) || !localArr.length) { localStorage.removeItem(k); return; }
+          var fbArr = [];
+          try { var fv = existing[dateStr]; fbArr = fv ? (typeof fv === 'string' ? JSON.parse(fv) : fv) : []; if (!Array.isArray(fbArr)) fbArr = []; } catch(e) { fbArr = []; }
+          // 중복 제거 후 병합 (time 기준)
+          var merged = fbArr.slice();
+          localArr.forEach(function(m) {
+            if (!merged.some(function(x){ return x.time === m.time && x.text === m.text; })) merged.push(m);
+          });
+          db.ref(HUB + '/calMemos/' + dateStr).set(JSON.stringify(merged));
+          localStorage.removeItem(k);
+        } catch(e) {}
+      });
+    }
+  });
   db.ref(HUB + '/calMemos').on('value', snap => {
     var rawVal = snap.val();
     var newCache = {};
@@ -3091,23 +3118,6 @@ function setupFirebaseSync() {
         try {
           var arr = typeof val === 'string' ? JSON.parse(val) : val;
           if (Array.isArray(arr) && arr.length) newCache[dateStr] = arr;
-        } catch(e) {}
-      });
-    } else {
-      // 첫 접속 시 localStorage 메모를 Firebase로 이전
-      var migrateKeys = [];
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        if (k && k.startsWith('smscal-memo-')) migrateKeys.push(k);
-      }
-      migrateKeys.forEach(function(k) {
-        try {
-          var dateStr = k.replace('smscal-memo-', '');
-          var arr = JSON.parse(localStorage.getItem(k) || '[]');
-          if (Array.isArray(arr) && arr.length) {
-            db.ref(HUB + '/calMemos/' + dateStr).set(JSON.stringify(arr));
-            localStorage.removeItem(k);
-          }
         } catch(e) {}
       });
     }
