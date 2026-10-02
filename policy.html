@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정책 비교</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
+<style>
+:root {
+  --bg: #f1f5f9;
+  --panel: #ffffff;
+  --line: #e2e8f0;
+  --ink: #0f172a;
+  --ink-soft: #64748b;
+  --accent: #2563eb;
+  --accent-soft: #eff6ff;
+  --ok: #16a34a;
+  --ok-bg: #f0fdf4;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --err: #dc2626;
+  --err-bg: #fef2f2;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a; --panel: #1e293b; --line: #334155;
+    --ink: #f1f5f9; --ink-soft: #94a3b8; --accent-soft: #1e3a5f;
+    --ok-bg: #14532d; --warn-bg: #451a03; --err-bg: #450a0a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f172a; --panel: #1e293b; --line: #334155;
+  --ink: #f1f5f9; --ink-soft: #94a3b8; --accent-soft: #1e3a5f;
+  --ok-bg: #14532d; --warn-bg: #451a03; --err-bg: #450a0a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+.hdr { background: var(--panel); border-bottom: 1px solid var(--line); padding: 0 20px; display: flex; align-items: center; gap: 12px; height: 54px; position: sticky; top: 0; z-index: 200; }
+.hdr h1 { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+.hdr .beta { font-size: 10px; background: var(--accent); color: #fff; padding: 2px 7px; border-radius: 20px; font-weight: 700; }
+.hdr-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.tabs { display: flex; background: var(--panel); border-bottom: 2px solid var(--line); padding: 0 16px; overflow-x: auto; }
+.tab { padding: 13px 18px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--ink-soft); border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all 0.15s; }
+.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+main { padding: 20px 16px 60px; max-width: 960px; margin: 0 auto; }
+.section { display: none; }
+.section.on { display: block; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+.card-title { font-size: 11px; font-weight: 800; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+
+label { font-size: 12px; font-weight: 700; display: block; margin-bottom: 5px; color: var(--ink-soft); }
+input[type=text], input[type=password], select, textarea {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 8px;
+  background: var(--bg); color: var(--ink); font-size: 14px; font-family: inherit; transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+textarea { resize: vertical; min-height: 120px; }
+
+.btn { padding: 9px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-gray { background: var(--bg); color: var(--ink); border: 1.5px solid var(--line); }
+.btn-gray:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-danger { background: var(--err-bg); color: var(--err); border: 1px solid #fca5a5; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; filter: none; }
+
+.radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.radio-btn { padding: 7px 14px; border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.12s; user-select: none; }
+.radio-btn.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+/* Compare */
+.cmp-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.cmp-form .frow { flex: 1; min-width: 160px; }
+.cmp-form .btn { height: 40px; margin-top: auto; flex-shrink: 0; }
+
+.result-wrap { overflow-x: auto; }
+.result-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+.result-table th { padding: 9px 12px; background: var(--bg); font-weight: 700; text-align: left; border-bottom: 2px solid var(--line); color: var(--ink-soft); font-size: 11px; white-space: nowrap; }
+.result-table td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.result-table tbody tr:last-child td { border-bottom: none; }
+.result-table tbody tr:hover td { background: var(--bg); }
+.result-table tbody tr:first-child td { background: #fffbeb; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .result-table tbody tr:first-child td { background: #292000; } }
+:root[data-theme="dark"] .result-table tbody tr:first-child td { background: #292000; }
+
+.rank { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; font-size: 12px; font-weight: 800; }
+.r1 { background: #fef3c7; color: #92400e; }
+.r2 { background: #f1f5f9; color: #475569; }
+.r3 { background: #fce7f3; color: #9d174d; }
+.rn { background: var(--line); color: var(--ink-soft); }
+.carrier { padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+.cSK { background: #fee2e2; color: #b91c1c; }
+.cKT { background: #dbeafe; color: #1d4ed8; }
+.cLG { background: #f3e8ff; color: #7c3aed; }
+.amount-big { font-size: 17px; font-weight: 800; color: var(--accent); }
+.cond-tag { font-size: 11px; color: var(--ink-soft); background: var(--bg); border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; display: inline-block; }
+
+.empty { text-align: center; padding: 60px 20px; color: var(--ink-soft); }
+.empty .icon { font-size: 44px; margin-bottom: 10px; }
+.empty .msg { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+.empty .sub { font-size: 13px; }
+
+/* Upload */
+.upload-area { border: 2px dashed var(--line); border-radius: 12px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all 0.15s; }
+.upload-area:hover, .upload-area.drag { border-color: var(--accent); background: var(--accent-soft); }
+.upload-area .icon { font-size: 32px; margin-bottom: 8px; }
+.upload-area .hint { font-size: 13px; color: var(--ink-soft); }
+.upload-area input[type=file] { display: none; }
+
+.parse-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.parse-table th { padding: 7px 8px; background: var(--bg); font-size: 10px; font-weight: 800; color: var(--ink-soft); border: 1px solid var(--line); text-align: center; white-space: nowrap; }
+.parse-table td { padding: 5px 6px; border: 1px solid var(--line); text-align: center; }
+.parse-table td:first-child { text-align: left; font-weight: 600; }
+.parse-table input { border: none; background: transparent; text-align: center; width: 100%; font-size: 12px; font-family: inherit; color: var(--ink); padding: 2px; min-width: 54px; }
+.parse-table input:focus { background: var(--accent-soft); border-radius: 3px; outline: 1px solid var(--accent); }
+.parse-table .sub { font-size: 10px; color: var(--ink-soft); }
+
+/* Settings */
+.dist-list { display: flex; flex-direction: column; gap: 8px; }
+.dist-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg); border-radius: 8px; border: 1px solid var(--line); }
+.dist-item .dname { flex: 1; font-weight: 700; font-size: 14px; }
+.dist-item .dinfo { font-size: 12px; color: var(--ink-soft); }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 500px) { .row2 { grid-template-columns: 1fr; } }
+
+.spin { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.5s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.alert { padding: 11px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; line-height: 1.5; }
+.alert-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid #fcd34d; }
+.alert-ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #86efac; }
+.alert-err { background: var(--err-bg); color: var(--err); border: 1px solid #fca5a5; }
+
+.note { font-size: 12px; color: var(--ink-soft); margin-top: 5px; line-height: 1.6; }
+.mb12 { margin-bottom: 12px; }
+.mb8 { margin-bottom: 8px; }
+.flex { display: flex; gap: 8px; align-items: center; }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <h1>📊 정책 비교</h1>
+  <span class="beta">BETA</span>
+  <div class="hdr-right">
+    <button class="btn btn-gray btn-sm" onclick="location.href='hub.html'">← 허브</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tab on" onclick="switchTab('compare')">📊 비교 조회</div>
+  <div class="tab" onclick="switchTab('upload')">📥 정책 입력</div>
+  <div class="tab" onclick="switchTab('settings')">⚙️ 설정</div>
+</nav>
+
+<main>
+
+<!-- ===== 비교 조회 ===== -->
+<section class="section on" id="tab-compare">
+  <div class="card">
+    <div class="cmp-form">
+      <div class="frow">
+        <label>단말명</label>
+        <input type="text" id="cmp-model" placeholder="예: S26, 아이폰17, S25 울트라" list="model-list" oninput="updateModelList()">
+        <datalist id="model-list"></datalist>
+      </div>
+      <div class="frow">
+        <label>조건</label>
+        <div class="radio-group" id="cmp-cond">
+          <div class="radio-btn on" data-v="MNP" onclick="pickCond(this)">번호이동</div>
+          <div class="radio-btn" data-v="신규" onclick="pickCond(this)">신규</div>
+          <div class="radio-btn" data-v="기변" onclick="pickCond(this)">기변</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="doCompare()">비교하기</button>
+    </div>
+  </div>
+
+  <div id="cmp-result">
+    <div class="empty">
+      <div class="icon">📊</div>
+      <div class="msg">단말명과 조건을 선택하세요</div>
+      <div class="sub">등록된 모든 거래처 정책을 한눈에 비교합니다</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 정책 입력 ===== -->
+<section class="section" id="tab-upload">
+  <div class="card">
+    <div class="card-title">거래처 선택</div>
+    <div class="row2">
+      <div>
+        <label>거래처</label>
+        <select id="up-dist" onchange="onDistChange()">
+          <option value="">-- 거래처 선택 --</option>
+        </select>
+      </div>
+      <div>
+        <label>정책 날짜</label>
+        <input type="text" id="up-date" placeholder="예: 2026-10-02">
+      </div>
+    </div>
+    <div id="up-dist-warn" style="display:none" class="alert alert-warn">⚙️ 설정 탭에서 거래처를 먼저 추가하세요.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">정책표 입력</div>
+    <div class="radio-group mb12" id="input-mode-group">
+      <div class="radio-btn on" data-v="text" onclick="pickMode(this)">✏️ 텍스트 붙여넣기</div>
+      <div class="radio-btn" data-v="image" onclick="pickMode(this)">🖼 이미지 업로드</div>
+    </div>
+
+    <div id="input-text-area">
+      <textarea id="up-text" placeholder="카톡/문자로 받은 정책표 내용을 여기에 붙여넣으세요.&#10;텍스트가 많을수록 파싱 정확도가 높아집니다."></textarea>
+    </div>
+
+    <div id="input-image-area" style="display:none">
+      <div class="upload-area" id="drop-zone" onclick="document.getElementById('up-file').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <input type="file" id="up-file" accept="image/*" onchange="handleFile(this)">
+        <div class="icon">📁</div>
+        <div style="font-weight:700;margin-bottom:4px;">클릭 · 끌어놓기 · <span style="color:var(--accent);">Ctrl+V 붙여넣기</span></div>
+        <div class="hint">카톡에서 이미지 복사 후 Ctrl+V 하면 바로 올라가요</div>
+      </div>
+      <div id="img-preview" style="margin-top:10px;"></div>
+    </div>
+
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-primary" id="parse-btn" onclick="parsePolicy()">
+        ✨ AI 파싱 시작
+      </button>
+      <span id="parse-status" style="font-size:13px;color:var(--ink-soft);"></span>
+    </div>
+  </div>
+
+  <div id="parse-result-area" style="display:none">
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>파싱 결과 (검수 후 저장)</span>
+        <div class="flex">
+          <button class="btn btn-primary" onclick="savePolicy()">💾 저장</button>
+        </div>
+      </div>
+      <div class="alert alert-warn" style="margin-bottom:12px;">⚠️ AI가 추출한 결과입니다. 숫자 클릭해서 수정 가능. 확인 후 저장하세요.</div>
+
+      <div style="font-size:12px;font-weight:800;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">단말별 기본정책 (원)</div>
+      <div style="overflow-x:auto;margin-bottom:16px;">
+        <table class="parse-table" id="parse-table">
+          <thead>
+            <tr>
+              <th style="min-width:130px;text-align:left;">단말명</th>
+              <th>번호이동(MNP)</th>
+              <th>신규</th>
+              <th>기변</th>
+              <th>비고</th>
+              <th><button class="btn btn-gray btn-sm" onclick="addParsedRow()" style="white-space:nowrap;">+ 추가</button></th>
+            </tr>
+          </thead>
+          <tbody id="parse-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="font-size:12px;font-weight:800;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;">추가정책 (부가서비스·TAC+·우주패스 등)</div>
+      <div style="overflow-x:auto;">
+        <table class="parse-table" id="addition-table">
+          <thead>
+            <tr>
+              <th style="min-width:120px;text-align:left;">정책명</th>
+              <th>금액(원)</th>
+              <th style="min-width:160px;">제외모델 (쉼표구분)</th>
+              <th style="min-width:200px;text-align:left;">지급 조건 (정책표 그대로)</th>
+              <th><button class="btn btn-gray btn-sm" onclick="addAdditionRow()" style="white-space:nowrap;">+ 추가</button></th>
+            </tr>
+          </thead>
+          <tbody id="addition-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 설정 ===== -->
+<section class="section" id="tab-settings">
+  <div class="card">
+    <div class="card-title">Claude API 키</div>
+    <div class="flex mb8">
+      <input type="password" id="set-api-key" placeholder="sk-ant-api03-..." style="flex:1;">
+      <button class="btn btn-primary btn-sm" onclick="saveApiKey()">저장</button>
+    </div>
+    <div class="note">API 키는 이 기기의 로컬에만 저장됩니다. <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);">console.anthropic.com</a>에서 발급</div>
+    <div id="api-key-status" style="margin-top:8px;font-size:12px;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>거래처 관리</span>
+      <button class="btn btn-primary btn-sm" onclick="showAddDist()">+ 거래처 추가</button>
+    </div>
+    <div id="add-dist-form" style="display:none;margin-bottom:14px;background:var(--bg);border-radius:10px;padding:14px;">
+      <div class="row2">
+        <div>
+          <label>거래처 이름</label>
+          <input type="text" id="new-dist-name" placeholder="예: SK A거래처">
+        </div>
+        <div>
+          <label>통신사</label>
+          <select id="new-dist-carrier">
+            <option value="SK">SK</option>
+            <option value="KT">KT</option>
+            <option value="LG">LG</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex">
+        <button class="btn btn-primary btn-sm" onclick="addDist()">추가</button>
+        <button class="btn btn-gray btn-sm" onclick="hideAddDist()">취소</button>
+      </div>
+    </div>
+    <div class="dist-list" id="dist-list">
+      <div class="empty" style="padding:30px 0;"><div class="sub">등록된 거래처가 없습니다.</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">데이터 관리</div>
+    <div class="flex">
+      <button class="btn btn-gray btn-sm" onclick="exportData()">📤 데이터 내보내기</button>
+      <button class="btn btn-gray btn-sm" onclick="importData()">📥 데이터 가져오기</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="doImport(this)">
+    </div>
+    <div class="note" style="margin-top:8px;">정책 데이터를 JSON 파일로 백업하거나 복원할 수 있습니다.</div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ===== 데이터 =====
+var DB_KEY = 'policy_db';
+var API_KEY = 'policy_apikey';
+var db = { distributors: [], policies: {} };
+var selectedCond = 'MNP';
+var inputMode = 'text';
+var uploadedImageB64 = null;
+var uploadedImageType = null;
+var parsedRows = [];
+var parsedAdditions = []; // 추가정책 목록
+
+function loadDB() {
+  try { var s = localStorage.getItem(DB_KEY); if (s) db = JSON.parse(s); } catch(e) {}
+  if (!db.distributors) db.distributors = [];
+  if (!db.policies) db.policies = {};
+}
+function saveDB() {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(e) { alert('저장 실패: ' + e.message); }
+}
+
+// ===== 탭 =====
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('on', ['compare','upload','settings'][i] === t));
+  document.querySelectorAll('.section').forEach((el, i) => el.classList.toggle('on', ['compare','upload','settings'][i] === t));
+  if (t === 'upload') refreshDistSelect();
+  if (t === 'settings') renderDistList(), loadApiKeyStatus();
+  if (t === 'compare') updateModelList();
+}
+
+// ===== 비교 조회 =====
+function pickCond(el) {
+  document.querySelectorAll('#cmp-cond .radio-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  selectedCond = el.dataset.v;
+}
+
+function updateModelList() {
+  var seen = new Set();
+  Object.values(db.policies).forEach(p => {
+    (p.phones || []).forEach(r => { if (r.단말명) seen.add(r.단말명); });
+  });
+  var dl = document.getElementById('model-list');
+  dl.innerHTML = [...seen].map(n => `<option value="${n}">`).join('');
+}
+
+function doCompare() {
+  var modelInput = (document.getElementById('cmp-model').value || '').trim().toLowerCase();
+  if (!modelInput) { alert('단말명을 입력하세요.'); return; }
+  var cond = selectedCond;
+  var condKey = cond === 'MNP' ? 'MNP' : cond === '신규' ? '신규' : '기변';
+
+  var rows = [];
+  db.distributors.forEach(dist => {
+    var pol = db.policies[dist.id];
+    if (!pol || !pol.phones) return;
+    var phone = pol.phones.find(p => (p.단말명||'').toLowerCase().includes(modelInput) || modelInput.includes((p.단말명||'').toLowerCase()));
+    if (!phone) return;
+    var base = Number(phone[condKey]) || 0;
+    if (!base) return;
+
+    // 추가정책 (제외모델 체크, 조건 텍스트 포함)
+    var additions = (pol.추가정책 || []);
+    var addTotal = 0;
+    var addLines = [];
+    additions.forEach(a => {
+      var excluded = (a.제외모델 || []).some(ex => (phone.단말명||'').toLowerCase().includes(ex.toLowerCase()));
+      var amt = Number(a.금액) || 0;
+      if (!excluded && amt) {
+        addTotal += amt;
+        addLines.push({ 이름: a.이름, 금액: amt, 조건: a.조건 || '' });
+      }
+    });
+
+    rows.push({
+      dist: dist.이름, carrier: dist.통신사,
+      base, addTotal, addLines,
+      total: base + addTotal,
+      비고: phone.비고 || '', 날짜: pol.날짜 || ''
+    });
+  });
+
+  if (!rows.length) {
+    document.getElementById('cmp-result').innerHTML = `<div class="empty"><div class="icon">🔍</div><div class="msg">"${modelInput}" 데이터 없음</div><div class="sub">정책 입력 탭에서 해당 단말 정책을 먼저 등록하세요.</div></div>`;
+    return;
+  }
+
+  rows.sort((a, b) => b.total - a.total);
+  var rankClass = ['r1','r2','r3'];
+  var condLabel = cond === 'MNP' ? '번호이동' : cond;
+
+  var html = `<div class="card">
+  <div style="font-size:15px;font-weight:800;margin-bottom:4px;">"${document.getElementById('cmp-model').value}" ${condLabel} — ${rows.length}개 거래처 비교</div>
+  <div style="font-size:12px;color:var(--ink-soft);margin-bottom:16px;">⚠️ 조건 표시된 추가정책은 판매자가 직접 확인 후 적용 여부 판단</div>`;
+
+  rows.forEach((r, i) => {
+    var rc = i < 3 ? rankClass[i] : 'rn';
+    var cc = r.carrier === 'SK' ? 'cSK' : r.carrier === 'KT' ? 'cKT' : 'cLG';
+    var addHtml = r.addLines.length
+      ? r.addLines.map(a =>
+          `<div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px dashed var(--line);">
+            <span style="font-size:12px;font-weight:700;color:var(--ok);white-space:nowrap;">+${fmtW(a.금액)}</span>
+            <span style="font-size:12px;font-weight:600;">${a.이름}</span>
+            ${a.조건 ? `<span style="font-size:11px;color:var(--warn);background:var(--warn-bg);padding:1px 6px;border-radius:4px;white-space:nowrap;">⚠️ ${a.조건}</span>` : ''}
+          </div>`
+        ).join('')
+      : '<span style="font-size:12px;color:var(--ink-soft);">추가정책 없음</span>';
+
+    html += `<div style="border:1.5px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px;${i===0?'border-color:#fbbf24;background:#fffbeb;':''}">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="rank ${rc}">${i+1}</span>
+        <span style="font-weight:800;font-size:15px;">${r.dist}</span>
+        <span class="carrier ${cc}">${r.carrier}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--ink-soft);">${r.날짜}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <span style="font-size:13px;color:var(--ink-soft);">기본정책</span>
+        <span style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;">${fmtW(r.base)}</span>
+        ${r.addTotal ? `<span style="font-size:13px;color:var(--ink-soft);">+ 추가</span><span style="font-size:16px;font-weight:700;color:var(--ok);">+${fmtW(r.addTotal)}</span>` : ''}
+        <span style="font-size:13px;color:var(--ink-soft);">=</span>
+        <span style="font-size:22px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;">${fmtW(r.total)}</span>
+        <span style="font-size:11px;color:var(--ink-soft);">(최대, 조건 충족시)</span>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 10px;">${addHtml}</div>
+      ${r.비고 ? `<div style="font-size:11px;color:var(--ink-soft);margin-top:6px;">📝 ${r.비고}</div>` : ''}
+    </div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('cmp-result').innerHTML = html;
+}
+
+function fmtW(n) {
+  if (!n) return '-';
+  if (n >= 10000) return (n/10000).toFixed(n % 10000 === 0 ? 0 : 1) + '만';
+  return n.toLocaleString() + '원';
+}
+
+// ===== 정책 입력 =====
+function refreshDistSelect() {
+  var sel = document.getElementById('up-dist');
+  var warn = document.getElementById('up-dist-warn');
+  sel.innerHTML = '<option value="">-- 거래처 선택 --</option>' +
+    db.distributors.map(d => `<option value="${d.id}">[${d.통신사}] ${d.이름}</option>`).join('');
+  warn.style.display = db.distributors.length ? 'none' : 'block';
+  var today = new Date();
+  document.getElementById('up-date').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+}
+function onDistChange() {}
+
+function pickMode(el) {
+  document.querySelectorAll('#input-mode-group .radio-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  inputMode = el.dataset.v;
+  document.getElementById('input-text-area').style.display = inputMode === 'text' ? '' : 'none';
+  document.getElementById('input-image-area').style.display = inputMode === 'image' ? '' : 'none';
+}
+
+function handleFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = e => {
+    uploadedImageB64 = e.target.result.split(',')[1];
+    uploadedImageType = file.type || 'image/jpeg';
+    document.getElementById('img-preview').innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:280px;border-radius:8px;border:1px solid var(--line);">`;
+  };
+  reader.readAsDataURL(file);
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  var file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    var dt = new DataTransfer(); dt.items.add(file);
+    var fi = document.getElementById('up-file'); fi.files = dt.files; handleFile(fi);
+  }
+}
+
+document.addEventListener('paste', function(e) {
+  if (inputMode !== 'image') return;
+  var items = e.clipboardData && e.clipboardData.items;
+  if (!items) return;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].type.startsWith('image/')) {
+      var file = items[i].getAsFile();
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        uploadedImageB64 = ev.target.result.split(',')[1];
+        uploadedImageType = file.type || 'image/png';
+        document.getElementById('img-preview').innerHTML =
+          `<div style="font-size:12px;color:var(--ok);margin-bottom:6px;">✅ 클립보드에서 이미지 붙여넣기 완료</div>` +
+          `<img src="${ev.target.result}" style="max-width:100%;max-height:280px;border-radius:8px;border:1px solid var(--line);">`;
+        document.getElementById('drop-zone').style.borderColor = 'var(--ok)';
+        document.getElementById('drop-zone').style.background = 'var(--ok-bg)';
+      };
+      reader.readAsDataURL(file);
+      break;
+    }
+  }
+});
+
+async function parsePolicy() {
+  var distId = document.getElementById('up-dist').value;
+  if (!distId) { alert('거래처를 선택하세요.'); return; }
+  var apiKey = localStorage.getItem(API_KEY);
+  if (!apiKey) { alert('설정 탭에서 API 키를 먼저 입력하세요.'); return; }
+
+  var btn = document.getElementById('parse-btn');
+  var st = document.getElementById('parse-status');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> AI 분석 중...';
+  st.textContent = '';
+
+  try {
+    var systemPrompt = `당신은 한국 통신사 거래처 정책표 분석 전문가입니다.
+
+⚠️ 주의: 출고가(단말 판매가격, 보통 100만원 이상)는 절대 추출하지 마세요.
+우리가 필요한 것은 거래처가 대리점에 지급하는 "정책지원금"입니다.
+
+[추출할 것 1] 단말별 기본 정책지원금
+- 정책표 메인 테이블에서 MNP(번호이동)/신규/기변 열의 정책차감 금액을 읽으세요
+- 공시지원금이 아닌 "정책차감" 또는 "정책" 금액 (보통 수만원~수십만원 수준)
+- MNP가 가장 높고 기변이 가장 낮은 경우가 많음
+- 단말명만 간결하게 (갤럭시 S26, iPhone 18 Pro 256GB 등)
+- 출고가(1,254,000원 같은 큰 숫자)는 절대 넣지 말 것
+
+[추출할 것 2] 하단 추가정책 목록 (부가서비스, TAC+, 우주패스, ZEM 등)
+- 이름: 정책명
+- 금액: 지급금액 (원 단위, 보통 1만~30만원 수준)
+- 제외모델: 제외되는 모델코드 목록
+- 조건: 나이조건/요금제조건/서비스유치조건 등 정책표에 적힌 조건 한 줄 요약
+
+규칙:
+- 금액은 원 단위 정수만 (570000 처럼, 절대 출고가 넣지 말 것)
+- JSON만 출력, 코드블록/설명 없이
+
+{
+  "폰목록": [
+    {"단말명": "갤럭시 S26", "MNP": 570000, "신규": 300000, "기변": 200000, "비고": ""},
+    {"단말명": "iPhone 18 Pro 256GB", "MNP": 450000, "신규": 200000, "기변": 100000, "비고": ""}
+  ],
+  "추가정책": [
+    {"이름": "마이스마트콜3", "금액": 20000, "제외모델": [], "조건": "1957~2012년생, 마이스마트콜3 유치시"},
+    {"이름": "TAC+", "금액": 20000, "제외모델": ["M140"], "조건": "T올케어+6 가입시"},
+    {"이름": "우주패스", "금액": 10000, "제외모델": ["A376","A336","M176","M166"], "조건": "우주패스 가입시"}
+  ]
+}`;
+
+    var userContent;
+    if (inputMode === 'image') {
+      if (!uploadedImageB64) { alert('이미지를 먼저 업로드하세요.'); btn.disabled = false; btn.innerHTML = '✨ AI 파싱 시작'; return; }
+      userContent = [
+        { type: 'image', source: { type: 'base64', media_type: uploadedImageType, data: uploadedImageB64 } },
+        { type: 'text', text: '위 정책표 이미지를 분석하여 JSON으로 추출하세요.' }
+      ];
+    } else {
+      var text = (document.getElementById('up-text').value || '').trim();
+      if (!text) { alert('정책표 내용을 붙여넣으세요.'); btn.disabled = false; btn.innerHTML = '✨ AI 파싱 시작'; return; }
+      userContent = text;
+    }
+
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: inputMode === 'image' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001',
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userContent }]
+      })
+    });
+
+    if (!res.ok) {
+      var err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API 오류 ${res.status}`);
+    }
+
+    var data = await res.json();
+    var raw = data.content[0].text;
+    var jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSON 파싱 실패 — AI 응답에서 JSON을 찾을 수 없습니다.');
+    var parsed = JSON.parse(jsonMatch[0]);
+    parsedRows = parsed.폰목록 || [];
+    parsedAdditions = parsed.추가정책 || [];
+    renderParseTable();
+    st.textContent = `✅ 단말 ${parsedRows.length}개 · 추가정책 ${parsedAdditions.length}개 추출 완료`;
+  } catch(e) {
+    st.innerHTML = `<span style="color:var(--err);">❌ ${e.message}</span>`;
+  }
+  btn.disabled = false;
+  btn.innerHTML = '✨ AI 파싱 시작';
+}
+
+function renderParseTable() {
+  // 단말 테이블
+  var tbody = document.getElementById('parse-tbody');
+  tbody.innerHTML = '';
+  parsedRows.forEach((r, i) => {
+    var tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input value="${r.단말명||''}" onchange="parsedRows[${i}].단말명=this.value" style="text-align:left;min-width:120px;font-weight:700;"></td>
+      <td><input type="number" value="${r.MNP||0}" onchange="parsedRows[${i}].MNP=+this.value" style="min-width:70px;"></td>
+      <td><input type="number" value="${r.신규||0}" onchange="parsedRows[${i}].신규=+this.value" style="min-width:70px;"></td>
+      <td><input type="number" value="${r.기변||0}" onchange="parsedRows[${i}].기변=+this.value" style="min-width:70px;"></td>
+      <td><input value="${r.비고||''}" onchange="parsedRows[${i}].비고=this.value" style="min-width:80px;"></td>
+      <td><button class="btn btn-danger btn-sm" onclick="parsedRows.splice(${i},1);renderParseTable()">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // 추가정책 테이블
+  var atbody = document.getElementById('addition-tbody');
+  if (atbody) {
+    atbody.innerHTML = '';
+    parsedAdditions.forEach((a, i) => {
+      var tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${a.이름||''}" onchange="parsedAdditions[${i}].이름=this.value" style="text-align:left;min-width:110px;font-weight:600;"></td>
+        <td><input type="number" value="${a.금액||0}" onchange="parsedAdditions[${i}].금액=+this.value" style="min-width:70px;"></td>
+        <td><input value="${(a.제외모델||[]).join(', ')}" onchange="parsedAdditions[${i}].제외모델=this.value.split(',').map(s=>s.trim()).filter(Boolean)" style="min-width:130px;font-size:12px;" placeholder="A376, M140 등 쉼표구분"></td>
+        <td><input value="${(a.조건||'').replace(/"/g,'&quot;')}" onchange="parsedAdditions[${i}].조건=this.value" style="text-align:left;min-width:180px;font-size:12px;" placeholder="1957~2012년생, 요금제 조건 등"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="parsedAdditions.splice(${i},1);renderParseTable()">✕</button></td>
+      `;
+      atbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('parse-result-area').style.display = (parsedRows.length || parsedAdditions.length) ? '' : 'none';
+}
+
+function addParsedRow() {
+  parsedRows.push({ 단말명:'', MNP:0, 신규:0, 기변:0, 비고:'' });
+  renderParseTable();
+}
+function addAdditionRow() {
+  parsedAdditions.push({ 이름:'', 금액:0, 제외모델:[] });
+  renderParseTable();
+}
+
+function savePolicy() {
+  var distId = document.getElementById('up-dist').value;
+  if (!distId) { alert('거래처를 선택하세요.'); return; }
+  if (!parsedRows.length) { alert('저장할 데이터가 없습니다.'); return; }
+  var date = document.getElementById('up-date').value || '';
+  db.policies[distId] = {
+    distId, 날짜: date,
+    phones: parsedRows.map(r => JSON.parse(JSON.stringify(r))),
+    추가정책: parsedAdditions.map(a => JSON.parse(JSON.stringify(a)))
+  };
+  saveDB();
+  alert('✅ 저장 완료!');
+  document.getElementById('parse-result-area').style.display = 'none';
+  parsedRows = []; parsedAdditions = [];
+  updateModelList();
+}
+
+// ===== 설정 =====
+function loadApiKeyStatus() {
+  var k = localStorage.getItem(API_KEY);
+  var el = document.getElementById('api-key-status');
+  if (k) {
+    document.getElementById('set-api-key').value = k;
+    el.innerHTML = '<span style="color:var(--ok);">✅ API 키 저장됨</span>';
+  } else {
+    el.innerHTML = '<span style="color:var(--ink-soft);">API 키 없음</span>';
+  }
+}
+function saveApiKey() {
+  var v = document.getElementById('set-api-key').value.trim();
+  if (!v) { alert('API 키를 입력하세요.'); return; }
+  localStorage.setItem(API_KEY, v);
+  document.getElementById('api-key-status').innerHTML = '<span style="color:var(--ok);">✅ 저장됨</span>';
+}
+
+function renderDistList() {
+  var el = document.getElementById('dist-list');
+  if (!db.distributors.length) {
+    el.innerHTML = '<div class="empty" style="padding:20px 0;"><div class="sub">등록된 거래처가 없습니다.</div></div>';
+    return;
+  }
+  el.innerHTML = db.distributors.map((d, i) => {
+    var cc = d.통신사 === 'SK' ? 'cSK' : d.통신사 === 'KT' ? 'cKT' : 'cLG';
+    var pol = db.policies[d.id];
+    var info = pol ? `정책 ${pol.phones?.length||0}개 단말 · ${pol.날짜||'날짜없음'}` : '정책 없음';
+    return `<div class="dist-item">
+      <span class="carrier ${cc}">${d.통신사}</span>
+      <span class="dname">${d.이름}</span>
+      <span class="dinfo">${info}</span>
+      <button class="btn btn-danger btn-sm" onclick="deleteDist(${i})">삭제</button>
+    </div>`;
+  }).join('');
+}
+
+function showAddDist() { document.getElementById('add-dist-form').style.display = ''; }
+function hideAddDist() { document.getElementById('add-dist-form').style.display = 'none'; }
+function addDist() {
+  var name = document.getElementById('new-dist-name').value.trim();
+  if (!name) { alert('거래처 이름을 입력하세요.'); return; }
+  var carrier = document.getElementById('new-dist-carrier').value;
+  var id = 'dist_' + Date.now();
+  db.distributors.push({ id, 이름: name, 통신사: carrier });
+  saveDB();
+  hideAddDist();
+  renderDistList();
+  document.getElementById('new-dist-name').value = '';
+}
+function deleteDist(i) {
+  var d = db.distributors[i];
+  if (!confirm(`"${d.이름}" 거래처와 등록된 정책을 모두 삭제할까요?`)) return;
+  delete db.policies[d.id];
+  db.distributors.splice(i, 1);
+  saveDB();
+  renderDistList();
+}
+
+function exportData() {
+  var blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'policy_db_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+function importData() { document.getElementById('import-file').click(); }
+function doImport(input) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = e => {
+    try {
+      var imported = JSON.parse(e.target.result);
+      if (!confirm('현재 데이터를 덮어쓸까요?')) return;
+      db = imported;
+      saveDB();
+      renderDistList();
+      alert('✅ 가져오기 완료');
+    } catch(err) { alert('파일 형식 오류: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+// ===== 초기화 =====
+loadDB();
+updateModelList();
+</script>
+</body>
+</html>

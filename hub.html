@@ -842,8 +842,6 @@
     <!-- 서브탭 -->
     <div class="consult-sub-tabs">
       <button class="csub-btn active" data-csub="csub-consult">📋 상담업무</button>
-      <button class="csub-btn" data-csub="csub-sms">💬 문자업무공유</button>
-      <button class="csub-btn" data-csub="csub-activation">📱 개통확인</button>
       <button class="csub-btn" data-csub="csub-calendar">📅 달력</button>
     </div>
 
@@ -905,113 +903,6 @@
     <div id="consult-card-list" style="display:none;"></div>
     </div><!-- /csub-consult -->
 
-    <!-- ── 개통확인 ── -->
-    <div class="csub-panel" id="csub-activation">
-
-      <!-- 텔레그램 Topic 설정 -->
-      <div style="background:var(--panel);border:1px solid #ddd6fe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span style="font-size:11px;font-weight:800;color:#7c3aed;">🔔 개통확인 Topic ID</span>
-        <input id="tg-activation-topic" placeholder="텔레그램 주제 ID"
-          style="width:140px;padding:6px 10px;border:1.5px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;"
-          onchange="actSaveTopic()">
-        <span id="act-alarm-status" style="font-size:11px;color:#dc2626;font-weight:700;"></span>
-      </div>
-
-      <!-- 개통 입력 폼 -->
-      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;">
-        <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:12px;">📱 개통 정보 입력</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">거래처</label>
-            <select id="act-dealer"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--panel);color:var(--ink);box-sizing:border-box;">
-              <option value="">선택</option>
-              <option value="블루">블루</option>
-              <option value="이도">이도</option>
-              <option value="텔나라">텔나라</option>
-              <option value="에이스">에이스</option>
-            </select></div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">고객명</label>
-            <input id="act-customer" type="text" placeholder="홍길동"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">번호</label>
-            <input id="act-phone" type="tel" placeholder="010-0000-0000"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">요금제</label>
-            <input id="act-plan" type="text" placeholder="수기 작성"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">부가서비스</label>
-            <input id="act-addon" type="text" placeholder="수기 작성 (없으면 없음)"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">할부원금</label>
-            <input id="act-principal" type="text" placeholder="예: 800,000"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">지원금 유형</label>
-            <div style="display:flex;gap:5px;margin-top:5px;">
-              <button id="act-disc-pub" onclick="actDisc('공시지원금')"
-                style="flex:1;padding:6px 4px;border:1.5px solid #6366f1;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">공시지원금</button>
-              <button id="act-disc-sel" onclick="actDisc('선택약정')"
-                style="flex:1;padding:6px 4px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">선택약정</button>
-            </div>
-          </div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">추가지원금</label>
-            <input id="act-extra" type="text" placeholder="예: 50,000"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;"></div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">할부개월수</label>
-            <select id="act-installment"
-              style="width:100%;margin-top:3px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:var(--panel);color:var(--ink);box-sizing:border-box;">
-              <option value="24">24개월</option>
-              <option value="30">30개월</option>
-              <option value="36">36개월</option>
-              <option value="48">48개월</option>
-            </select>
-          </div>
-
-          <div><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">약정기간</label>
-            <div style="display:flex;gap:5px;margin-top:5px;">
-              <button id="act-contract-12" onclick="actContract('12')"
-                style="flex:1;padding:6px 4px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">12개월</button>
-              <button id="act-contract-24" onclick="actContract('24')"
-                style="flex:1;padding:6px 4px;border:1.5px solid #6366f1;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">24개월</button>
-            </div>
-          </div>
-
-          <div style="grid-column:1/-1;"><label style="font-size:11px;font-weight:700;color:var(--ink-soft);">복지할인</label>
-            <div style="display:flex;gap:5px;margin-top:5px;">
-              <button id="act-welfare-n" onclick="actWelfare(false)"
-                style="flex:1;padding:6px;border:1.5px solid #6366f1;border-radius:8px;background:#6366f1;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">없음</button>
-              <button id="act-welfare-y" onclick="actWelfare(true)"
-                style="flex:1;padding:6px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">있음</button>
-            </div>
-          </div>
-
-        </div>
-        <button onclick="actSubmit()"
-          style="width:100%;margin-top:14px;padding:11px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;">
-          📱 개통 알림 전송
-        </button>
-      </div>
-
-      <!-- 개통 목록 -->
-      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-          <span style="font-weight:800;font-size:14px;flex:1;">📋 개통 내역</span>
-          <button class="smslog-filter on" id="act-filter-all"     onclick="actFilter('all',this)">전체</button>
-          <button class="smslog-filter"    id="act-filter-pending" onclick="actFilter('pending',this)">⏳ 미확인</button>
-          <button class="smslog-filter"    id="act-filter-done"    onclick="actFilter('done',this)">✅ 완료</button>
-        </div>
-        <div id="act-list"><div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">내역이 없습니다.</div></div>
-      </div>
-
-    </div><!-- /csub-activation -->
 
     <!-- ── 달력 ── -->
     <!-- ── 달력 ── -->
@@ -1049,46 +940,6 @@
       </div>
     </div>
 
-    <!-- ── 문자업무공유 ── -->
-    <div class="csub-panel" id="csub-sms">
-
-      <!-- 텔레그램 설정 -->
-      <div style="background:var(--panel);border:1px solid #ddd6fe;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;">
-        <div style="font-size:11px;font-weight:800;color:#7c3aed;width:100%;margin-bottom:2px;">🔔 텔레그램 알림 설정</div>
-        <div style="flex:1;min-width:120px;">
-          <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:4px;">문자업무 Topic ID</div>
-          <input id="tg-sms-topic" placeholder="텔레그램 주제 ID (예: 12)"
-            style="width:100%;padding:7px 10px;border:1.5px solid #ddd6fe;border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
-        </div>
-        <button onclick="smsTgSave()" style="padding:7px 14px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">저장</button>
-        <button onclick="smsTgTest()" style="padding:7px 14px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">📨 테스트</button>
-      </div>
-      <!-- 입력 영역 -->
-      <div class="sms-task-input-wrap">
-        <div style="font-size:13px;font-weight:800;color:var(--ink);">📨 문자 붙여넣기</div>
-        <textarea id="sms-task-text" placeholder="받은 문자 내용을 여기에 붙여넣으세요..."></textarea>
-        <div style="display:flex;justify-content:flex-end;">
-          <button onclick="smsTaskAdd()" style="padding:8px 20px;border:none;border-radius:8px;background:#7c3aed;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">+ 등록</button>
-        </div>
-      </div>
-      <!-- 검색 -->
-      <div style="margin-bottom:10px;">
-        <input id="sms-search-input" type="text" placeholder="🔍 문자 내용 검색..."
-          oninput="smsTaskRender()"
-          style="width:100%;padding:9px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--ink);outline:none;">
-      </div>
-      <!-- 필터 -->
-      <div class="sms-task-filter">
-        <button class="sms-ftab active" data-sf="전체" onclick="smsFilterSet(this)">전체</button>
-        <button class="sms-ftab" data-sf="미완료" onclick="smsFilterSet(this)">🔴 미완료</button>
-        <button class="sms-ftab" data-sf="완료" onclick="smsFilterSet(this)">✅ 완료</button>
-      </div>
-      <!-- 목록 -->
-      <div class="sms-task-list" id="sms-task-list">
-        <div style="text-align:center;color:var(--ink-soft);padding:30px;font-size:13px;">등록된 문자 업무가 없습니다.</div>
-      </div>
-
-    </div><!-- /csub-sms -->
 
   </div><!-- /panel-consult -->
 
@@ -3066,14 +2917,6 @@ function setupFirebaseSync() {
     const at = document.getElementById('tg-activation-topic');
     if (at) at.value = tgCfg.activationTopic;
   });
-  // 개통확인 내역
-  db.ref(HUB + '/activation').on('value', snap => {
-    const d = snap.val() || {};
-    actDataList = Object.entries(d).map(([id, v]) => ({ id, ...v }))
-      .sort((a, b) => (b.ts || 0) - (a.ts || 0));
-    actListRender();
-    if (actDataList.some(x => x.status !== 'done')) actStartAlarm();
-  });
   // 문자발송 내역
   db.ref(HUB + '/smsLog').on('value', snap => {
     const d = snap.val() || {};
@@ -3722,14 +3565,6 @@ function renewalCopy(id, btn) {
   });
 }
 
-// ── 개통 내역 (Firebase) ─────────────────────────────
-let actvList = [];
-db.ref(HUB + '/activations').on('value', snap => {
-  const d = snap.val() || {};
-  actvList = Object.values(d).sort((a,b) => b.id - a.id);
-  actvRender();
-  actvPopulateMonths();
-});
 
 function actvPopulateMonths() {
   const sel = document.getElementById('actv-month-filter');
