@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>업무 서류 허브</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
   :root {
     --bg: #f0f2f5;
@@ -660,6 +663,123 @@
   .smslog-item { border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--bg); margin-bottom:8px; }
   .smslog-item.done { opacity:.65; }
 </style>
+<style id="theme-jeongsan">
+  /* ================= 정산노트 디자인 적용 (사용자 요청, 2026-10-13) — 기존 스타일 위에 덮어쓴다 ================= */
+  :root{
+    --bg:#F5F6F7; --panel:#FFFFFF; --ink:#171C1A; --ink-soft:#6B756F; --line:#E4E7E9; --no:#A3ACA7;
+    --navy:#0E7C74; --ok:#1E8E5A; --radius:14px;
+    --surface:#FFFFFF; --surface-2:#F5F6F7; --surface-3:#EEF0F1; --border:#E4E7E9; --border-strong:#D5D9DC;
+    --text:#171C1A; --text-muted:#6B756F;
+    --accent:#0E7C74; --accent-strong:#0A5F59; --accent-soft:#E7F5F3;
+    --good:#1E8E5A; --good-soft:#E7F6EE; --warn:#B9790E; --warn-soft:#FBF0DC; --bad:#C1443D; --bad-soft:#FBE7E5;
+    --shadow-sm:0 1px 2px rgba(23,28,26,0.05);
+    --shadow:0 1px 2px rgba(23,28,26,0.04), 0 6px 20px rgba(23,28,26,0.05);
+    --ring:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  body{ background:#fff; color:var(--text); font-family:"IBM Plex Sans KR","Pretendard","Malgun Gothic",sans-serif; font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+  button, input, select, textarea{ font-family:inherit; }
+  input[type=checkbox], input[type=radio]{ accent-color:var(--accent); }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  /* 상단 바 */
+  header{ background:var(--surface); border-bottom:1px solid var(--border); height:54px; padding:0 22px; }
+  header .logo{ display:flex; align-items:center; gap:10px; color:var(--text); font-size:15.5px; font-weight:700; letter-spacing:-0.01em; }
+  header .logo span{ color:inherit; }
+  header .logo .brand-mark{ width:30px; height:30px; border-radius:8px; background:linear-gradient(155deg,var(--accent),var(--accent-strong));
+    color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; box-shadow:var(--shadow-sm); }
+  header .logo .brand-tag{ font-size:10px; font-weight:700; color:var(--accent-strong); background:var(--accent-soft); padding:2px 6px; border-radius:5px; }
+  header .tool-link, .hdr-widget-btn, .btn-date, .btn-calc{ min-height:34px; display:inline-flex; align-items:center; gap:4px; padding:0 12px; border-radius:10px;
+    border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:12.5px; font-weight:600; box-shadow:0 1px 2px rgba(23,28,26,.06); }
+  header .tool-link:hover, .hdr-widget-btn:hover{ background:var(--surface-2); border-color:var(--border-strong); color:var(--text); opacity:1; }
+  .wd-date, .wd-calc{ background:#12302C; }
+  .cb-eq{ background:#3FCBBC; color:#0B1513; }
+
+  /* 메뉴 */
+  .tab-nav{ background:var(--surface); border-top:none; border-bottom:1px solid var(--border); top:54px; padding:6px 16px; gap:4px; align-items:center; overflow-x:auto; }
+  .tab-btn{ height:auto; padding:8px 12px; border:none; border-radius:9px; color:var(--text-muted); font-size:13.5px; font-weight:600; transition:background .12s ease, color .12s ease; }
+  .tab-btn:hover{ background:var(--surface-2); color:var(--text); }
+  .tab-btn.active{ background:var(--accent-soft); color:var(--accent-strong); border-bottom:none; }
+  .tab-nav > button:not(.tab-btn){ flex:none; min-height:32px; padding:0 11px !important; border-radius:9px !important; font-size:12px !important; font-weight:600 !important;
+    background:var(--surface) !important; color:var(--text-muted) !important; border:1px solid var(--border) !important; }
+  .tab-nav > button:not(.tab-btn):hover{ background:var(--surface-2) !important; color:var(--text) !important; }
+  #store-badge{ color:var(--accent-strong) !important; background:var(--accent-soft) !important; border-color:transparent !important; }
+
+  /* 본문 · 제목 */
+  main{ max-width:1200px; padding:26px 32px 60px; }
+  .section-head{ margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid var(--border); }
+  .section-head h2{ font-size:20px; font-weight:700; letter-spacing:-0.01em; }
+  .section-head p{ font-size:13px; color:var(--text-muted); margin-top:5px; }
+  @media (max-width:768px){ main{ padding:20px 16px 48px; } }
+
+  /* 통신사 서류 카드 */
+  .carrier-card{ border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow-sm); }
+  .carrier-card.sk{ --brand:var(--sk); } .carrier-card.kt{ --brand:var(--kt); } .carrier-card.ktm{ --brand:var(--ktm); }
+  .carrier-card.lg{ --brand:var(--lg); } .carrier-card.etc{ --brand:var(--etc); }
+  .carrier-card .head, .carrier-card.sk .head, .carrier-card.kt .head, .carrier-card.ktm .head, .carrier-card.lg .head, .carrier-card.etc .head{
+    background:var(--surface); color:var(--text); border-bottom:1px solid var(--border); padding:14px 16px; font-weight:700; }
+  .carrier-card .head::before{ content:""; width:10px; height:10px; border-radius:3px; background:var(--brand, var(--accent)); flex:none; margin-right:2px; }
+  .carrier-card .body{ padding:6px; }
+  .doc-row{ border-radius:10px; }
+  .doc-row:hover{ background:var(--surface-2); }
+  .doc-row:hover .title{ color:var(--accent-strong); }
+  .doc-row .dot{ background:var(--border-strong); }
+  .etc-info{ background:var(--surface-2); border-left-color:var(--border-strong); border-radius:10px; }
+
+  /* 버튼 */
+  .btn-add-card, .mbtn-ok, .pr-save-btn, .qr-submit-btn, .btn-share.add{ background:var(--accent); color:#fff; border:1px solid var(--accent); border-radius:10px; min-height:38px; padding:0 16px; font-weight:600;
+    box-shadow:0 1px 2px rgba(10,95,89,.25), 0 4px 12px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .btn-add-card:hover, .mbtn-ok:hover, .pr-save-btn:hover, .qr-submit-btn:hover:not(:disabled), .btn-share.add:hover{ background:var(--accent-strong); border-color:var(--accent-strong); }
+  .mbtn-no{ background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:10px; min-height:38px; padding:0 16px; font-weight:600; }
+  .mbtn-no:hover{ background:var(--surface-2); }
+  .btn-share{ border-radius:10px; min-height:38px; padding:0 14px; font-weight:600; }
+  .btn-share.exp, .btn-share.imp{ background:var(--surface); color:var(--text); border:1px solid var(--border); box-shadow:0 1px 2px rgba(23,28,26,.06); }
+  .btn-share.exp:hover, .btn-share.imp:hover{ background:var(--surface-2); }
+  .cbtn{ border-radius:8px; border-color:var(--border); padding:5px 10px; font-weight:600; }
+  .cbtn:hover{ background:var(--surface-2); }
+  .cbtn.write{ background:var(--accent); border-color:var(--accent); }
+  .cbtn.ok{ background:var(--good); border-color:var(--good); }
+  .cbtn.del{ color:var(--bad); border-color:color-mix(in srgb, var(--bad) 35%, transparent); }
+  .cbtn.del:hover{ background:var(--bad-soft); }
+
+  /* 필터 · 칩 */
+  .ftab, .sms-ftab, .smslog-cat, .smslog-type, .smslog-filter, .pol-view-btn{ padding:7px 14px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-weight:600; }
+  .ftab:hover, .sms-ftab:hover, .pol-view-btn:hover{ background:var(--surface-2); color:var(--text); }
+  .ftab.active, .sms-ftab.active, .smslog-cat.on, .smslog-type.on, .smslog-filter.on, .pol-view-btn.active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .policy-partner-btn{ border-radius:9px; }
+  .policy-partner-btn:hover{ background:var(--surface-2); }
+  .policy-partner-btn.active{ background:var(--accent-soft); color:var(--accent-strong); }
+  .policy-sidebar{ top:120px; border-radius:14px; }
+  .csub-btn.active{ color:var(--accent-strong); border-bottom-color:var(--accent); background:var(--accent-soft); }
+  .consult-sub-tabs{ border-bottom:1px solid var(--border); }
+
+  /* 통계 카드 · 표 */
+  .cstat{ border-radius:14px; border-color:var(--border); box-shadow:var(--shadow-sm); padding:14px 18px; }
+  .cstat .num{ font-family:"IBM Plex Mono","IBM Plex Sans KR",monospace; font-variant-numeric:tabular-nums; font-weight:600; }
+  .card-table-wrap, .consult-table-wrap, .pr-table-wrap, .qcmp-table-wrap{ border-radius:14px; border-color:var(--border); box-shadow:var(--shadow-sm); }
+  .card-table thead tr, .consult-table thead tr, .pr-table thead tr, .qcmp-table thead tr{ background:var(--surface-2); }
+  .card-table th, .consult-table th, .pr-table th, .qcmp-table th{ font-size:12px; font-weight:600; color:var(--text-muted); }
+  .card-table tr:hover td, .consult-table tr:hover td, .pr-table tr:hover td, .qcmp-table tr:hover td{ background:var(--accent-soft); }
+  .consult-mobile-card, .fav-card, .cred-card, .sms-task-card, .pol-entry-card, .pol-cmp-card, .pr-setup-card, .tg-panel, .up-card, .sms-task-input-wrap{
+    border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow-sm); }
+  .pr-setup-title{ color:var(--accent-strong); }
+  .pr-tag{ background:var(--accent-soft); color:var(--accent-strong); }
+  .pr-tag button{ color:var(--accent); }
+
+  /* 입력칸 */
+  .mrow input, .mrow select, .mrow textarea, .card-search-bar input, .fav-add-row input, .pr-name-input, .tg-input, .sms-task-input-wrap textarea, #card-month-filter{
+    border:1px solid var(--border); border-radius:10px; background-color:var(--surface); min-height:40px; transition:border-color .12s ease, box-shadow .12s ease; }
+  .mrow textarea, .sms-task-input-wrap textarea{ min-height:auto; }
+  .mrow input:focus, .mrow select:focus, .mrow textarea:focus, .card-search-bar input:focus, .fav-add-row input:focus, .pr-name-input:focus,
+  .tg-input:focus, .sms-task-input-wrap textarea:focus, .pol-price-input:focus, .qcmp-inp:focus{ outline:none; border-color:var(--accent); box-shadow:var(--ring); }
+  .mrow label{ font-size:12.5px; font-weight:600; color:var(--text-muted); }
+
+  /* 팝업 */
+  .modal-bg{ background:rgba(15,20,18,0.45); }
+  .modal{ border-radius:16px; box-shadow:0 12px 32px rgba(23,28,26,0.18); }
+  .modal-head{ border-bottom-color:var(--border); }
+  .modal-head h2{ font-size:16px; font-weight:700; }
+  .modal-foot{ border-top-color:var(--border); }
+</style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -672,7 +792,7 @@
 <body>
 
 <header>
-  <div class="logo">업무 서류 <span>허브</span></div>
+  <div class="logo"><span class="brand-mark">허</span>업무 서류 허브</div>
   <div class="hdr-tools">
 
     <!-- 날짜 계산기 -->
@@ -2672,15 +2792,18 @@
         <div class="mrow"><label>고객명</label><input type="text" id="cf-name" placeholder="홍길동"></div>
         <div class="mrow"><label>전화번호</label><input type="text" id="cf-phone" placeholder="010-0000-0000"></div>
       </div>
+      <div style="margin:2px 0 8px;padding:8px 10px;background:#eff6ff;border-radius:8px;border-left:3px solid #3b82f6;font-size:12px;font-weight:700;color:#1e3a8a;">
+        🔒 카드번호 · 유효기간 · 주민번호는 서류 작성(인쇄)에만 쓰고 저장하지 않습니다. 새로고침하거나 창을 닫으면 지워집니다.
+      </div>
       <div class="two-col">
-        <div class="mrow"><label>주민번호 (앞 6자리)</label><input type="text" id="cf-ssn" placeholder="000000" maxlength="6"></div>
+        <div class="mrow"><label>주민번호 (앞 6자리) 🔒</label><input type="text" id="cf-ssn" placeholder="000000" maxlength="6" autocomplete="off"></div>
         <div class="mrow"><label>카드사</label><input type="text" id="cf-issuer" placeholder="신한/삼성/현대/국민..."></div>
       </div>
       <div class="two-col">
-        <div class="mrow"><label>카드번호</label><input type="text" id="cf-card" placeholder="0000-0000-0000-0000"></div>
+        <div class="mrow"><label>카드번호 🔒</label><input type="text" id="cf-card" placeholder="0000-0000-0000-0000" autocomplete="off"></div>
       </div>
       <div class="two-col">
-        <div class="mrow"><label>유효기간</label><input type="text" id="cf-expiry" placeholder="MM/YY" maxlength="5"></div>
+        <div class="mrow"><label>유효기간 🔒</label><input type="text" id="cf-expiry" placeholder="MM/YY" maxlength="5" autocomplete="off"></div>
         <div class="mrow"><label>자동이체</label>
           <select id="cf-autodebit">
             <option value="">미선택</option>
@@ -2708,7 +2831,7 @@
         <div style="font-size:11px;font-weight:800;color:#92400e;margin-bottom:6px;">💳 카드주 정보 (고객과 다를 경우 입력)</div>
         <div class="two-col">
           <div class="mrow"><label>카드주 이름</label><input type="text" id="cf-card-name" placeholder="카드주 성명"></div>
-          <div class="mrow"><label>카드주 주민번호 (앞 6자리)</label><input type="text" id="cf-card-ssn" placeholder="000000" maxlength="6"></div>
+          <div class="mrow"><label>카드주 주민번호 (앞 6자리) 🔒</label><input type="text" id="cf-card-ssn" placeholder="000000" maxlength="6" autocomplete="off"></div>
         </div>
       </div>
       <div class="mrow"><label>특이사항</label><textarea id="cf-note" rows="2" placeholder="메모..."></textarea></div>
@@ -2851,8 +2974,8 @@ function setupFirebaseSync() {
   // 제휴카드
   db.ref(HUB + '/cards').on('value', snap => {
     const d = snap.val() || {};
-    cardList = Object.values(d).sort((a, b) => Number(b.id) - Number(a.id));
-    try { localStorage.setItem('card_issuance_list', JSON.stringify(cardList)); } catch(e) {}
+    cardList = Object.values(d).sort((a, b) => Number(b.id) - Number(a.id)).map(cardStrip); // 예전에 저장된 카드번호도 화면·저장소에 안 씀
+    cardStoreLocal();
     cardRender();
   });
   // 업무 ID/PW
@@ -3226,6 +3349,28 @@ const CARD_URLS = { SKT:'SK/sk_변경신청서_카드_작성.html', KT:'KT/kt_�
 const CARD_CLS  = { SKT:'csk', KT:'ckt', KTM:'cktm', LG:'clg' };
 
 let cardList        = [];
+// 🔒 Firebase 정지(2026-10, DB 민감정보 검사) 대응: 카드번호·유효기간·주민번호는 DB·브라우저 저장소에 넣지 않는다.
+//    이 탭 메모리(cardSecret)에만 두고, 서류 작성 창을 열 때만 잠깐 넘겼다가 지운다.
+const CARD_SECRET_KEYS = ['카드번호', '유효기간', '주민번호', '카드주주민번호'];
+const cardSecret = {};
+// 메모·상담내용에 적은 카드번호(13~19자리, Luhn 검사 통과)는 끝 4자리만 남기고 가림
+function maskCardNumbers(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/(?:\d[ -]?){13,19}/g, m => {
+    const d = m.replace(/\D/g, '');
+    if (d.length < 13 || d.length > 19) return m;
+    let sum = 0, alt = false;
+    for (let i = d.length - 1; i >= 0; i--) { let n = +d[i]; if (alt) { n *= 2; if (n > 9) n -= 9; } sum += n; alt = !alt; }
+    return sum % 10 === 0 ? '****-' + d.slice(-4) : m;
+  });
+}
+function cardStrip(e) { const o = Object.assign({}, e); CARD_SECRET_KEYS.forEach(k => delete o[k]); return o; }
+function cardStoreLocal() {
+  try {
+    localStorage.setItem('card_issuance_list', JSON.stringify(cardList.map(cardStrip)));
+    Object.keys(localStorage).filter(k => k.indexOf('card_entry_') === 0).forEach(k => localStorage.removeItem(k));
+  } catch(e) {}
+}
 let cardFilter      = '전체';
 let cardSearch      = '';
 let cardMonthFilter = '';
@@ -3289,8 +3434,8 @@ function cardRender() {
       <td><strong>${e.고객명||'-'}</strong></td>
       <td><span class="cbadge ${cls}">${e.통신사}</span></td>
       <td>${e.전화번호||'-'}</td>
-      <td>${e.주민번호||'-'}</td>
-      <td>${e.카드번호||'-'}${e.유효기간||e.결제금액||e.개월수?`<br><small style="color:#6b7280">${[e.유효기간,e.결제금액?(e.결제금액+'원'):'',e.개월수].filter(Boolean).join(' · ')}</small>`:''}</td>
+      <td>${cardSecret[e.id]?.주민번호 ? '🔒 입력됨' : '-'}</td>
+      <td>${[e.카드사, cardSecret[e.id]?.카드번호 ? '🔒 카드번호 입력됨' : ''].filter(Boolean).join(' · ') || '-'}${e.결제금액||e.개월수?`<br><small style="color:#6b7280">${[e.결제금액?(e.결제금액+'원'):'',e.개월수].filter(Boolean).join(' · ')}</small>`:''}</td>
       <td style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${e.특이사항||''}">${e.특이사항||'-'}</td>
       <td><span class="cbadge ${isDone?'done':'pend'}">${e.상태}</span></td>
       <td>${e.처리완료날짜||'-'}</td>
@@ -3318,8 +3463,13 @@ document.querySelectorAll('.ftab').forEach(tab => {
 function cardOpenDoc(id) {
   const e = cardList.find(x => x.id === id); if (!e) return;
   const url = CARD_URLS[e.통신사]; if (!url) return;
-  try { localStorage.setItem('card_entry_' + id, JSON.stringify(e)); } catch(_){}
+  const full = Object.assign(cardStrip(e), cardSecret[id] || {});
+  try {
+    localStorage.setItem('card_entry_' + id, JSON.stringify(full));
+    localStorage.setItem('card_issuance_list', JSON.stringify(cardList.map(x => x.id === id ? full : cardStrip(x))));
+  } catch(_){}
   window.open(`${url}?id=${id}`, 'workarea');
+  setTimeout(cardStoreLocal, 5000); // 서류 창이 읽고 나면 카드번호 지움
 }
 function cardMarkDone(id) {
   const e = cardList.find(x => x.id === id); if (!e) return;
@@ -3341,15 +3491,15 @@ function cardOpenModal(id = null) {
   document.getElementById('cf-carrier').value = e?.통신사    || 'SKT';
   document.getElementById('cf-name').value    = e?.고객명    || '';
   document.getElementById('cf-phone').value   = e?.전화번호  || '010-';
-  document.getElementById('cf-ssn').value     = e?.주민번호  || '';
+  document.getElementById('cf-ssn').value = (id && cardSecret[id]?.주민번호) || '';
   document.getElementById('cf-issuer').value  = e?.카드사    || '';
-  document.getElementById('cf-card').value    = e?.카드번호  || '';
-  document.getElementById('cf-expiry').value    = e?.유효기간  || '';
+  document.getElementById('cf-card').value = (id && cardSecret[id]?.카드번호) || '';
+  document.getElementById('cf-expiry').value = (id && cardSecret[id]?.유효기간) || '';
   document.getElementById('cf-autodebit').value = e?.자동이체  || '';
   document.getElementById('cf-amount').value    = e?.결제금액  || '';
   document.getElementById('cf-months').value    = e?.개월수    || '';
   document.getElementById('cf-card-name').value = e?.카드주이름     || '';
-  document.getElementById('cf-card-ssn').value  = e?.카드주주민번호 || '';
+  document.getElementById('cf-card-ssn').value = (id && cardSecret[id]?.카드주주민번호) || '';
   document.getElementById('cf-note').value      = e?.특이사항  || '';
   document.getElementById('card-modal-bg').classList.add('open');
   setTimeout(() => document.getElementById('cf-name').focus(), 80);
@@ -3376,11 +3526,13 @@ function cardSaveEntry() {
     개월수:       document.getElementById('cf-months').value,
     카드주이름:   document.getElementById('cf-card-name').value.trim(),
     카드주주민번호: document.getElementById('cf-card-ssn').value.trim(),
-    특이사항:     document.getElementById('cf-note').value.trim(),
+    특이사항:     maskCardNumbers(document.getElementById('cf-note').value.trim()),
     상태:         prev?.상태 || '대기중',
     처리완료날짜: prev?.처리완료날짜 || '',
   };
-  db.ref(HUB + '/cards/' + entry.id).set(entry);
+  cardSecret[entry.id] = {};
+  CARD_SECRET_KEYS.forEach(k => { if (entry[k]) cardSecret[entry.id][k] = entry[k]; });
+  db.ref(HUB + '/cards/' + entry.id).set(cardStrip(entry)); // 🔒 카드번호·유효기간·주민번호는 DB에 안 올림
   cardCloseModal();
 }
 document.getElementById('card-modal-bg').addEventListener('click', e => {
@@ -6427,10 +6579,10 @@ function consultSaveEntry() {
     penalty:  document.getElementById('cs-penalty').value.trim(),
     agent:        document.getElementById('cs-agent').value.trim(),
     scheduleDate:   document.getElementById('cs-schedule-date').value   || '',
-    scheduleNote:   document.getElementById('cs-schedule-note').value.trim(),
+    scheduleNote:   maskCardNumbers(document.getElementById('cs-schedule-note').value.trim()),
     scheduleDate2:  document.getElementById('cs-schedule-date2').value  || '',
-    scheduleNote2:  document.getElementById('cs-schedule-note2').value.trim(),
-    content:        document.getElementById('cs-content').value.trim(),
+    scheduleNote2:  maskCardNumbers(document.getElementById('cs-schedule-note2').value.trim()),
+    content:        maskCardNumbers(document.getElementById('cs-content').value.trim()),
   };
   if (prev?.done) entry.done = prev.done;  // 완료된 항목 수정 시 done 상태 보존
   db.ref(HUB + '/consultations/' + entry.id).set(entry);
@@ -6811,19 +6963,17 @@ document.getElementById('consult-modal-bg').addEventListener('click', e => {
 
 function exportConsultExcel() {
   if (!consultList.length) { alert('내보낼 데이터가 없습니다.'); return; }
-  const headers = ['상담일시','고객명','전화번호','현통신사','주민번호앞자리','잔여할부/위약금','상담내용','담당자'];
-  function esc(v) {
-    const s = (v===null||v===undefined)?'':String(v);
-    if (s.includes(',')||s.includes('"')||s.includes('\n')) return '"'+s.replace(/"/g,'""')+'"';
-    return s;
-  }
-  const rows = consultList.map(e => [e.datetime,e.name,e.phone,e.carrier,e.ssn,e.penalty,e.content,e.agent].map(esc).join(','));
-  const csv  = '﻿' + headers.join(',') + '\n' + rows.join('\n');
-  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
-  const url  = URL.createObjectURL(blob);
-  const today = new Date().toISOString().slice(0,10);
-  const a = document.createElement('a'); a.href=url; a.download=`공유업무_${today}.csv`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  const headers = ['상담일시','고객명','전화번호','현통신사','주민번호앞자리','자동이체','결제금액','개월수','잔여할부/위약금','상담내용','담당자','완료여부'];
+  const rows = consultList.map(e => [
+    e.datetime||'', e.name||'', e.phone||'', e.carrier||'', e.ssn||'',
+    e.자동이체||'', e.결제금액||'', e.개월수||'',
+    e.penalty||'', e.content||'', e.agent||'', e.done?'완료':'미완료'
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws['!cols'] = headers.map((_,i) => ({ wch: [18,12,14,10,14,18,10,10,10,8,14,30,10,8][i]||12 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '공유업무');
+  XLSX.writeFile(wb, `공유업무_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
 function exportConsultJSON() {
@@ -6844,7 +6994,11 @@ function importConsultJSON(input) {
       if (!Array.isArray(imported)) throw new Error('형식 오류');
       const existIds = new Set(consultList.map(e => e.id));
       const newItems = imported.filter(e => !existIds.has(e.id));
-      newItems.forEach(item => db.ref(HUB + '/consultations/' + item.id).set(item));
+      newItems.forEach(item => {
+        const o = Object.assign({}, item); delete o.카드번호; delete o.유효기간; // 🔒 카드 정보는 DB에 안 올림
+        ['content', 'scheduleNote', 'scheduleNote2', 'penalty'].forEach(k => { if (o[k]) o[k] = maskCardNumbers(o[k]); });
+        db.ref(HUB + '/consultations/' + item.id).set(o);
+      });
       alert(`✅ ${newItems.length}건 추가됨 (중복 ${imported.length - newItems.length}건 제외)`);
     } catch { alert('파일 형식이 올바르지 않습니다.'); }
     input.value = '';
@@ -6857,29 +7011,17 @@ consultRender();
 /* ===== 엑셀 내보내기 ===== */
 function exportExcel() {
   if (!cardList.length) { alert('내보낼 데이터가 없습니다.'); return; }
-
-  const headers = ['가입날짜','고객명','통신사','전화번호','주민번호','카드번호','유효기간','자동이체','결제금액(원)','개월수','특이사항','상태','처리완료날짜'];
-
-  function esc(v) {
-    const s = (v === null || v === undefined) ? '' : String(v);
-    if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
-    return s;
-  }
-
+  const headers = ['가입날짜','고객명','통신사','전화번호','카드사','자동이체','결제금액','개월수','특이사항','상태','처리완료날짜'];
   const rows = cardList.map(e => [
-    e.가입날짜, e.고객명, e.통신사, e.전화번호,
-    e.주민번호, e.카드번호, e.유효기간, e.자동이체,
-    e.결제금액, e.개월수, e.특이사항, e.상태, e.처리완료날짜
-  ].map(esc).join(','));
-
-  const csv = '﻿' + headers.join(',') + '\n' + rows.join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url  = URL.createObjectURL(blob);
-  const today = new Date().toISOString().slice(0,10);
-  const a = document.createElement('a');
-  a.href = url; a.download = `제휴카드발급현황_${today}.csv`;
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+    e.가입날짜||'', e.고객명||'', e.통신사||'', e.전화번호||'',
+    e.카드사||'', e.자동이체||'',
+    e.결제금액||'', e.개월수||'', e.특이사항||'', e.상태||'', e.처리완료날짜||''
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws['!cols'] = [10,12,8,14,10,10,12,8,16,10,12].map(wch => ({ wch }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '제휴카드발급현황');
+  XLSX.writeFile(wb, `제휴카드발급현황_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
 // ── 엑셀 분석 ─────────────────────────────────────────────────────
